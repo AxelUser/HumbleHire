@@ -1,38 +1,26 @@
-# sv
+# HumbleHire - A humble set of tools to just make your job seeking stress free (I hope)
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Hi there! Probably you are here because you are looking for a job. I know how stressful it can be, even if you are a senior specialist. This project contains a set of tools that may help you in this routine.
 
-## Creating a project
+## Tools
 
-If you're seeing this, you've probably already done this step. Congrats!
+- [ ] A configurable LinkedIn® banner generator to display your skills and experience.
+- [ ] A LinkedIn® profile image cover generator to make your profile stand out.
+- [ ] A resume builder with markdown support, where you can adapt your master resume to the job you are applying for.
 
-```bash
-# create a new project in the current directory
-npx sv create
+This project is not affiliated with LinkedIn®.
 
-# create a new project in my-app
-npx sv create my-app
-```
+## Tech Stack
 
-## Developing
+- Svelte 5
+- SvelteKit
+- TailwindCSS
+- Shadcn UI
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
 
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
+## Development
 
 ```bash
-npm run build
+pnpm install
+pnpm run dev
 ```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
