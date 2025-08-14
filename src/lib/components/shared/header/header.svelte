@@ -9,6 +9,9 @@
 				<NavigationMenu.Item>
 					<NavigationMenu.Link href="/">Home</NavigationMenu.Link>
 				</NavigationMenu.Item>
+				<NavigationMenu.Item>
+					<NavigationMenu.Link href="/banner-generator">Banner Generator</NavigationMenu.Link>
+				</NavigationMenu.Item>
 			</NavigationMenu.List>
 		</NavigationMenu.Root>
 	</div>
