@@ -10,8 +10,8 @@ const config = {
 	kit: {
 		adapter: adapter(),
 		alias: {
-			'@ui/*': 'src/lib/components/ui/*',
-			'@ui': 'src/lib/components/ui'
+			'@ui': 'src/lib/components/ui',
+			'@shared': 'src/lib/components/shared'
 		}
 	}
 };
