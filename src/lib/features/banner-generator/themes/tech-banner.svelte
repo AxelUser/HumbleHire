@@ -2,11 +2,12 @@
 	import { onMount } from 'svelte';
 	import { Label } from '@ui/label';
 	import { Slider } from '@ui/slider';
-	import { buttonVariants } from '@ui/button';
+	import { Button, buttonVariants } from '@ui/button';
 	import * as Select from '@ui/select';
 	import ColorPicker from 'svelte-awesome-color-picker';
 	import Input from '@ui/input/input.svelte';
 	import * as ToggleGroup from '@ui/toggle-group';
+	import { PlusIcon } from '@lucide/svelte';
 
 	let { ctx, width, height } = $props<{
 		ctx: CanvasRenderingContext2D;
@@ -69,6 +70,9 @@
 
 	let iconFiles = $state<File[]>([]);
 	let iconUrls = $state<string[]>([]);
+	let fileInputEl: HTMLInputElement | null = null;
+	const MAX_ICONS = 12;
+	const CANVAS_PADDING = 48;
 
 	function setBackground() {
 		if (!ctx) return;
@@ -99,7 +103,7 @@
 		ctx.textBaseline = 'top';
 		ctx.textAlign = 'right';
 
-		const padding = 48;
+		const padding = CANVAS_PADDING;
 		const titleX = width - padding;
 		const titleY = padding;
 
@@ -126,7 +130,7 @@
 
 	async function drawIcons() {
 		if (!ctx || iconUrls.length === 0) return;
-		const padding = 32;
+		const padding = CANVAS_PADDING;
 		const areaWidth = Math.min(width * 0.6, 800);
 		const areaX = width - padding - areaWidth;
 		const iconSize = 48;
@@ -165,8 +169,16 @@
 	function onFilesSelected(event: Event) {
 		const input = event.target as HTMLInputElement;
 		if (!input.files) return;
-		iconFiles = Array.from(input.files);
-		iconUrls = iconFiles.map((f) => URL.createObjectURL(f));
+		const allowed = Math.max(0, MAX_ICONS - iconFiles.length);
+		if (allowed <= 0) {
+			input.value = '';
+			return;
+		}
+		const filesToAdd = Array.from(input.files).slice(0, allowed);
+		const urlsToAdd = filesToAdd.map((f) => URL.createObjectURL(f));
+		iconFiles = [...iconFiles, ...filesToAdd];
+		iconUrls = [...iconUrls, ...urlsToAdd];
+		input.value = '';
 	}
 
 	function removeIcon(index: number) {
@@ -326,14 +338,20 @@
 
 	<div class="space-y-2">
 		<Label for="icons">Icons</Label>
-		<Input
+		<input
 			id="icons"
-			class="w-96"
+			class="hidden"
 			type="file"
 			accept="image/*"
 			multiple
+			bind:this={fileInputEl}
 			onchange={onFilesSelected}
 		/>
+		<Button
+			type="button"
+			onclick={() => fileInputEl?.click()}
+			disabled={iconUrls.length >= MAX_ICONS}><PlusIcon /> Add icons</Button
+		>
 	</div>
 
 	{#if iconUrls.length > 0}
