@@ -3,6 +3,7 @@
 	import { Card, CardContent, CardHeader, CardTitle } from '@ui/card';
 	import TechBanner from '$lib/features/banner-generator/themes/tech-banner.svelte';
 	import { Button } from '@ui/button';
+	import { SEO } from '@shared/seo';
 	let canvasEl: HTMLCanvasElement | null = null;
 	let ctx: CanvasRenderingContext2D | null = null;
 
@@ -26,10 +27,12 @@
 		const url = canvasEl.toDataURL('image/png');
 		const a = document.createElement('a');
 		a.href = url;
-		a.download = 'banner.png';
+		a.download = `banner-${new Date().toISOString()}.png`;
 		a.click();
 	}
 </script>
+
+<SEO title="Banner Generator" description="Generate a banner for your LinkedIn profile" />
 
 <section class="mx-auto max-w-5xl space-y-4">
 	<Card>
@@ -48,7 +51,7 @@
 
 	<Card>
 		<CardHeader>
-			<CardTitle>Tech Banner Controls</CardTitle>
+			<CardTitle>Settings</CardTitle>
 		</CardHeader>
 		<CardContent>
 			{#if ctx}

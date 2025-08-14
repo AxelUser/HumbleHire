@@ -26,7 +26,7 @@
 	let gradientAngle = $state(45);
 
 	let title = $state('John Doe');
-	let titleColor = $state('#ffffff');
+	let titleColor = $state('#f9f9f9');
 	let titleSize = $state(64);
 
 	let subtitle = $state('Software Engineer');
