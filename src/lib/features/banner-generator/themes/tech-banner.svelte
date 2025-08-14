@@ -4,6 +4,7 @@
 	import { Slider } from '@ui/slider';
 	import { buttonVariants } from '@ui/button';
 	import * as Select from '@ui/select';
+	import ColorPicker from 'svelte-awesome-color-picker';
 
 	let { ctx, width, height } = $props<{
 		ctx: CanvasRenderingContext2D;
@@ -178,31 +179,16 @@
 		{#if colorMode === 'Solid'}
 			<div class="space-y-2">
 				<Label for="solid">Color</Label>
-				<input
-					id="solid"
-					class="bg-background h-9 w-full rounded-md border px-3 py-2"
-					type="color"
-					bind:value={solidColor}
-				/>
+				<ColorPicker bind:hex={solidColor} name="solid" label="Choose a color" />
 			</div>
 		{:else}
 			<div class="space-y-2">
 				<Label for="from">From</Label>
-				<input
-					id="from"
-					class="bg-background h-9 w-full rounded-md border px-3 py-2"
-					type="color"
-					bind:value={gradientFrom}
-				/>
+				<ColorPicker bind:hex={gradientFrom} name="from" label="From" />
 			</div>
 			<div class="space-y-2">
 				<Label for="to">To</Label>
-				<input
-					id="to"
-					class="bg-background h-9 w-full rounded-md border px-3 py-2"
-					type="color"
-					bind:value={gradientTo}
-				/>
+				<ColorPicker bind:hex={gradientTo} name="to" label="To" />
 			</div>
 			<div class="space-y-2">
 				<Label>Angle ({gradientAngle}°)</Label>
@@ -223,12 +209,7 @@
 		</div>
 		<div class="space-y-2">
 			<Label for="titleColor">Title Color</Label>
-			<input
-				id="titleColor"
-				class="bg-background h-9 w-full rounded-md border px-3 py-2"
-				type="color"
-				bind:value={titleColor}
-			/>
+			<ColorPicker bind:hex={titleColor} name="titleColor" label="Title color" />
 		</div>
 		<div class="space-y-2">
 			<Label for="titleSize">Title Size</Label>
@@ -255,12 +236,7 @@
 		</div>
 		<div class="space-y-2">
 			<Label for="subtitleColor">Subtitle Color</Label>
-			<input
-				id="subtitleColor"
-				class="bg-background h-9 w-full rounded-md border px-3 py-2"
-				type="color"
-				bind:value={subtitleColor}
-			/>
+			<ColorPicker bind:hex={subtitleColor} name="subtitleColor" label="Subtitle color" />
 		</div>
 		<div class="space-y-2">
 			<Label for="subtitleSize">Subtitle Size</Label>
