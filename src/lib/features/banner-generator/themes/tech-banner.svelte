@@ -5,6 +5,7 @@
 	import { buttonVariants } from '@ui/button';
 	import * as Select from '@ui/select';
 	import ColorPicker from 'svelte-awesome-color-picker';
+	import Input from '@ui/input/input.svelte';
 
 	let { ctx, width, height } = $props<{
 		ctx: CanvasRenderingContext2D;
@@ -14,6 +15,10 @@
 
 	type ColorMode = 'Solid' | 'Gradient';
 	let colorMode: ColorMode = $state('Solid');
+	const colorModeOptions = new Map<ColorMode, string>([
+		['Solid', 'Solid color'],
+		['Gradient', 'Gradient color']
+	]);
 
 	let solidColor = $state('#0ea5e9');
 	let gradientFrom = $state('#0ea5e9');
@@ -161,101 +166,82 @@
 <div class="space-y-6">
 	<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 		<div class="space-y-2">
-			<Label for="mode">Color Type</Label>
+			<Label for="mode">Background</Label>
 			<Select.Root type="single" bind:value={colorMode}>
 				<Select.Trigger
 					data-placeholder="Select a color type"
-					class="bg-background w-full rounded-md border px-3 py-2"
+					class="w-fit rounded-md border px-3 py-2"
 				>
-					{colorMode}
+					{colorModeOptions.get(colorMode)}
 				</Select.Trigger>
 				<Select.Content>
-					<Select.Item value="Solid" label="Solid" />
-					<Select.Item value="Gradient" label="Gradient" />
+					{#each colorModeOptions.entries() as [value, label]}
+						<Select.Item {value} {label} />
+					{/each}
 				</Select.Content>
 			</Select.Root>
 		</div>
 
 		{#if colorMode === 'Solid'}
-			<div class="space-y-2">
-				<Label for="solid">Color</Label>
+			<div class="mt-auto">
 				<ColorPicker bind:hex={solidColor} name="solid" label="Choose a color" />
 			</div>
 		{:else}
-			<div class="space-y-2">
-				<Label for="from">From</Label>
-				<ColorPicker bind:hex={gradientFrom} name="from" label="From" />
-			</div>
-			<div class="space-y-2">
-				<Label for="to">To</Label>
-				<ColorPicker bind:hex={gradientTo} name="to" label="To" />
-			</div>
-			<div class="space-y-2">
-				<Label>Angle ({gradientAngle}°)</Label>
-				<Slider type="single" bind:value={gradientAngleValue} min={0} max={360} step={1} />
+			<div class="flex flex-wrap items-end gap-4">
+				<div class="space-y-2">
+					<ColorPicker bind:hex={gradientFrom} name="from" label="From" />
+				</div>
+				<div class="space-y-2">
+					<ColorPicker bind:hex={gradientTo} name="to" label="To" />
+				</div>
+				<div class="min-w-1/2 space-y-2">
+					<Label>Angle ({gradientAngle}°)</Label>
+					<Slider type="single" bind:value={gradientAngleValue} min={0} max={360} step={1} />
+				</div>
 			</div>
 		{/if}
 	</div>
 
 	<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-		<div class="space-y-2">
-			<Label for="title">Title</Label>
-			<input
-				id="title"
-				class="bg-background h-9 w-full rounded-md border px-3 py-2"
-				placeholder="e.g. your name"
-				bind:value={title}
-			/>
+		<div class="flex flex-col space-y-2">
+			<Label>Title</Label>
+			<div class="flex items-center gap-2">
+				<ColorPicker bind:hex={titleColor} name="titleColor" label="Color" />
+				<Input id="title" placeholder="e.g. your name" bind:value={title} />
+			</div>
 		</div>
 		<div class="space-y-2">
-			<Label for="titleColor">Title Color</Label>
-			<ColorPicker bind:hex={titleColor} name="titleColor" label="Title color" />
-		</div>
-		<div class="space-y-2">
-			<Label for="titleSize">Title Size</Label>
-			<input
-				id="titleSize"
-				class="bg-background h-9 w-full rounded-md border px-3 py-2"
-				type="number"
-				min="10"
-				max="200"
-				bind:value={titleSize}
-			/>
+			<Label for="titleSize">Size</Label>
+			<Input id="titleSize" class="w-16" type="number" min="10" max="200" bind:value={titleSize} />
 		</div>
 	</div>
 
 	<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-		<div class="space-y-2">
-			<Label for="subtitle">Subtitle</Label>
-			<input
-				id="subtitle"
-				class="bg-background h-9 w-full rounded-md border px-3 py-2"
-				placeholder="e.g. you role"
-				bind:value={subtitle}
-			/>
+		<div class="flex flex-col space-y-2">
+			<Label>Subtitle</Label>
+			<div class="flex items-center gap-2">
+				<ColorPicker bind:hex={subtitleColor} name="subtitleColor" label="Color" />
+				<Input id="subtitle" placeholder="e.g. your role" bind:value={subtitle} />
+			</div>
 		</div>
 		<div class="space-y-2">
-			<Label for="subtitleColor">Subtitle Color</Label>
-			<ColorPicker bind:hex={subtitleColor} name="subtitleColor" label="Subtitle color" />
-		</div>
-		<div class="space-y-2">
-			<Label for="subtitleSize">Subtitle Size</Label>
-			<input
+			<Label for="subtitleSize">Size</Label>
+			<Input
 				id="subtitleSize"
-				class="bg-background h-9 w-full rounded-md border px-3 py-2"
+				class="w-16"
 				type="number"
-				min="8"
-				max="180"
+				min="10"
+				max="200"
 				bind:value={subtitleSize}
 			/>
 		</div>
 	</div>
 
 	<div class="space-y-2">
-		<Label for="icons">Tech Icons</Label>
-		<input
+		<Label for="icons">Icons</Label>
+		<Input
 			id="icons"
-			class="bg-background h-9 w-full rounded-md border px-3 py-2"
+			class="w-96"
 			type="file"
 			accept="image/*"
 			multiple

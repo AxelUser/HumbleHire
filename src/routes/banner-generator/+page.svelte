@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { buttonVariants } from '@ui/button';
 	import { Card, CardContent, CardHeader, CardTitle } from '@ui/card';
 	import TechBanner from '$lib/features/banner-generator/themes/tech-banner.svelte';
-
+	import { Button } from '@ui/button';
 	let canvasEl: HTMLCanvasElement | null = null;
 	let ctx: CanvasRenderingContext2D | null = null;
 
@@ -42,10 +41,7 @@
 				<canvas bind:this={canvasEl} class="mx-auto block h-auto w-full max-w-full"></canvas>
 			</div>
 			<div class="flex justify-end">
-				<button
-					class={buttonVariants({ variant: 'default', size: 'default' })}
-					onclick={downloadPng}>Download PNG</button
-				>
+				<Button onclick={downloadPng}>Download PNG</Button>
 			</div>
 		</CardContent>
 	</Card>
