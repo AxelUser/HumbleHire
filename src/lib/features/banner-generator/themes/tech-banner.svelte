@@ -23,16 +23,41 @@
 	let solidColor = $state('#0ea5e9');
 	let gradientFrom = $state('#0ea5e9');
 	let gradientTo = $state('#6366f1');
-	let gradientAngleValue = $state(45);
-	const gradientAngle = $derived(gradientAngleValue ?? 0);
+	let gradientAngle = $state(45);
 
-	let title = $state('');
+	let title = $state('John Doe');
 	let titleColor = $state('#ffffff');
 	let titleSize = $state(64);
 
-	let subtitle = $state('');
+	let subtitle = $state('Software Engineer');
 	let subtitleColor = $state('#e5e7eb');
 	let subtitleSize = $state(32);
+
+	type FontFamily =
+		| 'Inter'
+		| 'Roboto'
+		| 'Montserrat'
+		| 'Poppins'
+		| 'Playfair Display'
+		| 'Merriweather'
+		| 'JetBrains Mono'
+		| 'system-ui'
+		| 'serif'
+		| 'monospace';
+
+	let fontFamily: FontFamily = $state('Inter');
+	const fontOptions = new Map<FontFamily, string>([
+		['Inter', 'Inter'],
+		['Roboto', 'Roboto'],
+		['Montserrat', 'Montserrat'],
+		['Poppins', 'Poppins'],
+		['Playfair Display', 'Playfair Display'],
+		['Merriweather', 'Merriweather'],
+		['JetBrains Mono', 'JetBrains Mono'],
+		['system-ui', 'System UI'],
+		['serif', 'Serif'],
+		['monospace', 'Monospace']
+	]);
 
 	let iconFiles = $state<File[]>([]);
 	let iconUrls = $state<string[]>([]);
@@ -71,12 +96,18 @@
 		const titleY = padding;
 
 		ctx.fillStyle = titleColor;
-		ctx.font = `${titleSize}px Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`;
+		const isGenericTitle =
+			fontFamily === 'system-ui' || fontFamily === 'serif' || fontFamily === 'monospace';
+		const familyForCanvasTitle = isGenericTitle ? fontFamily : `"${fontFamily}"`;
+		ctx.font = `${titleSize}px ${familyForCanvasTitle}, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`;
 		if (title) ctx.fillText(title, titleX, titleY, width * 0.8);
 
 		const subtitleY = titleY + titleSize + 12;
 		ctx.fillStyle = subtitleColor;
-		ctx.font = `${subtitleSize}px Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`;
+		const isGenericSubtitle =
+			fontFamily === 'system-ui' || fontFamily === 'serif' || fontFamily === 'monospace';
+		const familyForCanvasSubtitle = isGenericSubtitle ? fontFamily : `"${fontFamily}"`;
+		ctx.font = `${subtitleSize}px ${familyForCanvasSubtitle}, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`;
 		if (subtitle) ctx.fillText(subtitle, titleX, subtitleY, width * 0.8);
 	}
 
@@ -160,6 +191,11 @@
 
 	onMount(() => {
 		void redraw();
+		if (typeof document !== 'undefined' && (document as any).fonts?.ready) {
+			(document as any).fonts.ready.then(() => {
+				void redraw();
+			});
+		}
 	});
 </script>
 
@@ -196,10 +232,26 @@
 				</div>
 				<div class="min-w-1/2 space-y-2">
 					<Label>Angle ({gradientAngle}°)</Label>
-					<Slider type="single" bind:value={gradientAngleValue} min={0} max={360} step={1} />
+					<Slider type="single" bind:value={gradientAngle} min={0} max={360} step={1} />
 				</div>
 			</div>
 		{/if}
+	</div>
+
+	<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+		<div class="space-y-2">
+			<Label for="font">Font</Label>
+			<Select.Root type="single" bind:value={fontFamily}>
+				<Select.Trigger data-placeholder="Select a font" class="w-fit rounded-md border px-3 py-2">
+					{fontOptions.get(fontFamily)}
+				</Select.Trigger>
+				<Select.Content>
+					{#each fontOptions.entries() as [value, label]}
+						<Select.Item {value} {label} />
+					{/each}
+				</Select.Content>
+			</Select.Root>
+		</div>
 	</div>
 
 	<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
