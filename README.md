@@ -17,7 +17,6 @@ This project is not affiliated with LinkedIn®.
 - TailwindCSS
 - Shadcn UI
 
-
 ## Development
 
 ```bash
