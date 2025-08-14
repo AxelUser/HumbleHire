@@ -6,6 +6,7 @@
 	import * as Select from '@ui/select';
 	import ColorPicker from 'svelte-awesome-color-picker';
 	import Input from '@ui/input/input.svelte';
+	import * as ToggleGroup from '@ui/toggle-group';
 
 	let { ctx, width, height } = $props<{
 		ctx: CanvasRenderingContext2D;
@@ -26,34 +27,41 @@
 	let gradientAngle = $state(45);
 
 	let title = $state('John Doe');
+	let titleWeight = $state<'normal' | 'bold'>('bold');
+	let titleStyle = $state<'normal' | 'italic'>('normal');
+	let titleToggles = $state<string[]>(['bold']);
 	let titleColor = $state('#f9f9f9');
 	let titleSize = $state(64);
 
 	let subtitle = $state('Software Engineer');
+	let subtitleWeight = $state<'normal' | 'bold'>('normal');
+	let subtitleStyle = $state<'normal' | 'italic'>('normal');
+	let subtitleToggles = $state<string[]>([]);
 	let subtitleColor = $state('#e5e7eb');
 	let subtitleSize = $state(32);
 
-	type FontFamily =
-		| 'Inter'
-		| 'Roboto'
-		| 'Montserrat'
-		| 'Poppins'
-		| 'Playfair Display'
-		| 'Merriweather'
-		| 'JetBrains Mono'
-		| 'system-ui'
-		| 'serif'
-		| 'monospace';
+	const loadableFontFamilies = [
+		'Inter',
+		'Roboto',
+		'Montserrat',
+		'Poppins',
+		'"Playfair Display"',
+		'Merriweather',
+		'"JetBrains Mono"'
+	];
+	const genericFontFamilies = ['system-ui', 'serif', 'monospace'];
 
-	let fontFamily: FontFamily = $state('Inter');
+	type FontFamily = (typeof loadableFontFamilies)[number] | (typeof genericFontFamilies)[number];
+
+	let fontFamily: FontFamily = $state('"JetBrains Mono"');
 	const fontOptions = new Map<FontFamily, string>([
 		['Inter', 'Inter'],
 		['Roboto', 'Roboto'],
 		['Montserrat', 'Montserrat'],
 		['Poppins', 'Poppins'],
-		['Playfair Display', 'Playfair Display'],
+		['"Playfair Display"', 'Playfair Display'],
 		['Merriweather', 'Merriweather'],
-		['JetBrains Mono', 'JetBrains Mono'],
+		['"JetBrains Mono"', 'JetBrains Mono'],
 		['system-ui', 'System UI'],
 		['serif', 'Serif'],
 		['monospace', 'Monospace']
@@ -96,18 +104,16 @@
 		const titleY = padding;
 
 		ctx.fillStyle = titleColor;
-		const isGenericTitle =
-			fontFamily === 'system-ui' || fontFamily === 'serif' || fontFamily === 'monospace';
-		const familyForCanvasTitle = isGenericTitle ? fontFamily : `"${fontFamily}"`;
-		ctx.font = `${titleSize}px ${familyForCanvasTitle}, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`;
+		const titleFontStyle = titleStyle === 'italic' ? 'italic' : 'normal';
+		const titleFontWeight = titleWeight === 'bold' ? '700' : '400';
+		ctx.font = `${titleFontStyle} ${titleFontWeight} ${titleSize}px ${fontFamily}, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`;
 		if (title) ctx.fillText(title, titleX, titleY, width * 0.8);
 
 		const subtitleY = titleY + titleSize + 12;
 		ctx.fillStyle = subtitleColor;
-		const isGenericSubtitle =
-			fontFamily === 'system-ui' || fontFamily === 'serif' || fontFamily === 'monospace';
-		const familyForCanvasSubtitle = isGenericSubtitle ? fontFamily : `"${fontFamily}"`;
-		ctx.font = `${subtitleSize}px ${familyForCanvasSubtitle}, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`;
+		const subtitleFontStyle = subtitleStyle === 'italic' ? 'italic' : 'normal';
+		const subtitleFontWeight = subtitleWeight === 'bold' ? '700' : '400';
+		ctx.font = `${subtitleFontStyle} ${subtitleFontWeight} ${subtitleSize}px ${fontFamily}, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`;
 		if (subtitle) ctx.fillText(subtitle, titleX, subtitleY, width * 0.8);
 	}
 
@@ -186,16 +192,29 @@
 	}
 
 	$effect(() => {
+		titleWeight = titleToggles.includes('bold') ? 'bold' : 'normal';
+		titleStyle = titleToggles.includes('italic') ? 'italic' : 'normal';
+	});
+
+	$effect(() => {
+		subtitleWeight = subtitleToggles.includes('bold') ? 'bold' : 'normal';
+		subtitleStyle = subtitleToggles.includes('italic') ? 'italic' : 'normal';
+	});
+
+	export async function loadAppFonts(): Promise<void> {
+		if (typeof document === 'undefined' || !(document as any).fonts) return;
+		const families = [...loadableFontFamilies];
+		await Promise.all(families.map((family) => (document as any).fonts.load(`1em ${family}`)));
+		await (document as any).fonts.ready;
+	}
+
+	$effect(() => {
 		void redraw();
 	});
 
-	onMount(() => {
+	onMount(async () => {
+		await loadAppFonts();
 		void redraw();
-		if (typeof document !== 'undefined' && (document as any).fonts?.ready) {
-			(document as any).fonts.ready.then(() => {
-				void redraw();
-			});
-		}
 	});
 </script>
 
@@ -260,6 +279,14 @@
 			<div class="flex items-center gap-2">
 				<ColorPicker bind:hex={titleColor} name="titleColor" label="Color" />
 				<Input id="title" placeholder="e.g. your name" bind:value={title} />
+				<ToggleGroup.Root type="multiple" variant="outline" bind:value={titleToggles}>
+					<ToggleGroup.Item value="bold" aria-label="Toggle bold">
+						<strong>B</strong>
+					</ToggleGroup.Item>
+					<ToggleGroup.Item value="italic" aria-label="Toggle italic">
+						<em>I</em>
+					</ToggleGroup.Item>
+				</ToggleGroup.Root>
 			</div>
 		</div>
 		<div class="space-y-2">
@@ -274,6 +301,14 @@
 			<div class="flex items-center gap-2">
 				<ColorPicker bind:hex={subtitleColor} name="subtitleColor" label="Color" />
 				<Input id="subtitle" placeholder="e.g. your role" bind:value={subtitle} />
+				<ToggleGroup.Root type="multiple" variant="outline" bind:value={subtitleToggles}>
+					<ToggleGroup.Item value="bold" aria-label="Toggle bold">
+						<strong>B</strong>
+					</ToggleGroup.Item>
+					<ToggleGroup.Item value="italic" aria-label="Toggle italic">
+						<em>I</em>
+					</ToggleGroup.Item>
+				</ToggleGroup.Root>
 			</div>
 		</div>
 		<div class="space-y-2">

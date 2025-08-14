@@ -57,6 +57,13 @@
 		]
 	},
 	"dependencies": {
+		"@fontsource/inter": "^5.2.6",
+		"@fontsource/jetbrains-mono": "^5.2.6",
+		"@fontsource/merriweather": "^5.2.9",
+		"@fontsource/montserrat": "^5.2.6",
+		"@fontsource/playfair-display": "^5.2.6",
+		"@fontsource/poppins": "^5.2.6",
+		"@fontsource/roboto": "^5.2.6",
 		"mode-watcher": "^1.1.0",
 		"svelte-awesome-color-picker": "^4.0.2"
 	}

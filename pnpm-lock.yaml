@@ -8,6 +8,27 @@ importers:
 
   .:
     dependencies:
+      '@fontsource/inter':
+        specifier: ^5.2.6
+        version: 5.2.6
+      '@fontsource/jetbrains-mono':
+        specifier: ^5.2.6
+        version: 5.2.6
+      '@fontsource/merriweather':
+        specifier: ^5.2.9
+        version: 5.2.9
+      '@fontsource/montserrat':
+        specifier: ^5.2.6
+        version: 5.2.6
+      '@fontsource/playfair-display':
+        specifier: ^5.2.6
+        version: 5.2.6
+      '@fontsource/poppins':
+        specifier: ^5.2.6
+        version: 5.2.6
+      '@fontsource/roboto':
+        specifier: ^5.2.6
+        version: 5.2.6
       mode-watcher:
         specifier: ^1.1.0
         version: 1.1.0(svelte@5.38.1)
@@ -387,6 +408,27 @@ packages:
 
   '@floating-ui/utils@0.2.10':
     resolution: {integrity: sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ==}
+
+  '@fontsource/inter@5.2.6':
+    resolution: {integrity: sha512-CZs9S1CrjD0jPwsNy9W6j0BhsmRSQrgwlTNkgQXTsAeDRM42LBRLo3eo9gCzfH4GvV7zpyf78Ozfl773826csw==}
+
+  '@fontsource/jetbrains-mono@5.2.6':
+    resolution: {integrity: sha512-nz//dBr99hXZmHp10wgNI00qThWImkzRR5PQjvRM+rpmuHO5rYBJCqPPWufidCvmkkryXx/GOP/lgqsM3R3Org==}
+
+  '@fontsource/merriweather@5.2.9':
+    resolution: {integrity: sha512-amd5Wp7BM5U0HE/FUgsJmf/dvfqSKYf55HrxR1tMlpT3BqQmVZHB9RJDBpNqqf3/yF6fkryCbx5H9fEMa4mY3g==}
+
+  '@fontsource/montserrat@5.2.6':
+    resolution: {integrity: sha512-AfFxq1q5tgkOsjQfMFsh95uMXh39VbGOuBLlHLFg16/txv93lqK7Sr6jev0neuJzZy1kqRG16SH6xpUYnk4cZg==}
+
+  '@fontsource/playfair-display@5.2.6':
+    resolution: {integrity: sha512-hWfFm2j+Dlg+UwabNJu5vi45otmLSG64hUzNFJ8pIDBgqWBviEPpVaDIZWHm2RYyIxhg9YXTPsZWdpvsu7fkqQ==}
+
+  '@fontsource/poppins@5.2.6':
+    resolution: {integrity: sha512-NFr0121+vWCfzLDVvSZOzwAjRUaNj6QHA9gtUh/KHHoWf1Qn23EkwVFs63XZ6UtF5K1b3UNmCx77YEMGgV7BOQ==}
+
+  '@fontsource/roboto@5.2.6':
+    resolution: {integrity: sha512-hzarG7yAhMoP418smNgfY4fO7UmuUEm5JUtbxCoCcFHT0hOJB+d/qAEyoNjz7YkPU5OjM2LM8rJnW8hfm0JLaA==}
 
   '@gcornut/valibot-json-schema@0.42.0':
     resolution: {integrity: sha512-4Et4AN6wmqeA0PfU5Clkv/IS27wiefsWf6TemAZrb75uzkClYEFavim7SboeKwbll9Nbsn2Iv0LT/HS5H7orZg==}
@@ -2381,6 +2423,20 @@ snapshots:
       '@floating-ui/utils': 0.2.10
 
   '@floating-ui/utils@0.2.10': {}
+
+  '@fontsource/inter@5.2.6': {}
+
+  '@fontsource/jetbrains-mono@5.2.6': {}
+
+  '@fontsource/merriweather@5.2.9': {}
+
+  '@fontsource/montserrat@5.2.6': {}
+
+  '@fontsource/playfair-display@5.2.6': {}
+
+  '@fontsource/poppins@5.2.6': {}
+
+  '@fontsource/roboto@5.2.6': {}
 
   '@gcornut/valibot-json-schema@0.42.0(esbuild@0.25.9)(typescript@5.9.2)':
     dependencies:

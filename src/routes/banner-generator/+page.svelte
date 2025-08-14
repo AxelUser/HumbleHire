@@ -1,4 +1,5 @@
 <script lang="ts">
+	import './banner.css';
 	import { onMount } from 'svelte';
 	import { Card, CardContent, CardHeader, CardTitle } from '@ui/card';
 	import TechBanner from '$lib/features/banner-generator/themes/tech-banner.svelte';
