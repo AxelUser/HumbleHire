@@ -10,6 +10,8 @@
 	let canvasEl: HTMLCanvasElement | null = null;
 	let ctx = $state<CanvasRenderingContext2D | null>(null);
 
+	let { data } = $props<{ data: { items: { id: string; texts: string[]; url: string }[] } }>();
+
 	// LinkedIn banner recommended size
 	const WIDTH = 1584;
 	const HEIGHT = 396;
@@ -70,7 +72,7 @@
 		</CardHeader>
 		<CardContent>
 			{#if ctx}
-				<TechBanner {ctx} width={WIDTH} height={HEIGHT} />
+				<TechBanner {ctx} width={WIDTH} height={HEIGHT} items={data.items} />
 			{/if}
 		</CardContent>
 	</Card>

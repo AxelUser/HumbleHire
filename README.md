@@ -23,3 +23,12 @@ This project is not affiliated with LinkedIn®.
 pnpm install
 pnpm run dev
 ```
+
+## Assets and attribution
+
+Icons in `static/skills-icons/` are sourced from the Skill Icons project by `tandpfun` and used under the MIT License. For the full collection, license details, and an easy-to-use API for GitHub profiles, see their repository and service:
+
+- Repository: `https://github.com/tandpfun/skill-icons`
+- API: `https://skillicons.dev`
+
+All trademarks and logos are the property of their respective owners. This project is not affiliated with Skill Icons.

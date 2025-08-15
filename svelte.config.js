@@ -11,7 +11,8 @@ const config = {
 		adapter: adapter(),
 		alias: {
 			'@ui': 'src/lib/components/ui',
-			'@shared': 'src/lib/components/shared'
+			'@shared': 'src/lib/components/shared',
+			'@skills-icons': 'static/skills-icons'
 		}
 	}
 };

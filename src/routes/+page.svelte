@@ -25,7 +25,7 @@
 		<div class="grid grid-cols-1 gap-4 text-left sm:grid-cols-2">
 			<Card>
 				<CardHeader>
-					<CardTitle>LinkedIn Banner Generator</CardTitle>
+					<CardTitle>LinkedIn® Banner Generator</CardTitle>
 				</CardHeader>
 				<CardContent class="flex h-full flex-col justify-between">
 					<p class="text-muted-foreground text-sm">

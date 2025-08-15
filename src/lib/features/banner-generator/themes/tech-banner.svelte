@@ -8,11 +8,18 @@
 	import Input from '@ui/input/input.svelte';
 	import * as ToggleGroup from '@ui/toggle-group';
 	import { PlusIcon, Trash2 } from '@lucide/svelte';
+	import { IconPicker } from '@shared/icon-picker';
 
-	let { ctx, width, height } = $props<{
+	let {
+		ctx,
+		width,
+		height,
+		items = []
+	} = $props<{
 		ctx: CanvasRenderingContext2D;
 		width: number;
 		height: number;
+		items?: { id: string; texts: string[]; url: string }[];
 	}>();
 
 	type ColorMode = 'Solid' | 'Gradient';
@@ -174,6 +181,24 @@
 		setBackground();
 		drawText();
 		drawIcons();
+	}
+
+	function selectFromLibrary(item: { id: string; texts: string[]; url: string }) {
+		if (iconUrls.length >= MAX_ICONS) return;
+		iconUrls = [...iconUrls, item.url];
+		loadImage(item.url).then((img) => {
+			iconBitmaps = [...iconBitmaps, img];
+			scheduleRedraw();
+		});
+	}
+
+	function unselectFromLibrary(item: { id: string; texts: string[]; url: string }) {
+		const index = iconUrls.findIndex((u) => u === item.url);
+		if (index >= 0) {
+			iconUrls.splice(index, 1);
+			iconBitmaps.splice(index, 1);
+			scheduleRedraw();
+		}
 	}
 
 	async function onFilesSelected(event: Event) {
@@ -391,11 +416,20 @@
 			bind:this={fileInputEl}
 			onchange={onFilesSelected}
 		/>
-		<Button
-			type="button"
-			onclick={() => fileInputEl?.click()}
-			disabled={iconUrls.length >= MAX_ICONS}><PlusIcon /> Add icons</Button
-		>
+		<div class="flex items-center gap-2">
+			<Button
+				type="button"
+				onclick={() => fileInputEl?.click()}
+				disabled={iconUrls.length >= MAX_ICONS}><PlusIcon /> Add icons</Button
+			>
+			<IconPicker
+				{items}
+				selectedIds={iconUrls}
+				buttonLabel="Pick icons from library"
+				onSelected={selectFromLibrary}
+				onUnselected={unselectFromLibrary}
+			/>
+		</div>
 	</div>
 
 	{#if iconUrls.length > 0}
