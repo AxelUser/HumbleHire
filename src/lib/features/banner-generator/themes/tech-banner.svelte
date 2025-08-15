@@ -7,8 +7,9 @@
 	import ColorPicker from 'svelte-awesome-color-picker';
 	import Input from '@ui/input/input.svelte';
 	import * as ToggleGroup from '@ui/toggle-group';
-	import { PlusIcon, Trash2 } from '@lucide/svelte';
+	import { PlusIcon, Trash2, UploadIcon } from '@lucide/svelte';
 	import { IconPicker } from '@shared/icon-picker';
+	import { dragAndDrop } from '@formkit/drag-and-drop';
 
 	let {
 		ctx,
@@ -49,6 +50,7 @@
 	let subtitleSize = $state(32);
 
 	import { loadableFontFamilies, loadAppFonts as loadAppFontsUtil } from '../fonts';
+	import IconsRow from './icons-row.svelte';
 
 	const genericFontFamilies = ['system-ui', 'serif', 'monospace'] as const;
 
@@ -71,10 +73,15 @@
 		Object.entries(fontOptionsObj) as [FontFamily, string][]
 	);
 
-	let iconUrls = $state<string[]>([]);
-	let iconBitmaps = $state<(ImageBitmap | HTMLImageElement)[]>([]);
+	type IconItem = { url: string; bmp: ImageBitmap | HTMLImageElement };
+	let iconRows = $state<IconItem[][]>([[], []]);
+	let rowEl0 = $state<HTMLElement>(null!);
+	let rowEl1 = $state<HTMLElement>(null!);
+	const totalIcons = $derived(iconRows[0].length + iconRows[1].length);
+	const selectedIconUrls = $derived([...iconRows[0], ...iconRows[1]].map((i) => i.url));
 	let fileInputEl: HTMLInputElement | null = null;
 	const MAX_ICONS = 12;
+	const MAX_PER_ROW = 6;
 	const CANVAS_PADDING = 48;
 
 	let rafId: number | null = null;
@@ -131,26 +138,19 @@
 		if (subtitle) ctx.fillText(subtitle, titleX, subtitleY, width * 0.8);
 	}
 
-	function layoutIcons(urls: string[]) {
-		const maxPerRow = 6;
-		const rows: string[][] = [];
-		for (let i = 0; i < urls.length; i += maxPerRow) rows.push(urls.slice(i, i + maxPerRow));
-		return rows;
-	}
-
 	function drawIcons() {
-		if (!ctx || iconUrls.length === 0) return;
+		const total = iconRows[0].length + iconRows[1].length;
+		if (!ctx || total === 0) return;
 		const padding = CANVAS_PADDING;
 		const iconSize = 48;
 		const gap = 12;
 
-		const rows = layoutIcons(iconUrls);
-		let y = height - padding - rows.length * iconSize - (rows.length - 1) * gap;
-		let idx = 0;
-		for (const row of rows) {
+		const nonEmptyRows: IconItem[][] = iconRows.filter((r) => r.length > 0);
+		let y = height - padding - nonEmptyRows.length * iconSize - (nonEmptyRows.length - 1) * gap;
+		for (const row of nonEmptyRows) {
 			let x = width - padding - row.length * iconSize - (row.length - 1) * gap;
 			for (let i = 0; i < row.length; i++) {
-				const bmp = iconBitmaps[idx++];
+				const bmp = row[i]?.bmp;
 				if (bmp) ctx.drawImage(bmp as any, x, y, iconSize, iconSize);
 				x += iconSize + gap;
 			}
@@ -183,28 +183,41 @@
 		drawIcons();
 	}
 
+	function firstRowWithCapacity(): number | null {
+		for (let i = 0; i < 2; i++) if (iconRows[i].length < MAX_PER_ROW) return i;
+		return null;
+	}
+
+	function addIcon(url: string, bmp: ImageBitmap | HTMLImageElement) {
+		const total = iconRows[0].length + iconRows[1].length;
+		if (total >= MAX_ICONS) return;
+		const rowIndex = firstRowWithCapacity();
+		if (rowIndex === null) return;
+		iconRows[rowIndex] = [...iconRows[rowIndex], { url, bmp }];
+		scheduleRedraw();
+	}
+
 	function selectFromLibrary(item: { id: string; texts: string[]; url: string }) {
-		if (iconUrls.length >= MAX_ICONS) return;
-		iconUrls = [...iconUrls, item.url];
 		loadImage(item.url).then((img) => {
-			iconBitmaps = [...iconBitmaps, img];
-			scheduleRedraw();
+			addIcon(item.url, img);
 		});
 	}
 
 	function unselectFromLibrary(item: { id: string; texts: string[]; url: string }) {
-		const index = iconUrls.findIndex((u) => u === item.url);
-		if (index >= 0) {
-			iconUrls.splice(index, 1);
-			iconBitmaps.splice(index, 1);
-			scheduleRedraw();
+		for (let r = 0; r < 2; r++) {
+			const idx = iconRows[r].findIndex((it) => it.url === item.url);
+			if (idx >= 0) {
+				removeIcon(r, idx);
+				break;
+			}
 		}
 	}
 
 	async function onFilesSelected(event: Event) {
 		const input = event.target as HTMLInputElement;
 		if (!input.files) return;
-		const allowed = Math.max(0, MAX_ICONS - iconUrls.length);
+		const total = iconRows[0].length + iconRows[1].length;
+		const allowed = Math.max(0, MAX_ICONS - total);
 		if (allowed <= 0) {
 			input.value = '';
 			return;
@@ -212,35 +225,37 @@
 		const filesToAdd = Array.from(input.files).slice(0, allowed);
 		const urlsToAdd = filesToAdd.map((f) => URL.createObjectURL(f));
 		const bitmapsToAdd = await Promise.all(filesToAdd.map((f, i) => fileToBitmap(f, urlsToAdd[i])));
-		iconUrls = [...iconUrls, ...urlsToAdd];
-		iconBitmaps = [...iconBitmaps, ...bitmapsToAdd];
+		for (let i = 0; i < urlsToAdd.length; i++) addIcon(urlsToAdd[i], bitmapsToAdd[i]);
 		input.value = '';
+	}
+
+	function removeIcon(rowIndex: number, index: number) {
+		const item = iconRows[rowIndex][index];
+		iconRows[rowIndex].splice(index, 1);
+		if (item?.url && item.url.startsWith('blob:')) URL.revokeObjectURL(item.url);
 		scheduleRedraw();
 	}
 
-	function removeIcon(index: number) {
-		const [url] = iconUrls.splice(index, 1);
-		if (url) URL.revokeObjectURL(url);
-		iconBitmaps.splice(index, 1);
-		scheduleRedraw();
-	}
+	let destroyers: ((() => void) | null)[] = [null, null];
 
-	let dragIndex: number | null = null;
-	function onDragStart(index: number) {
-		dragIndex = index;
-	}
-	function onDrop(index: number) {
-		if (dragIndex === null || dragIndex === index) return;
-		const [url] = iconUrls.splice(dragIndex, 1);
-		const [bmp] = iconBitmaps.splice(dragIndex, 1);
-		iconUrls.splice(index, 0, url);
-		iconBitmaps.splice(index, 0, bmp);
-		dragIndex = null;
-		scheduleRedraw();
-	}
-
-	function handleDragOver(e: DragEvent) {
-		e.preventDefault();
+	function initDnDForRow(rowIndex: 0 | 1) {
+		const parentEl = rowIndex === 0 ? rowEl0 : rowEl1;
+		if (!parentEl) return;
+		if (destroyers[rowIndex]) destroyers[rowIndex]!();
+		const teardown = dragAndDrop({
+			parent: parentEl,
+			getValues: () => iconRows[rowIndex],
+			setValues: (newValues: IconItem[]) => {
+				iconRows[rowIndex] = newValues;
+				scheduleRedraw();
+			},
+			config: {
+				group: `icons-row${rowIndex}`,
+				sortable: true,
+				accepts: () => iconRows[rowIndex].length < MAX_PER_ROW
+			}
+		});
+		destroyers[rowIndex] = typeof teardown === 'function' ? teardown : null;
 	}
 
 	$effect(() => {
@@ -285,8 +300,7 @@
 		subtitleStyle;
 		subtitleWeight;
 		fontFamily;
-		iconUrls;
-		iconBitmaps;
+		iconRows;
 		width;
 		height;
 		ctx;
@@ -296,6 +310,15 @@
 	onMount(async () => {
 		await loadAppFontsUtil();
 		scheduleRedraw();
+		initDnDForRow(0);
+		initDnDForRow(1);
+	});
+
+	$effect(() => {
+		rowEl0;
+		rowEl1;
+		initDnDForRow(0);
+		initDnDForRow(1);
 	});
 </script>
 
@@ -417,14 +440,12 @@
 			onchange={onFilesSelected}
 		/>
 		<div class="flex items-center gap-2">
-			<Button
-				type="button"
-				onclick={() => fileInputEl?.click()}
-				disabled={iconUrls.length >= MAX_ICONS}><PlusIcon /> Add icons</Button
+			<Button type="button" onclick={() => fileInputEl?.click()} disabled={totalIcons >= MAX_ICONS}
+				><UploadIcon /> Upload icons</Button
 			>
 			<IconPicker
 				{items}
-				selectedIds={iconUrls}
+				selectedIds={selectedIconUrls}
 				buttonLabel="Pick icons from library"
 				onSelected={selectFromLibrary}
 				onUnselected={unselectFromLibrary}
@@ -432,32 +453,26 @@
 		</div>
 	</div>
 
-	{#if iconUrls.length > 0}
+	{#if totalIcons > 0}
 		<div class="space-y-2">
-			<div class="text-muted-foreground text-sm">Drag to reorder. Max 6 icons per row.</div>
-			<div class="flex flex-wrap gap-3">
-				{#each iconUrls as url, idx}
-					<div
-						class="flex items-center gap-2 rounded p-2"
-						draggable="true"
-						role="listitem"
-						ondragstart={() => onDragStart(idx)}
-						ondrop={() => onDrop(idx)}
-						ondragover={handleDragOver}
-					>
-						<div class="flex items-center">
-							<img src={url} alt="icon" class="size-10 rounded object-contain" />
-							<button
-								class="bg-destructive ring-destructive/40 hover:bg-destructive/90 -mr-1 ml-1 inline-flex size-5 items-center justify-center rounded-full text-white shadow ring-1 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:outline-none"
-								aria-label="Remove icon"
-								draggable="false"
-								onclick={() => removeIcon(idx)}
-							>
-								<Trash2 class="size-4" />
-							</button>
-						</div>
-					</div>
-				{/each}
+			<div class="text-muted-foreground text-sm">
+				Drag to rearrange or move between rows. Max {MAX_PER_ROW} per row.
+			</div>
+			<div class="space-y-3">
+				<IconsRow
+					rowIndex={0}
+					items={iconRows[0]}
+					bind:rowEl={rowEl0}
+					{removeIcon}
+					maxPerRow={MAX_PER_ROW}
+				/>
+				<IconsRow
+					rowIndex={1}
+					items={iconRows[1]}
+					bind:rowEl={rowEl1}
+					{removeIcon}
+					maxPerRow={MAX_PER_ROW}
+				/>
 			</div>
 		</div>
 	{/if}

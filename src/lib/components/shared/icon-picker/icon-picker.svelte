@@ -4,7 +4,7 @@
 	import { ScrollArea } from '@ui/scroll-area';
 	import Input from '@ui/input/input.svelte';
 	import { Button } from '@ui/button';
-	import { Check } from '@lucide/svelte';
+	import { Check, ImagePlus } from '@lucide/svelte';
 
 	type IconItem = {
 		id: string;
@@ -77,7 +77,10 @@
 
 <Popover.Root bind:open>
 	<Popover.Trigger>
-		<Button class={className} type="button" variant="secondary" {disabled}>{buttonLabel}</Button>
+		<Button class={className} type="button" variant="secondary" {disabled}>
+			<ImagePlus class="size-4" />
+			{buttonLabel}
+		</Button>
 	</Popover.Trigger>
 	<Popover.Content class="w-80 p-2">
 		<div class="space-y-2">

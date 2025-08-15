@@ -29,6 +29,9 @@ importers:
       '@fontsource/roboto':
         specifier: ^5.2.6
         version: 5.2.6
+      '@formkit/drag-and-drop':
+        specifier: ^0.5.3
+        version: 0.5.3
       mode-watcher:
         specifier: ^1.1.0
         version: 1.1.0(svelte@5.38.1)
@@ -429,6 +432,9 @@ packages:
 
   '@fontsource/roboto@5.2.6':
     resolution: {integrity: sha512-hzarG7yAhMoP418smNgfY4fO7UmuUEm5JUtbxCoCcFHT0hOJB+d/qAEyoNjz7YkPU5OjM2LM8rJnW8hfm0JLaA==}
+
+  '@formkit/drag-and-drop@0.5.3':
+    resolution: {integrity: sha512-VGQsKYc350OOMbz7wYt69YqDbn49x7RJ32eqiJieNke54nGZYmx18XEqTw0lBiJmH3RaiH6V45gB1u+tvI/TNw==}
 
   '@gcornut/valibot-json-schema@0.42.0':
     resolution: {integrity: sha512-4Et4AN6wmqeA0PfU5Clkv/IS27wiefsWf6TemAZrb75uzkClYEFavim7SboeKwbll9Nbsn2Iv0LT/HS5H7orZg==}
@@ -2437,6 +2443,8 @@ snapshots:
   '@fontsource/poppins@5.2.6': {}
 
   '@fontsource/roboto@5.2.6': {}
+
+  '@formkit/drag-and-drop@0.5.3': {}
 
   '@gcornut/valibot-json-schema@0.42.0(esbuild@0.25.9)(typescript@5.9.2)':
     dependencies:
