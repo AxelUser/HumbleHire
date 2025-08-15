@@ -1,3 +1,1 @@
-import IconPicker from './icon-picker.svelte';
-
-export { IconPicker };
+export { default as IconPicker } from './icon-picker.svelte';

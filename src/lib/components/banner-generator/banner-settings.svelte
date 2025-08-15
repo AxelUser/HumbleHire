@@ -11,17 +11,14 @@
 	import { IconPicker } from '@shared/icon-picker';
 	import { dragAndDrop } from '@formkit/drag-and-drop';
 
-	let {
-		ctx,
-		width,
-		height,
-		items = []
-	} = $props<{
+	interface Props {
 		ctx: CanvasRenderingContext2D;
 		width: number;
 		height: number;
-		items?: { id: string; texts: string[]; url: string }[];
-	}>();
+		skillsIcons?: { id: string; texts: string[]; url: string }[];
+	}
+
+	let { ctx, width, height, skillsIcons = [] }: Props = $props();
 
 	type ColorMode = 'Solid' | 'Gradient';
 	let colorMode: ColorMode = $state('Solid');
@@ -49,7 +46,7 @@
 	let subtitleColor = $state('#e5e7eb');
 	let subtitleSize = $state(32);
 
-	import { loadableFontFamilies, loadAppFonts as loadAppFontsUtil } from '../fonts';
+	import { loadableFontFamilies, loadAppFonts as loadAppFontsUtil } from './fonts';
 	import IconsRow from './icons-row.svelte';
 
 	const genericFontFamilies = ['system-ui', 'serif', 'monospace'] as const;
@@ -444,7 +441,7 @@
 				><UploadIcon /> Upload icons</Button
 			>
 			<IconPicker
-				{items}
+				items={skillsIcons}
 				selectedIds={selectedIconUrls}
 				buttonLabel="Pick icons from library"
 				onSelected={selectFromLibrary}

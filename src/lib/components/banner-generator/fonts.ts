@@ -11,15 +11,15 @@ export const loadableFontFamilies = [
 export type LoadableFontFamily = (typeof loadableFontFamilies)[number];
 
 export async function loadAppFonts(): Promise<void> {
-	if (typeof document === 'undefined' || !(document as any).fonts) return;
+	if (typeof document === 'undefined' || !document.fonts) return;
 	const styles = ['normal', 'italic'];
 	const weights = ['400', '700'];
 	await Promise.all(
 		loadableFontFamilies.flatMap((family) =>
 			styles.flatMap((style) =>
-				weights.map((weight) => (document as any).fonts.load(`${style} ${weight} 1em ${family}`))
+				weights.map((weight) => document.fonts.load(`${style} ${weight} 1em ${family}`))
 			)
 		)
 	);
-	await (document as any).fonts.ready;
+	await document.fonts.ready;
 }

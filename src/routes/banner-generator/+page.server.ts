@@ -16,7 +16,7 @@ export const load: PageServerLoad = async () => {
 	} catch {
 		files = [];
 	}
-	const items: SkillIconItem[] = files
+	const skillsIcons: SkillIconItem[] = files
 		.filter((f) => /\.(svg|png)$/i.test(f))
 		.sort()
 		.map((file) => {
@@ -26,5 +26,5 @@ export const load: PageServerLoad = async () => {
 			const texts = [base, ...words];
 			return { id, texts, url: `/skills-icons/${file}` };
 		});
-	return { items };
+	return { skillsIcons };
 };
