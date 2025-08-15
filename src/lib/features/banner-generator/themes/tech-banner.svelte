@@ -2,12 +2,12 @@
 	import { onMount } from 'svelte';
 	import { Label } from '@ui/label';
 	import { Slider } from '@ui/slider';
-	import { Button, buttonVariants } from '@ui/button';
+	import { Button } from '@ui/button';
 	import * as Select from '@ui/select';
 	import ColorPicker from 'svelte-awesome-color-picker';
 	import Input from '@ui/input/input.svelte';
 	import * as ToggleGroup from '@ui/toggle-group';
-	import { PlusIcon } from '@lucide/svelte';
+	import { PlusIcon, Trash2 } from '@lucide/svelte';
 
 	let { ctx, width, height } = $props<{
 		ctx: CanvasRenderingContext2D;
@@ -68,11 +68,20 @@
 		['monospace', 'Monospace']
 	]);
 
-	let iconFiles = $state<File[]>([]);
 	let iconUrls = $state<string[]>([]);
+	let iconBitmaps = $state<(ImageBitmap | HTMLImageElement)[]>([]);
 	let fileInputEl: HTMLInputElement | null = null;
 	const MAX_ICONS = 12;
 	const CANVAS_PADDING = 48;
+
+	let rafId: number | null = null;
+	function scheduleRedraw() {
+		if (rafId !== null) return;
+		rafId = requestAnimationFrame(() => {
+			rafId = null;
+			redraw();
+		});
+	}
 
 	function setBackground() {
 		if (!ctx) return;
@@ -108,16 +117,14 @@
 		const titleY = padding;
 
 		ctx.fillStyle = titleColor;
-		const titleFontStyle = titleStyle === 'italic' ? 'italic' : 'normal';
 		const titleFontWeight = titleWeight === 'bold' ? '700' : '400';
-		ctx.font = `${titleFontStyle} ${titleFontWeight} ${titleSize}px ${fontFamily}, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`;
+		ctx.font = `${titleStyle} ${titleFontWeight} ${titleSize}px ${fontFamily}, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`;
 		if (title) ctx.fillText(title, titleX, titleY, width * 0.8);
 
 		const subtitleY = titleY + titleSize + 12;
 		ctx.fillStyle = subtitleColor;
-		const subtitleFontStyle = subtitleStyle === 'italic' ? 'italic' : 'normal';
 		const subtitleFontWeight = subtitleWeight === 'bold' ? '700' : '400';
-		ctx.font = `${subtitleFontStyle} ${subtitleFontWeight} ${subtitleSize}px ${fontFamily}, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`;
+		ctx.font = `${subtitleStyle} ${subtitleFontWeight} ${subtitleSize}px ${fontFamily}, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`;
 		if (subtitle) ctx.fillText(subtitle, titleX, subtitleY, width * 0.8);
 	}
 
@@ -128,21 +135,20 @@
 		return rows;
 	}
 
-	async function drawIcons() {
+	function drawIcons() {
 		if (!ctx || iconUrls.length === 0) return;
 		const padding = CANVAS_PADDING;
-		const areaWidth = Math.min(width * 0.6, 800);
-		const areaX = width - padding - areaWidth;
 		const iconSize = 48;
 		const gap = 12;
 
 		const rows = layoutIcons(iconUrls);
 		let y = height - padding - rows.length * iconSize - (rows.length - 1) * gap;
+		let idx = 0;
 		for (const row of rows) {
 			let x = width - padding - row.length * iconSize - (row.length - 1) * gap;
-			for (const url of row) {
-				const img = await loadImage(url);
-				ctx.drawImage(img, x, y, iconSize, iconSize);
+			for (let i = 0; i < row.length; i++) {
+				const bmp = iconBitmaps[idx++];
+				if (bmp) ctx.drawImage(bmp as any, x, y, iconSize, iconSize);
 				x += iconSize + gap;
 			}
 			y += iconSize + gap;
@@ -158,32 +164,44 @@
 		});
 	}
 
-	async function redraw() {
+	async function fileToBitmap(file: File, url: string): Promise<ImageBitmap | HTMLImageElement> {
+		try {
+			return await createImageBitmap(file);
+		} catch {
+			return await loadImage(url);
+		}
+	}
+
+	function redraw() {
 		if (!ctx) return;
 		ctx.clearRect(0, 0, width, height);
 		setBackground();
 		drawText();
-		await drawIcons();
+		drawIcons();
 	}
 
-	function onFilesSelected(event: Event) {
+	async function onFilesSelected(event: Event) {
 		const input = event.target as HTMLInputElement;
 		if (!input.files) return;
-		const allowed = Math.max(0, MAX_ICONS - iconFiles.length);
+		const allowed = Math.max(0, MAX_ICONS - iconUrls.length);
 		if (allowed <= 0) {
 			input.value = '';
 			return;
 		}
 		const filesToAdd = Array.from(input.files).slice(0, allowed);
 		const urlsToAdd = filesToAdd.map((f) => URL.createObjectURL(f));
-		iconFiles = [...iconFiles, ...filesToAdd];
+		const bitmapsToAdd = await Promise.all(filesToAdd.map((f, i) => fileToBitmap(f, urlsToAdd[i])));
 		iconUrls = [...iconUrls, ...urlsToAdd];
+		iconBitmaps = [...iconBitmaps, ...bitmapsToAdd];
 		input.value = '';
+		scheduleRedraw();
 	}
 
 	function removeIcon(index: number) {
-		iconFiles.splice(index, 1);
-		iconUrls.splice(index, 1);
+		const [url] = iconUrls.splice(index, 1);
+		if (url) URL.revokeObjectURL(url);
+		iconBitmaps.splice(index, 1);
+		scheduleRedraw();
 	}
 
 	let dragIndex: number | null = null;
@@ -192,11 +210,12 @@
 	}
 	function onDrop(index: number) {
 		if (dragIndex === null || dragIndex === index) return;
-		const [file] = iconFiles.splice(dragIndex, 1);
 		const [url] = iconUrls.splice(dragIndex, 1);
-		iconFiles.splice(index, 0, file);
+		const [bmp] = iconBitmaps.splice(dragIndex, 1);
 		iconUrls.splice(index, 0, url);
+		iconBitmaps.splice(index, 0, bmp);
 		dragIndex = null;
+		scheduleRedraw();
 	}
 
 	function handleDragOver(e: DragEvent) {
@@ -216,17 +235,46 @@
 	export async function loadAppFonts(): Promise<void> {
 		if (typeof document === 'undefined' || !(document as any).fonts) return;
 		const families = [...loadableFontFamilies];
-		await Promise.all(families.map((family) => (document as any).fonts.load(`1em ${family}`)));
+		const styles = ['normal', 'italic'];
+		const weights = ['400', '700'];
+		await Promise.all(
+			families.flatMap((family) =>
+				styles.flatMap((style) =>
+					weights.map((weight) => (document as any).fonts.load(`${style} ${weight} 1em ${family}`))
+				)
+			)
+		);
 		await (document as any).fonts.ready;
 	}
 
 	$effect(() => {
-		void redraw();
+		colorMode;
+		solidColor;
+		gradientFrom;
+		gradientTo;
+		gradientAngle;
+		title;
+		titleColor;
+		titleSize;
+		titleStyle;
+		titleWeight;
+		subtitle;
+		subtitleColor;
+		subtitleSize;
+		subtitleStyle;
+		subtitleWeight;
+		fontFamily;
+		iconUrls;
+		iconBitmaps;
+		width;
+		height;
+		ctx;
+		scheduleRedraw();
 	});
 
 	onMount(async () => {
 		await loadAppFonts();
-		void redraw();
+		scheduleRedraw();
 	});
 </script>
 
@@ -360,18 +408,24 @@
 			<div class="flex flex-wrap gap-3">
 				{#each iconUrls as url, idx}
 					<div
-						class="relative flex items-center gap-2 rounded border p-2"
+						class="flex items-center gap-2 rounded p-2"
 						draggable="true"
 						role="listitem"
 						ondragstart={() => onDragStart(idx)}
 						ondrop={() => onDrop(idx)}
 						ondragover={handleDragOver}
 					>
-						<img src={url} alt="icon" class="size-10 rounded object-contain" />
-						<button
-							class={buttonVariants({ variant: 'destructive', size: 'sm' })}
-							onclick={() => removeIcon(idx)}>×</button
-						>
+						<div class="flex items-center">
+							<img src={url} alt="icon" class="size-10 rounded object-contain" />
+							<button
+								class="bg-destructive ring-destructive/40 hover:bg-destructive/90 -mr-1 ml-1 inline-flex size-5 items-center justify-center rounded-full text-white shadow ring-1 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:outline-none"
+								aria-label="Remove icon"
+								draggable="false"
+								onclick={() => removeIcon(idx)}
+							>
+								<Trash2 class="size-4" />
+							</button>
+						</div>
 					</div>
 				{/each}
 			</div>
