@@ -17,8 +17,8 @@
 		ctx: CanvasRenderingContext2D;
 		width: number;
 		height: number;
-		redraw$?: Observable<unknown>;
-		onChanged?: () => void;
+		redraw$: Observable<unknown>;
+		onChanged: () => void;
 	}
 
 	let { ctx, width, height, redraw$, onChanged }: Props = $props();
@@ -55,15 +55,11 @@
 	}
 
 	onMount(() => {
-		let sub: Subscription | null = null;
-		if (redraw$) {
-			sub = redraw$.subscribe(() => {
-				renderBackground();
-			});
-		}
-		onDestroy(() => {
+		const sub = redraw$.subscribe(renderBackground);
+
+		return () => {
 			sub?.unsubscribe();
-		});
+		};
 	});
 
 	$effect(() => {
@@ -72,7 +68,7 @@
 		gradientFrom;
 		gradientTo;
 		gradientAngle;
-		onChanged?.();
+		onChanged();
 	});
 </script>
 
