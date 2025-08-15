@@ -2,10 +2,11 @@
 	import { SEO } from '$lib/components/shared/seo/index.js';
 	import { Card, CardContent, CardHeader, CardTitle } from '@ui/card';
 	import { Button } from '@ui/button';
+	import { PROJECT_NAME } from '$lib/config.js';
 </script>
 
 <SEO
-	title="HumbleHire"
+	title={PROJECT_NAME}
 	description="A humble set of tools to make your job search less stressful"
 />
 
@@ -16,7 +17,7 @@
 			alt="HumbleHire logo"
 			class="mx-auto h-24 w-24 rounded-lg border shadow-sm"
 		/>
-		<h1 class="text-4xl font-bold tracking-tight md:text-5xl">HumbleHire</h1>
+		<h1 class="text-4xl font-bold tracking-tight md:text-5xl">{PROJECT_NAME}</h1>
 		<p class="text-muted-foreground text-base md:text-lg">
 			A humble set of tools to make your job search less stressful: generate a LinkedIn banner and
 			cover, and build resumes with Markdown.
