@@ -7,7 +7,7 @@
 
 <div class="flex min-h-screen flex-col">
 	<Header />
-	<main class="container mx-auto flex-1 px-4 py-6">
+	<main class="relative container mx-auto flex-1 px-4 py-6">
 		{@render children()}
 	</main>
 	<Footer />

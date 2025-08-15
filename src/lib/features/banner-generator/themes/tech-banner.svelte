@@ -41,15 +41,8 @@
 	let subtitleColor = $state('#e5e7eb');
 	let subtitleSize = $state(32);
 
-	const loadableFontFamilies = [
-		'Inter',
-		'Roboto',
-		'Montserrat',
-		'Poppins',
-		'"Playfair Display"',
-		'Merriweather',
-		'"JetBrains Mono"'
-	];
+	import { loadableFontFamilies, loadAppFonts as loadAppFontsUtil } from '../fonts';
+
 	const genericFontFamilies = ['system-ui', 'serif', 'monospace'];
 
 	type FontFamily = (typeof loadableFontFamilies)[number] | (typeof genericFontFamilies)[number];
@@ -273,7 +266,7 @@
 	});
 
 	onMount(async () => {
-		await loadAppFonts();
+		await loadAppFontsUtil();
 		scheduleRedraw();
 	});
 </script>

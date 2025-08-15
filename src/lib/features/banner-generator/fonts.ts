@@ -1,0 +1,23 @@
+export const loadableFontFamilies = [
+	'Inter',
+	'Roboto',
+	'Montserrat',
+	'Poppins',
+	'"Playfair Display"',
+	'Merriweather',
+	'"JetBrains Mono"'
+];
+
+export async function loadAppFonts(): Promise<void> {
+	if (typeof document === 'undefined' || !(document as any).fonts) return;
+	const styles = ['normal', 'italic'];
+	const weights = ['400', '700'];
+	await Promise.all(
+		loadableFontFamilies.flatMap((family) =>
+			styles.flatMap((style) =>
+				weights.map((weight) => (document as any).fonts.load(`${style} ${weight} 1em ${family}`))
+			)
+		)
+	);
+	await (document as any).fonts.ready;
+}

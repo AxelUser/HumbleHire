@@ -3,16 +3,20 @@
 	import { onMount } from 'svelte';
 	import { Card, CardContent, CardHeader, CardTitle } from '@ui/card';
 	import TechBanner from '$lib/features/banner-generator/themes/tech-banner.svelte';
+	import { loadAppFonts } from '$lib/features/banner-generator/fonts';
 	import { Button } from '@ui/button';
 	import { SEO } from '@shared/seo';
+	import { LoadingOverlay } from '@shared/loading-overlay';
 	let canvasEl: HTMLCanvasElement | null = null;
-	let ctx: CanvasRenderingContext2D | null = null;
+	let ctx = $state<CanvasRenderingContext2D | null>(null);
 
 	// LinkedIn banner recommended size
 	const WIDTH = 1584;
 	const HEIGHT = 396;
 
-	onMount(() => {
+	let fontsLoading = $state(true);
+
+	onMount(async () => {
 		if (canvasEl) {
 			canvasEl.width = WIDTH;
 			canvasEl.height = HEIGHT;
@@ -20,6 +24,14 @@
 			if (context) {
 				ctx = context;
 			}
+		}
+
+		try {
+			if (typeof document !== 'undefined' && (document as any).fonts) {
+				await loadAppFonts();
+			}
+		} finally {
+			fontsLoading = false;
 		}
 	});
 
@@ -34,6 +46,8 @@
 </script>
 
 <SEO title="Banner Generator" description="Generate a banner for your LinkedIn profile" />
+
+<LoadingOverlay bind:open={fontsLoading} label="Loading fonts…" />
 
 <section class="mx-auto max-w-5xl space-y-4">
 	<Card>
