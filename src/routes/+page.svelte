@@ -27,7 +27,7 @@
 				<CardHeader>
 					<CardTitle>LinkedIn Banner Generator</CardTitle>
 				</CardHeader>
-				<CardContent class="space-y-3">
+				<CardContent class="flex h-full flex-col justify-between">
 					<p class="text-muted-foreground text-sm">
 						Create a polished banner that highlights your skills and experience.
 					</p>
@@ -41,7 +41,7 @@
 				<CardHeader>
 					<CardTitle>LinkedIn Profile Cover</CardTitle>
 				</CardHeader>
-				<CardContent class="space-y-3">
+				<CardContent class="flex h-full flex-col justify-between">
 					<p class="text-muted-foreground text-sm">
 						Design a distinctive profile image cover to stand out.
 					</p>
@@ -56,7 +56,7 @@
 				<CardHeader>
 					<CardTitle>Resume Builder (Markdown)</CardTitle>
 				</CardHeader>
-				<CardContent class="space-y-3">
+				<CardContent class="flex h-full flex-col justify-between">
 					<p class="text-muted-foreground text-sm">
 						Craft and adapt your master resume using Markdown.
 					</p>
