@@ -19,8 +19,7 @@
 		/>
 		<h1 class="text-4xl font-bold tracking-tight md:text-5xl">{PROJECT_NAME}</h1>
 		<p class="text-muted-foreground text-base md:text-lg">
-			A humble set of tools to make your job search less stressful: generate a LinkedIn banner and
-			cover, and build resumes with Markdown.
+			A humble set of tools to make your job search less stressful
 		</p>
 
 		<div class="grid grid-cols-1 gap-4 text-left sm:grid-cols-2">
