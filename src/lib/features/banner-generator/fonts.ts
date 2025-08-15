@@ -6,7 +6,9 @@ export const loadableFontFamilies = [
 	'"Playfair Display"',
 	'Merriweather',
 	'"JetBrains Mono"'
-];
+] as const;
+
+export type LoadableFontFamily = (typeof loadableFontFamilies)[number];
 
 export async function loadAppFonts(): Promise<void> {
 	if (typeof document === 'undefined' || !(document as any).fonts) return;

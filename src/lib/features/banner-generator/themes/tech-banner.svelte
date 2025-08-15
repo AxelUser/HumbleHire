@@ -43,23 +43,26 @@
 
 	import { loadableFontFamilies, loadAppFonts as loadAppFontsUtil } from '../fonts';
 
-	const genericFontFamilies = ['system-ui', 'serif', 'monospace'];
+	const genericFontFamilies = ['system-ui', 'serif', 'monospace'] as const;
 
 	type FontFamily = (typeof loadableFontFamilies)[number] | (typeof genericFontFamilies)[number];
 
 	let fontFamily: FontFamily = $state('"JetBrains Mono"');
-	const fontOptions = new Map<FontFamily, string>([
-		['Inter', 'Inter'],
-		['Roboto', 'Roboto'],
-		['Montserrat', 'Montserrat'],
-		['Poppins', 'Poppins'],
-		['"Playfair Display"', 'Playfair Display'],
-		['Merriweather', 'Merriweather'],
-		['"JetBrains Mono"', 'JetBrains Mono'],
-		['system-ui', 'System UI'],
-		['serif', 'Serif'],
-		['monospace', 'Monospace']
-	]);
+	const fontOptionsObj = {
+		Inter: 'Inter',
+		Roboto: 'Roboto',
+		Montserrat: 'Montserrat',
+		Poppins: 'Poppins',
+		'"Playfair Display"': 'Playfair Display',
+		Merriweather: 'Merriweather',
+		'"JetBrains Mono"': 'JetBrains Mono',
+		'system-ui': 'System UI',
+		serif: 'Serif',
+		monospace: 'Monospace'
+	} as const satisfies Record<FontFamily, string>;
+	const fontOptions = new Map<FontFamily, string>(
+		Object.entries(fontOptionsObj) as [FontFamily, string][]
+	);
 
 	let iconUrls = $state<string[]>([]);
 	let iconBitmaps = $state<(ImageBitmap | HTMLImageElement)[]>([]);
