@@ -8,11 +8,15 @@ const config = {
 	preprocess: vitePreprocess(),
 
 	kit: {
-		adapter: adapter(),
+		adapter: adapter({
+			fallback: '404.html'
+		}),
+		prerender: {
+			crawl: true
+		},
 		alias: {
 			'@ui': 'src/lib/components/ui',
-			'@shared': 'src/lib/components/shared',
-			'@skills-icons': 'static/skills-icons'
+			'@shared': 'src/lib/components/shared'
 		}
 	}
 };

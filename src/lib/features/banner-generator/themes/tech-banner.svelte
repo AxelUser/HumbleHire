@@ -7,7 +7,7 @@
 	import ColorPicker from 'svelte-awesome-color-picker';
 	import Input from '@ui/input/input.svelte';
 	import * as ToggleGroup from '@ui/toggle-group';
-	import { PlusIcon, Trash2, UploadIcon } from '@lucide/svelte';
+	import { UploadIcon } from '@lucide/svelte';
 	import { IconPicker } from '@shared/icon-picker';
 	import { dragAndDrop } from '@formkit/drag-and-drop';
 
