@@ -6,7 +6,7 @@
 	import * as Select from '@ui/select';
 	import { onMount, onDestroy } from 'svelte';
 	import type { Observable, Subscription } from 'rxjs';
-	import { loadableFontFamilies, loadAppFonts } from '../fonts';
+	import { loadableFontFamilies } from '../fonts';
 
 	interface Props {
 		ctx: CanvasRenderingContext2D;
@@ -14,9 +14,10 @@
 		height: number;
 		redraw$: Observable<unknown>;
 		onChanged: () => void;
+		fontsLoaded: boolean;
 	}
 
-	let { ctx, width, height, redraw$, onChanged }: Props = $props();
+	let { ctx, width, height, redraw$, onChanged, fontsLoaded }: Props = $props();
 
 	const CANVAS_PADDING = 48;
 
@@ -40,16 +41,22 @@
 	);
 
 	let title = $state('John Doe');
-	let titleWeight = $state<'normal' | 'bold'>('bold');
-	let titleStyle = $state<'normal' | 'italic'>('normal');
 	let titleToggles = $state<string[]>(['bold']);
+	let titleWeight = $derived<'normal' | 'bold'>(titleToggles.includes('bold') ? 'bold' : 'normal');
+	let titleStyle = $derived<'normal' | 'italic'>(
+		titleToggles.includes('italic') ? 'italic' : 'normal'
+	);
 	let titleColor = $state('#f9f9f9');
 	let titleSize = $state(64);
 
 	let subtitle = $state('Software Engineer');
-	let subtitleWeight = $state<'normal' | 'bold'>('normal');
-	let subtitleStyle = $state<'normal' | 'italic'>('normal');
 	let subtitleToggles = $state<string[]>([]);
+	let subtitleWeight = $derived<'normal' | 'bold'>(
+		subtitleToggles.includes('bold') ? 'bold' : 'normal'
+	);
+	let subtitleStyle = $derived<'normal' | 'italic'>(
+		subtitleToggles.includes('italic') ? 'italic' : 'normal'
+	);
 	let subtitleColor = $state('#e5e7eb');
 	let subtitleSize = $state(32);
 
@@ -74,25 +81,18 @@
 		if (subtitle) ctx.fillText(subtitle, titleX, subtitleY, width * 0.8);
 	}
 
+	let sub: Subscription | null = null;
+
 	onMount(async () => {
-		await loadAppFonts();
-		const sub = redraw$.subscribe(renderText);
-		onDestroy(() => {
-			sub?.unsubscribe();
-		});
+		sub = redraw$.subscribe(renderText);
+	});
+
+	onDestroy(() => {
+		sub?.unsubscribe();
 	});
 
 	$effect(() => {
-		titleWeight = titleToggles.includes('bold') ? 'bold' : 'normal';
-		titleStyle = titleToggles.includes('italic') ? 'italic' : 'normal';
-	});
-
-	$effect(() => {
-		subtitleWeight = subtitleToggles.includes('bold') ? 'bold' : 'normal';
-		subtitleStyle = subtitleToggles.includes('italic') ? 'italic' : 'normal';
-	});
-
-	$effect(() => {
+		fontsLoaded;
 		title;
 		titleColor;
 		titleSize;
@@ -106,8 +106,7 @@
 		fontFamily;
 		width;
 		height;
-		ctx;
-		onChanged?.();
+		onChanged();
 	});
 </script>
 

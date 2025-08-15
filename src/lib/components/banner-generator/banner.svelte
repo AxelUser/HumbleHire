@@ -72,8 +72,14 @@
 			<CardTitle>Settings</CardTitle>
 		</CardHeader>
 		<CardContent>
-			{#if ctx}
-				<BannerSettings {ctx} width={WIDTH} height={HEIGHT} {skillsIcons} />
+			{#if ctx && !fontsLoading}
+				<BannerSettings
+					{ctx}
+					width={WIDTH}
+					height={HEIGHT}
+					fontsLoaded={!fontsLoading}
+					{skillsIcons}
+				/>
 			{/if}
 		</CardContent>
 	</Card>
