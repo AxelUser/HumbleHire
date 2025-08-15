@@ -10,6 +10,7 @@
 	import { UploadIcon } from '@lucide/svelte';
 	import { IconPicker } from '@shared/icon-picker';
 	import { dragAndDrop } from '@formkit/drag-and-drop';
+	import { Subject } from 'rxjs';
 
 	interface Props {
 		ctx: CanvasRenderingContext2D;
@@ -20,17 +21,7 @@
 
 	let { ctx, width, height, skillsIcons = [] }: Props = $props();
 
-	type ColorMode = 'Solid' | 'Gradient';
-	let colorMode: ColorMode = $state('Solid');
-	const colorModeOptions = new Map<ColorMode, string>([
-		['Solid', 'Solid color'],
-		['Gradient', 'Gradient color']
-	]);
-
-	let solidColor = $state('#0ea5e9');
-	let gradientFrom = $state('#0ea5e9');
-	let gradientTo = $state('#6366f1');
-	let gradientAngle = $state(45);
+	let redraw$ = new Subject<void>();
 
 	let title = $state('John Doe');
 	let titleWeight = $state<'normal' | 'bold'>('bold');
@@ -48,6 +39,7 @@
 
 	import { loadableFontFamilies, loadAppFonts as loadAppFontsUtil } from './fonts';
 	import IconsRow from './icons-row.svelte';
+	import BackgroundSection from './sections/background-section.svelte';
 
 	const genericFontFamilies = ['system-ui', 'serif', 'monospace'] as const;
 
@@ -88,30 +80,6 @@
 			rafId = null;
 			redraw();
 		});
-	}
-
-	function setBackground() {
-		if (!ctx) return;
-		if (colorMode === 'Solid') {
-			ctx.fillStyle = solidColor;
-			ctx.fillRect(0, 0, width, height);
-		} else {
-			const radians = (gradientAngle * Math.PI) / 180;
-			const x = Math.cos(radians);
-			const y = Math.sin(radians);
-			const cx = width / 2;
-			const cy = height / 2;
-			const halfDiag = Math.sqrt(cx * cx + cy * cy);
-			const x0 = cx - x * halfDiag;
-			const y0 = cy - y * halfDiag;
-			const x1 = cx + x * halfDiag;
-			const y1 = cy + y * halfDiag;
-			const grad = ctx.createLinearGradient(x0, y0, x1, y1);
-			grad.addColorStop(0, gradientFrom);
-			grad.addColorStop(1, gradientTo);
-			ctx.fillStyle = grad;
-			ctx.fillRect(0, 0, width, height);
-		}
 	}
 
 	function drawText() {
@@ -175,7 +143,7 @@
 	function redraw() {
 		if (!ctx) return;
 		ctx.clearRect(0, 0, width, height);
-		setBackground();
+		redraw$.next();
 		drawText();
 		drawIcons();
 	}
@@ -265,7 +233,7 @@
 		subtitleStyle = subtitleToggles.includes('italic') ? 'italic' : 'normal';
 	});
 
-	export async function loadAppFonts(): Promise<void> {
+	async function loadAppFonts(): Promise<void> {
 		if (typeof document === 'undefined' || !(document as any).fonts) return;
 		const families = [...loadableFontFamilies];
 		const styles = ['normal', 'italic'];
@@ -280,12 +248,11 @@
 		await (document as any).fonts.ready;
 	}
 
+	function onChanged() {
+		scheduleRedraw();
+	}
+
 	$effect(() => {
-		colorMode;
-		solidColor;
-		gradientFrom;
-		gradientTo;
-		gradientAngle;
 		title;
 		titleColor;
 		titleSize;
@@ -320,43 +287,7 @@
 </script>
 
 <div class="space-y-6">
-	<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-		<div class="space-y-2">
-			<Label for="mode">Background</Label>
-			<Select.Root type="single" bind:value={colorMode}>
-				<Select.Trigger
-					data-placeholder="Select a color type"
-					class="w-fit rounded-md border px-3 py-2"
-				>
-					{colorModeOptions.get(colorMode)}
-				</Select.Trigger>
-				<Select.Content>
-					{#each colorModeOptions.entries() as [value, label]}
-						<Select.Item {value} {label} />
-					{/each}
-				</Select.Content>
-			</Select.Root>
-		</div>
-
-		{#if colorMode === 'Solid'}
-			<div class="mt-auto">
-				<ColorPicker bind:hex={solidColor} name="solid" label="Choose a color" />
-			</div>
-		{:else}
-			<div class="flex flex-wrap items-end gap-4">
-				<div class="space-y-2">
-					<ColorPicker bind:hex={gradientFrom} name="from" label="From" />
-				</div>
-				<div class="space-y-2">
-					<ColorPicker bind:hex={gradientTo} name="to" label="To" />
-				</div>
-				<div class="min-w-1/2 space-y-2">
-					<Label>Angle ({gradientAngle}°)</Label>
-					<Slider type="single" bind:value={gradientAngle} min={0} max={360} step={1} />
-				</div>
-			</div>
-		{/if}
-	</div>
+	<BackgroundSection {ctx} {width} {height} {redraw$} {onChanged} />
 
 	<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 		<div class="space-y-2">
