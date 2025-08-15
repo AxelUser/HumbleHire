@@ -52,7 +52,7 @@
 
 <LoadingOverlay bind:open={fontsLoading} label="Loading fonts…" />
 
-<div class="mx-auto grid max-w-5xl grid-cols-1">
+<div class="mx-auto grid max-w-5xl grid-cols-1 gap-8">
 	<Card>
 		<CardHeader>
 			<CardTitle>Banner Preview</CardTitle>
