@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Button } from '@ui/button';
+	import { Input } from '@ui/input';
 	import { UploadIcon } from '@lucide/svelte';
 	import { IconPicker } from '@shared/icon-picker';
 	import { dragAndDrop } from '@formkit/drag-and-drop';
@@ -29,23 +30,25 @@
 	const MAX_PER_ROW = 6;
 	const CANVAS_PADDING = 48;
 
+	let iconSize = $state(48);
+
 	function renderIcons() {
 		const total = iconRows[0].length + iconRows[1].length;
 		if (!ctx || total === 0) return;
 		const padding = CANVAS_PADDING;
-		const iconSize = 48;
+		const size = Math.max(8, Number(iconSize) || 48);
 		const gap = 12;
 
 		const nonEmptyRows: IconItem[][] = iconRows.filter((r) => r.length > 0);
-		let y = height - padding - nonEmptyRows.length * iconSize - (nonEmptyRows.length - 1) * gap;
+		let y = height - padding - nonEmptyRows.length * size - (nonEmptyRows.length - 1) * gap;
 		for (const row of nonEmptyRows) {
-			let x = width - padding - row.length * iconSize - (row.length - 1) * gap;
+			let x = width - padding - row.length * size - (row.length - 1) * gap;
 			for (let i = 0; i < row.length; i++) {
 				const bmp = row[i]?.bmp;
-				if (bmp) ctx.drawImage(bmp as any, x, y, iconSize, iconSize);
-				x += iconSize + gap;
+				if (bmp) ctx.drawImage(bmp as any, x, y, size, size);
+				x += size + gap;
 			}
-			y += iconSize + gap;
+			y += size + gap;
 		}
 	}
 
@@ -160,32 +163,47 @@
 		iconRows;
 		width;
 		height;
+		iconSize;
 		onChanged();
 	});
 </script>
 
 <div class="space-y-2">
-	<label for="icons" class="text-sm leading-none font-medium">Icons</label>
-	<input
-		id="icons"
-		class="hidden"
-		type="file"
-		accept="image/*"
-		multiple
-		bind:this={fileInputEl}
-		onchange={onFilesSelected}
-	/>
-	<div class="flex items-center gap-2">
-		<Button type="button" onclick={() => fileInputEl?.click()} disabled={totalIcons >= MAX_ICONS}
-			><UploadIcon /> Upload icons</Button
+	<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+		<label for="icons" class="text-sm leading-none font-medium md:col-start-1 md:row-start-1"
+			>Icons</label
 		>
-		<IconPicker
-			items={skillsIcons}
-			selectedIds={selectedIconUrls}
-			buttonLabel="Pick icons from library"
-			onSelected={selectFromLibrary}
-			onUnselected={unselectFromLibrary}
-		/>
+		<div class="md:col-start-1 md:row-start-2">
+			<input
+				id="icons"
+				class="hidden"
+				type="file"
+				accept="image/*"
+				multiple
+				bind:this={fileInputEl}
+				onchange={onFilesSelected}
+			/>
+			<div class="flex items-center gap-2">
+				<Button
+					type="button"
+					onclick={() => fileInputEl?.click()}
+					disabled={totalIcons >= MAX_ICONS}><UploadIcon /> Upload icons</Button
+				>
+				<IconPicker
+					items={skillsIcons}
+					selectedIds={selectedIconUrls}
+					buttonLabel="Pick icons from library"
+					onSelected={selectFromLibrary}
+					onUnselected={unselectFromLibrary}
+				/>
+			</div>
+		</div>
+		<label for="icon-size" class="text-sm leading-none font-medium md:col-start-2 md:row-start-1"
+			>Icon size (px)</label
+		>
+		<div class="grid w-fit max-w-xs grid-cols-1 gap-1 md:col-start-2 md:row-start-2">
+			<Input id="icon-size" type="number" min={8} max={256} step={1} bind:value={iconSize} />
+		</div>
 	</div>
 
 	{#if totalIcons > 0}
