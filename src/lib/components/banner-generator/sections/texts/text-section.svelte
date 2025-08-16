@@ -5,9 +5,9 @@
 	import * as ToggleGroup from '@ui/toggle-group';
 	import * as Select from '@ui/select';
 	import { Slider } from '@ui/slider';
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount } from 'svelte';
 	import type { Observable, Subscription } from 'rxjs';
-	import { loadableFontFamilies } from '../fonts';
+	import { loadableFontFamilies } from '../../fonts';
 
 	interface Props {
 		ctx: CanvasRenderingContext2D;

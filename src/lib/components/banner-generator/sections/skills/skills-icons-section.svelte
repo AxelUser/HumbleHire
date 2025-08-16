@@ -4,7 +4,7 @@
 	import { UploadIcon } from '@lucide/svelte';
 	import { IconPicker } from '@shared/icon-picker';
 	import { dragAndDrop } from '@formkit/drag-and-drop';
-	import IconsRow from '../icons-row.svelte';
+	import IconsRow from './icons-row.svelte';
 	import { onMount } from 'svelte';
 	import type { Observable } from 'rxjs';
 

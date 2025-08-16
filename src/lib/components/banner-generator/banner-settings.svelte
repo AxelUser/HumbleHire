@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { Subject } from 'rxjs';
-	import BackgroundSection from './sections/background-section.svelte';
-	import TextSection from './sections/text-section.svelte';
-	import SkillsIconsSection from './sections/skills-icons-section.svelte';
+	import { BackgroundSection } from './sections/background';
+	import { TextSection } from './sections/texts';
+	import { SkillsIconsSection } from './sections/skills';
 
 	interface Props {
 		ctx: CanvasRenderingContext2D;
