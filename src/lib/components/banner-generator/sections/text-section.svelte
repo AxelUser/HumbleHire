@@ -4,6 +4,7 @@
 	import Input from '@ui/input/input.svelte';
 	import * as ToggleGroup from '@ui/toggle-group';
 	import * as Select from '@ui/select';
+	import { Slider } from '@ui/slider';
 	import { onMount, onDestroy } from 'svelte';
 	import type { Observable, Subscription } from 'rxjs';
 	import { loadableFontFamilies } from '../fonts';
@@ -60,6 +61,8 @@
 	let subtitleColor = $state('#e5e7eb');
 	let subtitleSize = $state(32);
 
+	let titleSubtitleGap = $state(12);
+
 	export function renderText() {
 		if (!ctx) return;
 		ctx.textBaseline = 'top';
@@ -74,7 +77,7 @@
 		ctx.font = `${titleStyle} ${titleFontWeight} ${titleSize}px ${fontFamily}, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`;
 		if (title) ctx.fillText(title, titleX, titleY, width * 0.8);
 
-		const subtitleY = titleY + titleSize + 12;
+		const subtitleY = titleY + titleSize + titleSubtitleGap;
 		ctx.fillStyle = subtitleColor;
 		const subtitleFontWeight = subtitleWeight === 'bold' ? '700' : '400';
 		ctx.font = `${subtitleStyle} ${subtitleFontWeight} ${subtitleSize}px ${fontFamily}, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`;
@@ -105,6 +108,7 @@
 		fontFamily;
 		width;
 		height;
+		titleSubtitleGap;
 		onChanged();
 	});
 </script>
@@ -175,5 +179,10 @@
 				bind:value={subtitleSize}
 			/>
 		</div>
+	</div>
+
+	<div class="max-w-sm space-y-4">
+		<Label>Title / Subtitle Spacing ({titleSubtitleGap}px)</Label>
+		<Slider type="single" bind:value={titleSubtitleGap} min={0} max={200} step={1} />
 	</div>
 </div>
