@@ -1,0 +1,1 @@
+export const env={"PUBLIC_POSTHOG_API_KEY":"phc_KVLrNfMtfw1EwIWBjs8kRq7m44j95Ht1T6jAm1YNgqS","PUBLIC_POSTHOG_HOST":"https://us.i.posthog.com"}
