@@ -5,9 +5,9 @@
 	let { children } = $props();
 </script>
 
-<div class="min-h-screen flex flex-col">
+<div class="flex min-h-screen flex-col">
 	<Header />
-	<main class="container mx-auto px-4 py-6 flex-1">
+	<main class="relative container mx-auto flex-1 px-4 py-6">
 		{@render children()}
 	</main>
 	<Footer />
