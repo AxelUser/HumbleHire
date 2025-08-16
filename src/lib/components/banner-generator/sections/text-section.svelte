@@ -83,12 +83,11 @@
 
 	let sub: Subscription | null = null;
 
-	onMount(async () => {
+	onMount(() => {
 		sub = redraw$.subscribe(renderText);
-	});
-
-	onDestroy(() => {
-		sub?.unsubscribe();
+		return () => {
+			sub?.unsubscribe();
+		};
 	});
 
 	$effect(() => {
@@ -131,7 +130,7 @@
 		<div class="flex flex-col space-y-2">
 			<Label>Title</Label>
 			<div class="flex items-center gap-2">
-				<ColorPicker bind:hex={titleColor} name="titleColor" label="Color" />
+				<ColorPicker bind:hex={titleColor} name="titleColor" label="" />
 				<Input id="title" placeholder="e.g. your name" bind:value={title} />
 				<ToggleGroup.Root type="multiple" variant="outline" bind:value={titleToggles}>
 					<ToggleGroup.Item value="bold" aria-label="Toggle bold">
@@ -153,7 +152,7 @@
 		<div class="flex flex-col space-y-2">
 			<Label>Subtitle</Label>
 			<div class="flex items-center gap-2">
-				<ColorPicker bind:hex={subtitleColor} name="subtitleColor" label="Color" />
+				<ColorPicker bind:hex={subtitleColor} name="subtitleColor" label="" />
 				<Input id="subtitle" placeholder="e.g. your role" bind:value={subtitle} />
 				<ToggleGroup.Root type="multiple" variant="outline" bind:value={subtitleToggles}>
 					<ToggleGroup.Item value="bold" aria-label="Toggle bold">

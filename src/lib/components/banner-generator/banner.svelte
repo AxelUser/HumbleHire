@@ -52,7 +52,7 @@
 
 <LoadingOverlay bind:open={fontsLoading} label="Loading fonts…" />
 
-<div class="mx-auto grid max-w-5xl grid-cols-1 gap-8">
+<div class="banner-generator mx-auto grid max-w-5xl grid-cols-1 gap-8">
 	<Card>
 		<CardHeader>
 			<CardTitle>Banner Preview</CardTitle>
@@ -88,5 +88,9 @@
 <style>
 	:global(canvas) {
 		image-rendering: optimizeQuality;
+	}
+
+	.banner-generator :global(.color) {
+		border: 1px solid;
 	}
 </style>
