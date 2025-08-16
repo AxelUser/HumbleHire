@@ -70,61 +70,77 @@
 		reader.readAsDataURL(file);
 	}
 
-	export function renderBackground() {
+	function renderBackground() {
 		if (!ctx) return;
-		if (colorMode === 'Solid') {
-			ctx.fillStyle = solidColor;
-			ctx.fillRect(0, 0, width, height);
-		} else if (colorMode === 'Gradient') {
-			const radians = (gradientAngle * Math.PI) / 180;
-			const x = Math.cos(radians);
-			const y = Math.sin(radians);
-			const cx = width / 2;
-			const cy = height / 2;
-			const halfDiag = Math.sqrt(cx * cx + cy * cy);
-			const x0 = cx - x * halfDiag;
-			const y0 = cy - y * halfDiag;
-			const x1 = cx + x * halfDiag;
-			const y1 = cy + y * halfDiag;
-			const grad = ctx.createLinearGradient(x0, y0, x1, y1);
-			grad.addColorStop(0, gradientFrom);
-			grad.addColorStop(1, gradientTo);
-			ctx.fillStyle = grad;
-			ctx.fillRect(0, 0, width, height);
-		} else if (colorMode === 'Image') {
-			ctx.fillStyle = '#000000';
-			ctx.fillRect(0, 0, width, height);
-			if (imageEl && imageEl.complete && imageEl.naturalWidth > 0) {
-				const iw = imageEl.naturalWidth;
-				const ih = imageEl.naturalHeight;
-				const canvasRatio = width / height;
-				const imageRatio = iw / ih;
-				let drawWidth = width;
-				let drawHeight = height;
-				if (imageRatio > canvasRatio) {
-					drawHeight = height;
-					drawWidth = (iw / ih) * drawHeight;
-				} else {
-					drawWidth = width;
-					drawHeight = (ih / iw) * drawWidth;
-				}
-				const dx = (width - drawWidth) / 2;
-				const dyMin = height - drawHeight;
-				const dyMax = 0;
-				const t = Math.max(0, Math.min(1, imageY / 100));
-				let dy = dyMin + t * (dyMax - dyMin);
-				dy = Math.max(dyMin, Math.min(dyMax, dy));
-				ctx.save();
-				ctx.globalAlpha = Math.max(0, Math.min(1, imageOpacity / 100));
-				ctx.drawImage(imageEl, dx, dy, drawWidth, drawHeight);
-				ctx.restore();
+		switch (colorMode) {
+			case 'Solid':
+				renderSolidColor();
+				break;
+			case 'Gradient':
+				renderGradientColor();
+				break;
+			case 'Image':
+				renderImage();
+				break;
+		}
+	}
+
+	function renderSolidColor() {
+		ctx.fillStyle = solidColor;
+		ctx.fillRect(0, 0, width, height);
+	}
+
+	function renderGradientColor() {
+		const radians = (gradientAngle * Math.PI) / 180;
+		const x = Math.cos(radians);
+		const y = Math.sin(radians);
+		const cx = width / 2;
+		const cy = height / 2;
+		const halfDiag = Math.sqrt(cx * cx + cy * cy);
+		const x0 = cx - x * halfDiag;
+		const y0 = cy - y * halfDiag;
+		const x1 = cx + x * halfDiag;
+		const y1 = cy + y * halfDiag;
+		const grad = ctx.createLinearGradient(x0, y0, x1, y1);
+		grad.addColorStop(0, gradientFrom);
+		grad.addColorStop(1, gradientTo);
+		ctx.fillStyle = grad;
+		ctx.fillRect(0, 0, width, height);
+	}
+
+	function renderImage() {
+		ctx.fillStyle = '#000000';
+		ctx.fillRect(0, 0, width, height);
+		if (imageEl && imageEl.complete && imageEl.naturalWidth > 0) {
+			const iw = imageEl.naturalWidth;
+			const ih = imageEl.naturalHeight;
+			const canvasRatio = width / height;
+			const imageRatio = iw / ih;
+			let drawWidth = width;
+			let drawHeight = height;
+			if (imageRatio > canvasRatio) {
+				drawHeight = height;
+				drawWidth = (iw / ih) * drawHeight;
+			} else {
+				drawWidth = width;
+				drawHeight = (ih / iw) * drawWidth;
 			}
+			const dx = (width - drawWidth) / 2;
+			const dyMin = height - drawHeight;
+			const dyMax = 0;
+			const t = Math.max(0, Math.min(1, imageY / 100));
+			let dy = dyMin + t * (dyMax - dyMin);
+			dy = Math.max(dyMin, Math.min(dyMax, dy));
 			ctx.save();
-			ctx.globalCompositeOperation = 'multiply';
-			ctx.fillStyle = maskColor;
-			ctx.fillRect(0, 0, width, height);
+			ctx.globalAlpha = Math.max(0, Math.min(1, imageOpacity / 100));
+			ctx.drawImage(imageEl, dx, dy, drawWidth, drawHeight);
 			ctx.restore();
 		}
+		ctx.save();
+		ctx.globalCompositeOperation = 'multiply';
+		ctx.fillStyle = maskColor;
+		ctx.fillRect(0, 0, width, height);
+		ctx.restore();
 	}
 
 	onMount(() => {

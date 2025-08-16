@@ -39,7 +39,7 @@
 
 			<Card>
 				<CardHeader>
-					<CardTitle>LinkedIn Profile Cover</CardTitle>
+					<CardTitle>LinkedIn® Profile Cover</CardTitle>
 				</CardHeader>
 				<CardContent class="flex h-full flex-col justify-between">
 					<p class="text-muted-foreground text-sm">
