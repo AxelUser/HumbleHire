@@ -26,8 +26,8 @@
 	const totalIcons = $derived(iconRows[0].length + iconRows[1].length);
 	const selectedIconUrls = $derived([...iconRows[0], ...iconRows[1]].map((i) => i.url));
 	let fileInputEl: HTMLInputElement | null = null;
-	const MAX_ICONS = 12;
-	const MAX_PER_ROW = 6;
+	const MAX_ICONS = 16;
+	const MAX_PER_ROW = 8;
 	const CANVAS_PADDING = 48;
 
 	let iconSize = $state(48);
