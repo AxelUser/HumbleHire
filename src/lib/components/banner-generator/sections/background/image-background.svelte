@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Label } from '@ui/label';
+	import * as Select from '@ui/select';
 	import ColorPicker from 'svelte-awesome-color-picker';
 	import { Slider } from '@ui/slider';
 	import Input from '@ui/input/input.svelte';
@@ -21,6 +22,17 @@
 	let maskColor = $state('#ffffff');
 	let imageY = $state(50);
 	let imageEl = $state<HTMLImageElement | null>(null);
+
+	type EffectMode = 'None' | 'ColorOverlay' | 'Blur';
+
+	const effectOptions = new Map<EffectMode, string>([
+		['None', 'None'],
+		['ColorOverlay', 'Color overlay'],
+		['Blur', 'Blur']
+	]);
+
+	let effectMode: EffectMode = $state('None');
+	let blurPx = $state(0);
 
 	function loadImageFromUrl(url: string) {
 		if (!url) {
@@ -79,15 +91,20 @@
 			let dy = dyMin + t * (dyMax - dyMin);
 			dy = Math.max(dyMin, Math.min(dyMax, dy));
 			ctx.save();
+			if (effectMode === 'Blur') {
+				ctx.filter = `blur(${blurPx}px)`;
+			}
 			ctx.globalAlpha = Math.max(0, Math.min(1, imageOpacity / 100));
 			ctx.drawImage(imageEl, dx, dy, drawWidth, drawHeight);
 			ctx.restore();
 		}
-		ctx.save();
-		ctx.globalCompositeOperation = 'multiply';
-		ctx.fillStyle = maskColor;
-		ctx.fillRect(0, 0, width, height);
-		ctx.restore();
+		if (effectMode === 'ColorOverlay') {
+			ctx.save();
+			ctx.globalCompositeOperation = 'multiply';
+			ctx.fillStyle = maskColor;
+			ctx.fillRect(0, 0, width, height);
+			ctx.restore();
+		}
 	}
 
 	onMount(() => {
@@ -103,6 +120,8 @@
 		imageY;
 		width;
 		height;
+		effectMode;
+		blurPx;
 		if (imageUrl) loadImageFromUrl(imageUrl);
 		onChanged();
 	});
@@ -131,10 +150,6 @@
 	</div>
 	<div class="grid grid-cols-1 items-start gap-6 md:grid-cols-2">
 		<div class="space-y-2">
-			<Label>Mask color</Label>
-			<ColorPicker bind:hex={maskColor} name="maskColor" label="" />
-		</div>
-		<div class="space-y-2">
 			<Label class="text-center">Vertical Position ({imageY}%)</Label>
 			<div class="flex items-center justify-center">
 				<Slider
@@ -148,4 +163,32 @@
 			</div>
 		</div>
 	</div>
+</div>
+
+<div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+	<div class="space-y-2">
+		<Label for="effects">Image Effects</Label>
+		<Select.Root type="single" bind:value={effectMode}>
+			<Select.Trigger data-placeholder="Select an effect" class="w-fit rounded-md border px-3 py-2">
+				{effectOptions.get(effectMode)}
+			</Select.Trigger>
+			<Select.Content>
+				{#each effectOptions.entries() as [value, label]}
+					<Select.Item {value} {label} />
+				{/each}
+			</Select.Content>
+		</Select.Root>
+	</div>
+
+	{#if effectMode === 'ColorOverlay'}
+		<div class="space-y-2">
+			<Label>Overlay color</Label>
+			<ColorPicker bind:hex={maskColor} name="maskColor" label="" />
+		</div>
+	{:else if effectMode === 'Blur'}
+		<div class="space-y-4">
+			<Label>Blur ({blurPx}px)</Label>
+			<Slider type="single" bind:value={blurPx} min={0} max={40} step={1} />
+		</div>
+	{/if}
 </div>
