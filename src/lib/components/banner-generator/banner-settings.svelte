@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { Subject } from 'rxjs';
-	import BackgroundSection from './sections/background-section.svelte';
-	import TextSection from './sections/text-section.svelte';
-	import SkillsIconsSection from './sections/skills-icons-section.svelte';
+	import { BackgroundSection } from './sections/background';
+	import { TextSection } from './sections/texts';
+	import { SkillsIconsSection } from './sections/skills';
+	import { Separator } from '@ui/separator';
 
 	interface Props {
 		ctx: CanvasRenderingContext2D;
@@ -50,8 +51,10 @@
 
 <div class="space-y-6">
 	<BackgroundSection {ctx} {width} {height} {redraw$} {onChanged} />
+	<Separator />
 
 	<TextSection {ctx} {width} {height} {redraw$} {onChanged} {fontsLoaded} />
+	<Separator />
 
 	<SkillsIconsSection {ctx} {width} {height} {redraw$} {onChanged} {skillsIcons} />
 </div>

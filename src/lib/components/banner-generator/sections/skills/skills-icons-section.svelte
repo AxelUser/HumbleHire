@@ -4,7 +4,7 @@
 	import { UploadIcon } from '@lucide/svelte';
 	import { IconPicker } from '@shared/icon-picker';
 	import { dragAndDrop } from '@formkit/drag-and-drop';
-	import IconsRow from '../icons-row.svelte';
+	import IconsRow from './icons-row.svelte';
 	import { onMount } from 'svelte';
 	import type { Observable } from 'rxjs';
 
@@ -26,8 +26,8 @@
 	const totalIcons = $derived(iconRows[0].length + iconRows[1].length);
 	const selectedIconUrls = $derived([...iconRows[0], ...iconRows[1]].map((i) => i.url));
 	let fileInputEl: HTMLInputElement | null = null;
-	const MAX_ICONS = 12;
-	const MAX_PER_ROW = 6;
+	const MAX_ICONS = 16;
+	const MAX_PER_ROW = 8;
 	const CANVAS_PADDING = 48;
 
 	let iconSize = $state(48);
@@ -168,65 +168,70 @@
 	});
 </script>
 
-<div class="space-y-2">
-	<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-		<label for="icons" class="text-sm leading-none font-medium md:col-start-1 md:row-start-1"
-			>Icons</label
-		>
-		<div class="md:col-start-1 md:row-start-2">
-			<input
-				id="icons"
-				class="hidden"
-				type="file"
-				accept="image/*"
-				multiple
-				bind:this={fileInputEl}
-				onchange={onFilesSelected}
-			/>
-			<div class="flex items-center gap-2">
-				<Button
-					type="button"
-					onclick={() => fileInputEl?.click()}
-					disabled={totalIcons >= MAX_ICONS}><UploadIcon /> Upload icons</Button
-				>
-				<IconPicker
-					items={skillsIcons}
-					selectedIds={selectedIconUrls}
-					buttonLabel="Pick icons from library"
-					onSelected={selectFromLibrary}
-					onUnselected={unselectFromLibrary}
-				/>
-			</div>
-		</div>
-		<label for="icon-size" class="text-sm leading-none font-medium md:col-start-2 md:row-start-1"
-			>Icon size (px)</label
-		>
-		<div class="grid w-fit max-w-xs grid-cols-1 gap-1 md:col-start-2 md:row-start-2">
-			<Input id="icon-size" type="number" min={8} max={256} step={1} bind:value={iconSize} />
-		</div>
+<div class="space-y-3">
+	<div>
+		<h3 class="text-md font-medium">Skills</h3>
 	</div>
-
-	{#if totalIcons > 0}
-		<div class="space-y-2">
-			<div class="text-muted-foreground text-sm">
-				Drag to rearrange or move between rows. Max {MAX_PER_ROW} per row.
+	<div class="space-y-2">
+		<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+			<label for="icons" class="text-sm leading-none font-medium md:col-start-1 md:row-start-1"
+				>Icons</label
+			>
+			<div class="md:col-start-1 md:row-start-2">
+				<input
+					id="icons"
+					class="hidden"
+					type="file"
+					accept="image/*"
+					multiple
+					bind:this={fileInputEl}
+					onchange={onFilesSelected}
+				/>
+				<div class="flex items-center gap-2">
+					<Button
+						type="button"
+						onclick={() => fileInputEl?.click()}
+						disabled={totalIcons >= MAX_ICONS}><UploadIcon /> Upload icons</Button
+					>
+					<IconPicker
+						items={skillsIcons}
+						selectedIds={selectedIconUrls}
+						buttonLabel="Pick icons from library"
+						onSelected={selectFromLibrary}
+						onUnselected={unselectFromLibrary}
+					/>
+				</div>
 			</div>
-			<div class="space-y-3">
-				<IconsRow
-					rowIndex={0}
-					items={iconRows[0]}
-					bind:rowEl={rowEl0}
-					{removeIcon}
-					maxPerRow={MAX_PER_ROW}
-				/>
-				<IconsRow
-					rowIndex={1}
-					items={iconRows[1]}
-					bind:rowEl={rowEl1}
-					{removeIcon}
-					maxPerRow={MAX_PER_ROW}
-				/>
+			<label for="icon-size" class="text-sm leading-none font-medium md:col-start-2 md:row-start-1"
+				>Icon size (px)</label
+			>
+			<div class="grid w-fit max-w-xs grid-cols-1 gap-1 md:col-start-2 md:row-start-2">
+				<Input id="icon-size" type="number" min={8} max={256} step={1} bind:value={iconSize} />
 			</div>
 		</div>
-	{/if}
+
+		{#if totalIcons > 0}
+			<div class="space-y-2">
+				<div class="text-muted-foreground text-sm">
+					Drag to rearrange or move between rows. Max {MAX_PER_ROW} per row.
+				</div>
+				<div class="space-y-3">
+					<IconsRow
+						rowIndex={0}
+						items={iconRows[0]}
+						bind:rowEl={rowEl0}
+						{removeIcon}
+						maxPerRow={MAX_PER_ROW}
+					/>
+					<IconsRow
+						rowIndex={1}
+						items={iconRows[1]}
+						bind:rowEl={rowEl1}
+						{removeIcon}
+						maxPerRow={MAX_PER_ROW}
+					/>
+				</div>
+			</div>
+		{/if}
+	</div>
 </div>

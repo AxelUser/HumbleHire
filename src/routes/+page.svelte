@@ -13,7 +13,7 @@
 <section class="flex min-h-[60vh] items-center justify-center">
 	<div class="fade-in mx-auto max-w-3xl space-y-6 text-center">
 		<img
-			src="/humble-hire-logo-521.png"
+			src="/humble-hire-logo-512.png"
 			alt="HumbleHire logo"
 			class="mx-auto h-24 w-24 rounded-lg border shadow-sm"
 		/>
@@ -39,7 +39,7 @@
 
 			<Card>
 				<CardHeader>
-					<CardTitle>LinkedIn Profile Cover</CardTitle>
+					<CardTitle>LinkedIn® Profile Cover</CardTitle>
 				</CardHeader>
 				<CardContent class="flex h-full flex-col justify-between">
 					<p class="text-muted-foreground text-sm">
