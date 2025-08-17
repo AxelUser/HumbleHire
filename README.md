@@ -1,34 +1,39 @@
-# HumbleHire - A humble set of tools to just make your job seeking stress free (I hope)
+![HumbleHire logo](static/humble-hire-logo-128.png)
 
-Hi there! Probably you are here because you are looking for a job. I know how stressful it can be, even if you are a senior specialist. This project contains a set of tools that may help you in this routine.
+## HumbleHire — a friendly toolkit to make job seeking less stressful
 
-## Tools
+Welcome! If you are hunting for a new role, you know it can be overwhelming—even for seasoned pros. HumbleHire is a small, growing collection of helpers to make your profile look great and your application flow smoother.
 
-- [ ] A configurable LinkedIn® banner generator to display your skills and experience.
-- [ ] A LinkedIn® profile image cover generator to make your profile stand out.
-- [ ] A resume builder with markdown support, where you can adapt your master resume to the job you are applying for.
+### Tools
 
-This project is not affiliated with LinkedIn®.
+- [x] LinkedIn® banner generator you can configure to showcase your skills and experience
+- [ ] LinkedIn® profile image cover generator to help your profile stand out
+- [ ] Markdown‑powered resume builder to tailor your master resume to each job
 
-## Tech Stack
+### Tech stack
 
-- Svelte 5
-- SvelteKit
-- TailwindCSS
-- Shadcn UI
+- [Svelte 5](https://svelte.dev)
+- [SvelteKit](https://kit.svelte.dev)
+- [Tailwind CSS](https://tailwindcss.com)
+- [shadcn-svelte](https://shadcn-svelte.com/)
 
-## Development
+### Development
+
+Prerequisites: Node.js LTS (>= 22.x) and pnpm.
 
 ```bash
 pnpm install
 pnpm run dev
 ```
 
-## Assets and attribution
+### Assets and attribution
 
-Icons in `static/skills-icons/` are sourced from the Skill Icons project by `tandpfun` and used under the MIT License. For the full collection, license details, and an easy-to-use API for GitHub profiles, see their repository and service:
+Icons in `static/skills-icons/` are from the Skill Icons project by `tandpfun` and used under the MIT License. Explore their work and API:
 
-- Repository: `https://github.com/tandpfun/skill-icons`
-- API: `https://skillicons.dev`
+- Repository: [github.com/tandpfun/skill-icons](https://github.com/tandpfun/skill-icons)
+- API: [skillicons.dev](https://skillicons.dev)
 
-All trademarks and logos are the property of their respective owners. This project is not affiliated with Skill Icons.
+### Disclaimer
+
+- This project is not affiliated with LinkedIn®.
+- All trademarks and logos are the property of their respective owners.
