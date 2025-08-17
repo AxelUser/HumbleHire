@@ -42,29 +42,34 @@
 	});
 </script>
 
-<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-	<div class="space-y-2">
-		<Label for="mode">Background</Label>
-		<Select.Root type="single" bind:value={bgMode}>
-			<Select.Trigger
-				data-placeholder="Select a color type"
-				class="w-fit rounded-md border px-3 py-2"
-			>
-				{bgModeOptions.get(bgMode)}
-			</Select.Trigger>
-			<Select.Content>
-				{#each bgModeOptions.entries() as [value, label]}
-					<Select.Item {value} {label} />
-				{/each}
-			</Select.Content>
-		</Select.Root>
+<div class="space-y-3">
+	<div>
+		<h3 class="text-md font-medium">Background</h3>
 	</div>
+	<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+		<div class="space-y-2">
+			<Label for="mode">Type</Label>
+			<Select.Root type="single" bind:value={bgMode}>
+				<Select.Trigger
+					data-placeholder="Select a color type"
+					class="w-fit rounded-md border px-3 py-2"
+				>
+					{bgModeOptions.get(bgMode)}
+				</Select.Trigger>
+				<Select.Content>
+					{#each bgModeOptions.entries() as [value, label]}
+						<Select.Item {value} {label} />
+					{/each}
+				</Select.Content>
+			</Select.Root>
+		</div>
 
-	{#if bgMode === 'Solid'}
-		<SolidBackground {ctx} {width} {height} redraw$={bgRedraw$} {onChanged} />
-	{:else if bgMode === 'Gradient'}
-		<GradientBackground {ctx} {width} {height} redraw$={bgRedraw$} {onChanged} />
-	{:else}
-		<ImageBackground {ctx} {width} {height} redraw$={bgRedraw$} {onChanged} />
-	{/if}
+		{#if bgMode === 'Solid'}
+			<SolidBackground {ctx} {width} {height} redraw$={bgRedraw$} {onChanged} />
+		{:else if bgMode === 'Gradient'}
+			<GradientBackground {ctx} {width} {height} redraw$={bgRedraw$} {onChanged} />
+		{:else}
+			<ImageBackground {ctx} {width} {height} redraw$={bgRedraw$} {onChanged} />
+		{/if}
+	</div>
 </div>

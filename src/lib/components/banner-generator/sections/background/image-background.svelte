@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { Label } from '@ui/label';
 	import * as Select from '@ui/select';
+	import { Button } from '@ui/button';
+	import { UploadIcon } from '@lucide/svelte';
 	import ColorPicker from 'svelte-awesome-color-picker';
 	import { Slider } from '@ui/slider';
 	import Input from '@ui/input/input.svelte';
@@ -22,6 +24,7 @@
 	let maskColor = $state('#ffffff');
 	let imageY = $state(50);
 	let imageEl = $state<HTMLImageElement | null>(null);
+	let fileInputEl: HTMLInputElement | null = null;
 
 	type EffectMode = 'None' | 'ColorOverlay' | 'Blur';
 
@@ -54,13 +57,15 @@
 	}
 
 	function onFileSelected(e: Event) {
+		imageUrl = '';
 		const input = e.target as HTMLInputElement;
 		const file = input.files?.[0];
-		if (!file) return;
+		if (!file) {
+			return;
+		}
 		const reader = new FileReader();
 		reader.onload = () => {
 			const result = reader.result as string;
-			imageUrl = result;
 			loadImageFromUrl(result);
 		};
 		reader.readAsDataURL(file);
@@ -127,40 +132,30 @@
 	});
 </script>
 
-<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+<div class="grid grid-cols-1 gap-6">
 	<div class="space-y-6">
 		<div class="space-y-2">
 			<Label for="imageUrl">Image URL</Label>
 			<Input id="imageUrl" placeholder="https://example.com/image.jpg" bind:value={imageUrl} />
-			<div>
-				<Label for="imageFile">Upload image</Label>
-				<Input
-					id="imageFile"
-					class="mt-1 block"
-					type="file"
-					accept="image/*"
-					onchange={onFileSelected}
-				/>
-			</div>
+			<div class="text-muted-foreground text-sm">You can upload an image or enter a URL.</div>
+			<input
+				id="imageFile"
+				class="hidden"
+				type="file"
+				accept="image/*"
+				bind:this={fileInputEl}
+				onchange={onFileSelected}
+			/>
+			<Button type="button" onclick={() => fileInputEl?.click()}><UploadIcon /> Upload image</Button
+			>
 		</div>
-		<div class="space-y-2">
+		<div class="space-y-4">
 			<Label>Image Opacity ({imageOpacity}%)</Label>
 			<Slider type="single" bind:value={imageOpacity} min={0} max={100} step={1} />
 		</div>
-	</div>
-	<div class="grid grid-cols-1 items-start gap-6 md:grid-cols-2">
-		<div class="space-y-2">
-			<Label class="text-center">Vertical Position ({imageY}%)</Label>
-			<div class="flex items-center justify-center">
-				<Slider
-					type="single"
-					orientation="vertical"
-					bind:value={imageY}
-					min={0}
-					max={100}
-					step={1}
-				/>
-			</div>
+		<div class="space-y-4">
+			<Label>Vertical Position ({imageY}%)</Label>
+			<Slider type="single" bind:value={imageY} min={0} max={100} step={1} />
 		</div>
 	</div>
 </div>
@@ -186,7 +181,7 @@
 			<ColorPicker bind:hex={maskColor} name="maskColor" label="" />
 		</div>
 	{:else if effectMode === 'Blur'}
-		<div class="space-y-4">
+		<div class="space-y-6">
 			<Label>Blur ({blurPx}px)</Label>
 			<Slider type="single" bind:value={blurPx} min={0} max={40} step={1} />
 		</div>
