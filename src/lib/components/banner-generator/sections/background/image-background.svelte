@@ -26,6 +26,13 @@
 	let imageEl = $state<HTMLImageElement | null>(null);
 	let fileInputEl: HTMLInputElement | null = null;
 
+	function openFileDialog() {
+		if (fileInputEl) {
+			fileInputEl.value = '';
+			fileInputEl.click();
+		}
+	}
+
 	type EffectMode = 'None' | 'ColorOverlay' | 'Blur';
 
 	const effectOptions = new Map<EffectMode, string>([
@@ -127,7 +134,9 @@
 		height;
 		effectMode;
 		blurPx;
-		if (imageUrl) loadImageFromUrl(imageUrl);
+		if (imageUrl) {
+			loadImageFromUrl(imageUrl);
+		}
 		onChanged();
 	});
 </script>
@@ -146,8 +155,7 @@
 				bind:this={fileInputEl}
 				onchange={onFileSelected}
 			/>
-			<Button type="button" onclick={() => fileInputEl?.click()}><UploadIcon /> Upload image</Button
-			>
+			<Button type="button" onclick={openFileDialog}><UploadIcon /> Upload image</Button>
 		</div>
 		<div class="space-y-4">
 			<Label>Image Opacity ({imageOpacity}%)</Label>
