@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as NavigationMenu from '$lib/components/ui/navigation-menu/index.js';
-	import { PROJECT_NAME } from '$lib/config.js';
+	import { PROJECT_GITHUB_URL, PROJECT_NAME } from '$lib/config';
+	import { GithubIcon } from '$lib/components/icons';
 </script>
 
 <header class="bg-background w-full border-b">
@@ -16,5 +17,8 @@
 				</NavigationMenu.Item>
 			</NavigationMenu.List>
 		</NavigationMenu.Root>
+		<a href={PROJECT_GITHUB_URL} target="_blank" class="ml-auto">
+			<GithubIcon size={32} />
+		</a>
 	</div>
 </header>
