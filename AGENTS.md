@@ -1,16 +1,26 @@
-# HumbleHire - Agent Context
+# AGENTS.md
 
 ## Project Overview
 
-A local-first, git-inspired CV builder with versioning support built with Svelte 5, SvelteKit (static adapter), Shadcn-Svelte, TailwindCSS.
+HumbleHire is a local-first, git-inspired CV builder with versioning support built with Svelte 5, SvelteKit (static adapter), Shadcn-Svelte, TailwindCSS.
 
-## Build & Test
+See docs/CODESTYLE.md for the full style guide.
+See docs/OVERVIEW.md for the project overview.
 
-- Install: `pnpm install`
-- Dev: `pnpm dev`
-- Test: `pnpm test`
-- Lint: `pnpm lint:fix`
-- Format: `pnpm format`
+## Commands
+
+```bash
+pnpm dev          # start dev server
+pnpm build        # production build (static)
+pnpm check        # svelte-check (type errors)
+pnpm lint         # prettier + eslint
+pnpm format       # auto-format
+pnpm test:unit    # vitest (watch mode)
+pnpm test:e2e     # playwright
+pnpm dlx shadcn-svelte@next add <component> # add a shadcn-svelte component
+```
+
+Always use `pnpm`, never `npm`.
 
 ## Key conventions
 
