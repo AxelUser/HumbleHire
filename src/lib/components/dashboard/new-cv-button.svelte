@@ -1,0 +1,24 @@
+<script lang="ts">
+	import { Button } from '$lib/components/ui/button';
+	import { Plus } from '@lucide/svelte';
+	import { db } from '$lib/db/index';
+	import { createEmptyCV } from '$lib/types/cv';
+
+	interface Props {
+		onCreate: (id: string) => void;
+	}
+
+	let { onCreate }: Props = $props();
+
+	async function handleClick() {
+		const id = crypto.randomUUID();
+		const cv = createEmptyCV(id, 'Untitled CV');
+		await db.cvs.add(cv);
+		onCreate(id);
+	}
+</script>
+
+<Button variant="default" onclick={handleClick}>
+	<Plus class="mr-2 h-4 w-4" />
+	New CV
+</Button>
