@@ -5,8 +5,7 @@
 		CardHeader,
 		CardTitle,
 		CardDescription,
-		CardFooter,
-		CardAction
+		CardFooter
 	} from '$lib/components/ui/card';
 	import {
 		AlertDialog,
@@ -33,17 +32,14 @@
 <Card>
 	<CardHeader>
 		<CardTitle>{cv.name}</CardTitle>
-		<CardAction>
-			<Button href="/cv/{cv.id}" variant="ghost" size="icon-sm">
-				<Eye class="h-4 w-4" />
-				<span class="sr-only">Open CV</span>
-			</Button>
-		</CardAction>
 	</CardHeader>
 	<CardDescription class="px-6 pb-2">
 		Last edited: {new Date(cv.updatedAt).toLocaleDateString()}
 	</CardDescription>
-	<CardFooter>
+	<CardFooter class="flex gap-2">
+		<Button href="/cv/{cv.id}" variant="ghost" size="sm">
+			<Eye class="mr-2 h-4 w-4" /> View
+		</Button>
 		<AlertDialog>
 			<AlertDialogTrigger>
 				{#snippet child({ props })}

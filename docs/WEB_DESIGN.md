@@ -48,10 +48,14 @@ HumbleHire expresses the "humble but grinding" feeling of job hunting. The aesth
 Shadows are purely geometric offsets — no `blur-radius`. They create depth through parallelism, not softness.
 
 ```css
---shadow-brutal-sm:    2px 2px 0px 0px <near-black>   /* default buttons, small cards */
---shadow-brutal:       4px 4px 0px 0px <near-black>   /* cards, primary CTA */
---shadow-brutal-hover: 6px 6px 0px 0px <near-black>   /* hover state */
---shadow-brutal-accent: 4px 4px 0px 0px <steel-blue>  /* accent emphasis */
+/* Shadow color adapts to theme via --shadow-color */
+/* :root  */ --shadow-color: oklch(0.12 0.025 262);       /* near-black */
+/* .dark  */ --shadow-color: oklch(0.95 0.008 255 / 30%); /* white glow */
+
+--shadow-brutal-sm:     2px 2px 0px 0px var(--shadow-color); /* default buttons, small cards */
+--shadow-brutal:        4px 4px 0px 0px var(--shadow-color); /* cards, primary CTA */
+--shadow-brutal-hover:  6px 6px 0px 0px var(--shadow-color); /* hover state */
+--shadow-brutal-accent: 4px 4px 0px 0px oklch(0.52 0.16 252); /* accent emphasis — fixed color */
 ```
 
 **Hover interaction pattern** (`.hover-brutal`):
@@ -76,10 +80,14 @@ Apply `.hover-brutal` to: all bordered/filled buttons, cards, CV rows, stat pane
 ## Component Conventions
 
 ### Buttons
-All filled/bordered variants (`default`, `secondary`, `outline`, `destructive`) share:
+All filled/bordered variants (`default`, `secondary`, `outline`, `destructive`, `accent`) share:
 - `border-2 border-foreground`
 - `shadow-brutal-sm hover-brutal`
 - `font-bold`
+
+`accent` variant: `bg-accent text-accent-foreground` — steel blue fill. Use for primary one-off CTAs ("New CV", "Get Started"). Not for frequent recurring actions ("Save Version").
+
+The `outline` variant uses `hover:bg-muted` (neutral grey) — reserved for secondary/additive actions (e.g. "Add Contact"). `hover:bg-accent` is not used on any button variant; accent hover is reserved for non-button interactive elements.
 
 Ghost buttons: borderless, no shadow — use for subtle icon actions. Hover uses `bg-muted` (neutral grey), **not** accent blue, to avoid contrast conflicts with destructive (red) icons.
 
@@ -102,7 +110,7 @@ Sizing: `size="lg"` for primary CTAs (New CV, Get Started). `size="sm"` for inli
 - **Global structure:** sticky Header → `flex-1` main content → Footer.
 - **Header:** sticky, `border-b-2 border-foreground`, shows logo + contextual back button.
 - **Footer:** `border-t-2 border-foreground`, author credit.
-- **CV editor toolbar:** `sticky top-14` (below global header), `border-b-2`.
+- **CV editor toolbar:** `sticky top-14` (below global header), `border-b-2 border-foreground`.
 
 ---
 

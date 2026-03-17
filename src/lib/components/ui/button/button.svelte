@@ -11,8 +11,9 @@
 				destructive:
 					"bg-destructive hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive text-white border-2 border-foreground shadow-brutal-sm hover-brutal font-bold",
 				outline:
-					"bg-background hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 border-2 shadow-brutal-sm hover-brutal font-bold",
+					"bg-background hover:bg-muted hover:text-foreground border-2 border-foreground shadow-brutal-sm hover-brutal font-bold",
 				secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 border-2 border-foreground shadow-brutal-sm hover-brutal font-bold",
+				accent: "bg-accent text-accent-foreground border-2 border-foreground shadow-brutal-sm hover-brutal font-bold",
 				ghost: "hover:bg-muted hover:text-foreground dark:hover:bg-muted/50",
 				link: "text-primary underline-offset-4 hover:underline",
 			},
