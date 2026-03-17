@@ -13,10 +13,17 @@ export class CVStore {
 	constructor() {
 		$effect(() => {
 			if (!this.cv) return;
+			/* 
+			Snapshot establishes deep reactive dependencies on all
+			nested cv properties for the effect to re-run whenever any field changes.
+			Don't remove it unless you know what you're doing.
+			*/
+			const snapshot = $state.snapshot(this.cv);
+
 			const timer = setTimeout(async () => {
 				this.saveStatus = 'saving';
 				try {
-					await db.cvs.put({ ...$state.snapshot(this.cv!), updatedAt: Date.now() });
+					await db.cvs.put({ ...snapshot, updatedAt: Date.now() });
 					this.saveStatus = 'saved';
 					this.lastSavedAt = Date.now();
 				} catch (err) {
