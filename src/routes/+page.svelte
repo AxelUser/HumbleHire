@@ -35,7 +35,7 @@
   {#if loading}
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {#each { length: 3 } as _, i (i)}
-        <Skeleton class="h-48 w-full rounded-xl" />
+        <Skeleton class="h-48 w-full rounded-none" />
       {/each}
     </div>
   {:else}

@@ -12,9 +12,9 @@
 	let { title, visible = $bindable(), children }: Props = $props();
 </script>
 
-<div class="flex flex-col gap-2">
+<div class="flex flex-col gap-2 border-l-4 border-foreground pl-3">
 	<div class="flex items-center justify-between">
-		<span class="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+		<span class="text-sm font-bold uppercase tracking-wide text-foreground">
 			{title}
 		</span>
 		<label class="flex items-center gap-2 cursor-pointer">
