@@ -26,9 +26,28 @@
   }
 </script>
 
+<!-- Motivation header -->
+<div class="border-b-2 border-foreground bg-card px-6 py-10">
+  <div class="mx-auto max-w-5xl">
+    <div class="mb-3 inline-flex items-center gap-1.5 border-2 border-accent px-2.5 py-1 text-xs font-bold uppercase tracking-widest text-accent">
+      ✦ Your job search, tracked
+    </div>
+    <h1 class="mb-2 text-4xl font-extrabold tracking-tight">
+      Build CVs with <em class="not-italic text-accent">quiet</em> confidence.
+    </h1>
+    <p class="text-base font-medium text-muted-foreground">
+      Every application is practice. Keep showing up — the right role is a revision away.
+    </p>
+  </div>
+</div>
+
+<!-- Dashboard content -->
 <div class="mx-auto max-w-5xl px-6 py-10">
   <div class="mb-8 flex items-center justify-between">
-    <h1 class="text-3xl font-bold">My CVs</h1>
+    <div>
+      <p class="mb-1 text-xs font-bold uppercase tracking-widest text-accent">↳ Your CVs</p>
+      <h2 class="text-2xl font-extrabold tracking-tight">Dashboard</h2>
+    </div>
     <NewCvButton onCreate={handleCreate} />
   </div>
 

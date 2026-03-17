@@ -27,8 +27,8 @@
 	});
 </script>
 
-<div class="sticky top-0 z-10 flex items-center gap-4 border-b-2 bg-background px-6 py-3">
-	<div class="flex-1">
+<div class="sticky top-14 z-10 flex items-center gap-4 border-b-2 bg-background px-6 py-3">
+	<div class="flex flex-1 items-center gap-4">
 		<InlineField bind:value={cvName} class="text-lg font-bold" />
 	</div>
 

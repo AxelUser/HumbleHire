@@ -25,20 +25,16 @@
 </script>
 
 {#if cvStore.cv === null}
-	<div class="container mx-auto max-w-3xl px-6 py-10 space-y-4">
+	<div class="mx-auto max-w-5xl space-y-4 px-6 py-10">
 		<Skeleton class="h-12 w-full" />
 		<Skeleton class="h-64 w-full" />
 		<Skeleton class="h-32 w-full" />
 	</div>
 {:else}
-	<div class="min-h-screen flex flex-col">
-		<CvEditorToolbar bind:cvName={cvStore.cv.name} onSaveVersion={() => (saveVersionOpen = true)} />
-		<main class="flex-1 overflow-y-auto">
-			<CvPreview bind:cv={cvStore.cv} />
-		</main>
-		<div class="border-t px-6 py-4">
-			<VersionHistoryPanel cvId={cvStore.cv.id} />
-		</div>
+	<CvEditorToolbar bind:cvName={cvStore.cv.name} onSaveVersion={() => (saveVersionOpen = true)} />
+	<CvPreview bind:cv={cvStore.cv} />
+	<div class="border-t-2 px-6 py-4">
+		<VersionHistoryPanel cvId={cvStore.cv.id} />
 	</div>
 	<SaveVersionModal bind:open={saveVersionOpen} />
 {/if}
