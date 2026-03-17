@@ -27,24 +27,26 @@
 	});
 </script>
 
-<div class="sticky top-14 z-10 flex items-center gap-4 border-b-2 bg-background px-6 py-3">
-	<div class="flex flex-1 items-center gap-4">
-		<InlineField bind:value={cvName} class="text-lg font-bold" />
-	</div>
+<div class="sticky top-14 z-10 border-b-2 bg-background">
+	<div class="mx-auto flex max-w-3xl items-center gap-4 px-6 py-3">
+		<div class="flex flex-1 items-center gap-4">
+			<InlineField bind:value={cvName} class="text-lg font-bold" />
+		</div>
 
-	<div class="flex items-center gap-3">
-		{#if cvStore.saveStatus === 'saving'}
-			<Badge variant="secondary">Saving…</Badge>
-		{:else if cvStore.saveStatus === 'saved' && badgeLabel !== null}
-			<Badge variant="outline">
-				{#if badgeLabel === 'just now'}
-					Saved just now
-				{:else}
-					Saved {badgeLabel}
-				{/if}
-			</Badge>
-		{/if}
+		<div class="flex items-center gap-3">
+			{#if cvStore.saveStatus === 'saving'}
+				<Badge variant="secondary">Saving…</Badge>
+			{:else if cvStore.saveStatus === 'saved' && badgeLabel !== null}
+				<Badge variant="outline">
+					{#if badgeLabel === 'just now'}
+						Saved just now
+					{:else}
+						Saved {badgeLabel}
+					{/if}
+				</Badge>
+			{/if}
 
-		<Button variant="default" size="sm" onclick={onSaveVersion}>Save Version</Button>
+			<Button variant="default" size="sm" onclick={onSaveVersion}>Save Version</Button>
+		</div>
 	</div>
 </div>

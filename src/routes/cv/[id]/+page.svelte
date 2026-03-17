@@ -33,8 +33,10 @@
 {:else}
 	<CvEditorToolbar bind:cvName={cvStore.cv.name} onSaveVersion={() => (saveVersionOpen = true)} />
 	<CvPreview bind:cv={cvStore.cv} />
-	<div class="border-t-2 px-6 py-4">
-		<VersionHistoryPanel cvId={cvStore.cv.id} />
+	<div class="border-t-2">
+		<div class="mx-auto max-w-3xl px-6 py-4">
+			<VersionHistoryPanel cvId={cvStore.cv.id} />
+		</div>
 	</div>
 	<SaveVersionModal bind:open={saveVersionOpen} />
 {/if}
