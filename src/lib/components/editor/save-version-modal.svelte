@@ -10,13 +10,14 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { Textarea } from '$lib/components/ui/textarea';
-	import { saveVersion } from '$lib/stores/cv.svelte';
+	import { getCVStoreContext } from '$lib/stores/cv.svelte';
 
 	interface Props {
 		open: boolean;
 	}
 
 	let { open = $bindable() }: Props = $props();
+	const cvStore = getCVStoreContext();
 
 	let name = $state('');
 	let notes = $state('');
@@ -28,7 +29,7 @@
 
 	async function handleSave() {
 		if (!name.trim()) return;
-		await saveVersion(name.trim(), notes.trim() || undefined);
+		await cvStore.saveVersion(name.trim(), notes.trim() || undefined);
 		reset();
 		open = false;
 	}

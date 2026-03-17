@@ -1,56 +1,53 @@
+import { getContext, setContext } from 'svelte';
 import { db } from '$lib/db/index';
-import type { CV, CVVersion } from '$lib/types/cv';
+import type { CV, CVBlocks, CVVersion } from '$lib/types/cv';
 import { toast } from 'svelte-sonner';
 
-let cv = $state<CV | null>(null);
-let saveStatus = $state<'idle' | 'saving' | 'saved'>('idle');
-let lastSavedAt = $state<number | null>(null);
+const CV_STORE_KEY = Symbol('cv-store');
 
-$effect.root(() => {
-	$effect(() => {
-		if (!cv) return;
-		const timer = setTimeout(async () => {
-			saveStatus = 'saving';
-			try {
-				await db.cvs.put({ ...$state.snapshot(cv!), updatedAt: Date.now() });
-				saveStatus = 'saved';
-				lastSavedAt = Date.now();
-			} catch (err) {
-				saveStatus = 'idle';
-				toast.error('Auto-save failed. Your changes may not be saved.');
-				console.error('Auto-save error:', err);
-			}
-		}, 1000);
-		return () => clearTimeout(timer);
-	});
-});
+export class CVStore {
+	cv = $state<CV | null>(null);
+	saveStatus = $state<'idle' | 'saving' | 'saved'>('idle');
+	lastSavedAt = $state<number | null>(null);
 
-export function getCV() {
-	return cv;
+	constructor() {
+		$effect(() => {
+			if (!this.cv) return;
+			const timer = setTimeout(async () => {
+				this.saveStatus = 'saving';
+				try {
+					await db.cvs.put({ ...$state.snapshot(this.cv!), updatedAt: Date.now() });
+					this.saveStatus = 'saved';
+					this.lastSavedAt = Date.now();
+				} catch (err) {
+					this.saveStatus = 'idle';
+					toast.error('Auto-save failed. Your changes may not be saved.');
+					console.error('Auto-save error:', err);
+				}
+			}, 1000);
+			return () => clearTimeout(timer);
+		});
+	}
+
+	async saveVersion(name: string, notes?: string): Promise<void> {
+		if (!this.cv) return;
+		const version: CVVersion = {
+			id: crypto.randomUUID(),
+			cvId: this.cv.id,
+			name,
+			notes,
+			createdAt: Date.now(),
+			snapshot: $state.snapshot(this.cv.blocks) as CVBlocks
+		};
+		await db.versions.add(version);
+		toast.success(`Version "${name}" saved.`);
+	}
 }
 
-export function setCV(value: CV | null) {
-	cv = value;
+export function setCVStoreContext(store: CVStore): void {
+	setContext(CV_STORE_KEY, store);
 }
 
-export function getSaveStatus() {
-	return saveStatus;
-}
-
-export function getLastSavedAt() {
-	return lastSavedAt;
-}
-
-export async function saveVersion(name: string, notes?: string): Promise<void> {
-	if (!cv) return;
-	const version: CVVersion = {
-		id: crypto.randomUUID(),
-		cvId: cv.id,
-		name,
-		notes,
-		createdAt: Date.now(),
-		snapshot: $state.snapshot(cv.blocks)
-	};
-	await db.versions.add(version);
-	toast.success(`Version "${name}" saved.`);
+export function getCVStoreContext(): CVStore {
+	return getContext<CVStore>(CV_STORE_KEY);
 }

@@ -2,7 +2,7 @@
 	import { InlineField } from '$lib/components/ui/inline-field';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
-	import { getSaveStatus, getLastSavedAt } from '$lib/stores/cv.svelte';
+	import { getCVStoreContext } from '$lib/stores/cv.svelte';
 
 	interface Props {
 		cvName: string;
@@ -11,9 +11,11 @@
 
 	let { cvName = $bindable(), onSaveVersion }: Props = $props();
 
+	const cvStore = getCVStoreContext();
+
 	const badgeLabel = $derived.by(() => {
-		const status = getSaveStatus();
-		const lastSavedAt = getLastSavedAt();
+		const status = cvStore.saveStatus;
+		const lastSavedAt = cvStore.lastSavedAt;
 		if (status === 'saving') return 'saving';
 		if (status === 'saved' && lastSavedAt !== null) {
 			const elapsed = Date.now() - lastSavedAt;
@@ -31,9 +33,9 @@
 	</div>
 
 	<div class="flex items-center gap-3">
-		{#if getSaveStatus() === 'saving'}
+		{#if cvStore.saveStatus === 'saving'}
 			<Badge variant="secondary">Saving…</Badge>
-		{:else if getSaveStatus() === 'saved' && badgeLabel !== null}
+		{:else if cvStore.saveStatus === 'saved' && badgeLabel !== null}
 			<Badge variant="outline">
 				{#if badgeLabel === 'just now'}
 					Saved just now
