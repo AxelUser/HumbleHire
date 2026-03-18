@@ -33,15 +33,14 @@
     <div class="flex flex-col gap-10 md:flex-row md:items-center">
       <!-- Left: text -->
       <div class="flex-1">
-        <div class="mb-5">
-          <img src={mode.current === 'dark' ? '/logo/humblehire_logo_dark.avif' : '/logo/humblehire_logo_light.avif'} alt="HumbleHire" class="h-20 w-auto" />
-        </div>
+
         <div
           class="mb-3 inline-flex items-center gap-1.5 border-2 border-accent px-2.5 py-1 text-xs font-bold uppercase tracking-widest text-accent"
         >
           ✦ Version controlled
         </div>
         <h1 class="mb-2 text-4xl font-extrabold tracking-tight">
+          <img src={mode.current === 'dark' ? '/logo/humblehire_logo_dark.avif' : '/logo/humblehire_logo_light.avif'} alt="HumbleHire" class="h-20 w-auto inline-block" />
           One CV. <em class="not-italic text-accent">Many targets.</em>
         </h1>
         <p class="text-base font-medium text-muted-foreground">
