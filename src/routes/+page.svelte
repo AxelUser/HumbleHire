@@ -7,6 +7,7 @@
   import { Skeleton } from '$lib/components/ui/skeleton';
 
   import type { CV } from '$lib/types/cv';
+  import { mode } from 'mode-watcher';
 
   let cvs = $state<CV[]>([]);
   let loading = $state(true);
@@ -32,6 +33,9 @@
     <div class="flex flex-col gap-10 md:flex-row md:items-center">
       <!-- Left: text -->
       <div class="flex-1">
+        <div class="mb-5">
+          <img src={mode.current === 'dark' ? '/logo/humblehire_logo_dark.avif' : '/logo/humblehire_logo_light.avif'} alt="HumbleHire" class="h-20 w-auto" />
+        </div>
         <div
           class="mb-3 inline-flex items-center gap-1.5 border-2 border-accent px-2.5 py-1 text-xs font-bold uppercase tracking-widest text-accent"
         >
