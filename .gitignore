@@ -27,3 +27,5 @@ vite.config.ts.timestamp-*
 .claude
 .cursor
 .agents
+*storybook.log
+storybook-static
