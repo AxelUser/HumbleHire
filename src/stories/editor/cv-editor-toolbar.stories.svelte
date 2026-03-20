@@ -11,10 +11,10 @@
 	});
 </script>
 
-<Story name="SavedState">
+<Story name="SavedState" asChild>
 		<CvEditorToolbarWrapper />
 </Story>
 
-<Story name="SavingState">
+<Story name="SavingState" asChild>
 		<CvEditorToolbarSavingWrapper />
 </Story>

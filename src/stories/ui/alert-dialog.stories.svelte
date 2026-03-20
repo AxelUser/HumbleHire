@@ -19,7 +19,7 @@
 	});
 </script>
 
-<Story name="DestructiveConfirmation">
+<Story name="DestructiveConfirmation" asChild>
 		<div class="p-8">
 			<AlertDialog>
 				<AlertDialogTrigger>

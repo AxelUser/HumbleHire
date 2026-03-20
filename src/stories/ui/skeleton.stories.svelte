@@ -9,7 +9,7 @@
 	});
 </script>
 
-<Story name="VariousSizes">
+<Story name="VariousSizes" asChild>
 		<div class="flex flex-col gap-3 w-64">
 			<Skeleton class="h-4 w-full" />
 			<Skeleton class="h-4 w-3/4" />
@@ -19,7 +19,7 @@
 		</div>
 </Story>
 
-<Story name="CardSkeleton">
+<Story name="CardSkeleton" asChild>
 		<div class="w-64 border-2 border-foreground p-4 flex flex-col gap-3">
 			<Skeleton class="h-5 w-1/2" />
 			<Skeleton class="h-4 w-full" />

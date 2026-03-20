@@ -10,6 +10,6 @@
 	});
 </script>
 
-<Story name="Default">
+<Story name="Default" asChild>
 		<Footer />
 </Story>

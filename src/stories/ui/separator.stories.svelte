@@ -9,7 +9,7 @@
 	});
 </script>
 
-<Story name="Horizontal">
+<Story name="Horizontal" asChild>
 		<div class="w-64">
 			<p class="text-sm">Above</p>
 			<Separator class="my-2" />
@@ -17,7 +17,7 @@
 		</div>
 </Story>
 
-<Story name="Vertical">
+<Story name="Vertical" asChild>
 		<div class="flex items-center gap-3 h-8">
 			<span class="text-sm">Left</span>
 			<Separator orientation="vertical" />

@@ -10,7 +10,7 @@
 	});
 </script>
 
-<Story name="WithTitle">
+<Story name="WithTitle" asChild>
 		<PanelCard title="Work Experience" class="w-72">
 			<p class="text-sm text-muted-foreground">Panel body content.</p>
 		</PanelCard>
@@ -20,7 +20,7 @@
 		<PanelCardWithActionWrapper />
 </Story>
 
-<Story name="NoHeader">
+<Story name="NoHeader" asChild>
 		<PanelCard class="w-72">
 			<p class="text-sm text-muted-foreground">No header, just content.</p>
 		</PanelCard>

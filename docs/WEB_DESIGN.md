@@ -27,17 +27,17 @@ HumbleHire expresses the "humble but grinding" feeling of job hunting. The aesth
 
 ## Color Palette — Cool & Concrete
 
-| Token | Light | Dark | Use |
-|---|---|---|---|
-| `--background` | `oklch(0.97 0.006 255)` — cool off-white | `oklch(0.13 0.03 264)` | Page surface |
-| `--card` | `oklch(1 0 0)` — pure white | `oklch(0.18 0.03 264)` | Elevated surface |
-| `--foreground` | `oklch(0.12 0.025 262)` — near-black | `oklch(0.95 0.008 255)` | Primary text, borders |
-| `--primary` | `oklch(0.22 0.04 264)` — dark slate | `oklch(0.90 0.015 255)` | Primary buttons |
-| `--secondary` | `oklch(0.88 0.018 255)` — light grey-blue | `oklch(0.26 0.038 262)` | Secondary surfaces |
-| `--muted` | `oklch(0.93 0.010 255)` | `oklch(0.26 0.038 262)` | Disabled, skeleton |
-| `--muted-foreground` | `oklch(0.48 0.040 258)` | `oklch(0.62 0.040 258)` | Captions, metadata |
-| `--accent` | `oklch(0.52 0.16 252)` — **steel blue** | `oklch(0.58 0.18 252)` | ONE accent, use sparingly |
-| `--border` | `oklch(0.22 0.025 262)` — near-black | `oklch(0.95 0.008 255 / 18%)` | All visible borders |
+| Token                | Light                                     | Dark                          | Use                       |
+| -------------------- | ----------------------------------------- | ----------------------------- | ------------------------- |
+| `--background`       | `oklch(0.97 0.006 255)` — cool off-white  | `oklch(0.13 0.03 264)`        | Page surface              |
+| `--card`             | `oklch(1 0 0)` — pure white               | `oklch(0.18 0.03 264)`        | Elevated surface          |
+| `--foreground`       | `oklch(0.12 0.025 262)` — near-black      | `oklch(0.95 0.008 255)`       | Primary text, borders     |
+| `--primary`          | `oklch(0.22 0.04 264)` — dark slate       | `oklch(0.90 0.015 255)`       | Primary buttons           |
+| `--secondary`        | `oklch(0.88 0.018 255)` — light grey-blue | `oklch(0.26 0.038 262)`       | Secondary surfaces        |
+| `--muted`            | `oklch(0.93 0.010 255)`                   | `oklch(0.26 0.038 262)`       | Disabled, skeleton        |
+| `--muted-foreground` | `oklch(0.48 0.040 258)`                   | `oklch(0.62 0.040 258)`       | Captions, metadata        |
+| `--accent`           | `oklch(0.52 0.16 252)` — **steel blue**   | `oklch(0.58 0.18 252)`        | ONE accent, use sparingly |
+| `--border`           | `oklch(0.22 0.025 262)` — near-black      | `oklch(0.95 0.008 255 / 18%)` | All visible borders       |
 
 **Accent rule:** Steel blue (`--accent`) is the single punch of color. Use it for: eyebrows, highlighted numbers, active badges, CTA hover. Do not introduce other hues.
 
@@ -49,16 +49,19 @@ Shadows are purely geometric offsets — no `blur-radius`. They create depth thr
 
 ```css
 /* Shadow color adapts to theme via --shadow-color */
-/* :root  */ --shadow-color: oklch(0.12 0.025 262);       /* near-black */
-/* .dark  */ --shadow-color: oklch(0.95 0.008 255 / 30%); /* white glow */
+/* :root  */
+--shadow-color: oklch(0.12 0.025 262); /* near-black */
+/* .dark  */
+--shadow-color: oklch(0.95 0.008 255 / 30%); /* white glow */
 
---shadow-brutal-sm:     2px 2px 0px 0px var(--shadow-color); /* default buttons, small cards */
---shadow-brutal:        4px 4px 0px 0px var(--shadow-color); /* cards, primary CTA */
---shadow-brutal-hover:  6px 6px 0px 0px var(--shadow-color); /* hover state */
+--shadow-brutal-sm: 2px 2px 0px 0px var(--shadow-color); /* default buttons, small cards */
+--shadow-brutal: 4px 4px 0px 0px var(--shadow-color); /* cards, primary CTA */
+--shadow-brutal-hover: 6px 6px 0px 0px var(--shadow-color); /* hover state */
 --shadow-brutal-accent: 4px 4px 0px 0px oklch(0.52 0.16 252); /* accent emphasis — fixed color */
 ```
 
 **Hover interaction pattern** (`.hover-brutal`):
+
 - Rest: `shadow-brutal-sm` + `translate(0, 0)`
 - Hover: `translate(-2px, -2px)` + `shadow-brutal-hover` → element "lifts" diagonally
 - Active: back to rest — snaps back on click
@@ -80,7 +83,9 @@ Apply `.hover-brutal` to: all bordered/filled buttons, cards, CV rows, stat pane
 ## Component Conventions
 
 ### Buttons
+
 All filled/bordered variants (`default`, `secondary`, `outline`, `destructive`, `accent`) share:
+
 - `border-2 border-foreground`
 - `shadow-brutal-sm hover-brutal`
 - `font-bold`
@@ -94,13 +99,25 @@ Ghost buttons: borderless, no shadow — use for subtle icon actions. Hover uses
 Sizing: `size="lg"` for primary CTAs (New CV, Get Started). `size="sm"` for inline toolbar actions.
 
 ### Cards
+
 `border-2 border-foreground shadow-brutal hover-brutal` — all cards lift on hover. No `rounded-xl`, no `shadow-sm`.
 
 ### Badges
+
 `rounded-none border` (inherits near-black border from token), `font-bold`, `px-2.5 py-1`. The border color comes from `--border` token — no `border-transparent` overrides.
 
 ### Inputs / Textareas
+
 `border-2` (never `border`). Focus ring: `ring-[3px]` with steel blue `--ring` token.
+
+### Bullet Points
+
+List items with bullet points use a geometric square (■) to maintain Neo-Brutalist rectangular aesthetic:
+
+- Size: `text-lg` (1.125rem) with `leading-none`
+- Positioning: `mt-[0.2rem]` to vertically center with first line of text
+- Color: `text-muted-foreground` for subtle hierarchy
+- Character: ■ (geometric square, not circular •)
 
 ---
 
@@ -119,19 +136,20 @@ Sizing: `size="lg"` for primary CTAs (New CV, Get Started). `size="sm"` for inli
 Implemented via [mode-watcher](https://github.com/svecosystem/mode-watcher). Adds `.dark` class to `<html>`.
 
 In dark mode:
+
 - Borders soften: `oklch(0.95 0.008 255 / 18%)` — near-white at low opacity
 - Hard shadows become: `oklch(0.95 0.008 255 / 30%)` — subtle glow instead of hard black
 - Accent brightens slightly: `oklch(0.58 0.18 252)`
 - Destructive uses solid red (not `destructive/60`) for legibility
 
-Toggle: floating `fixed bottom-6 right-6` button. Uses Sun/Moon icon to indicate the mode you'll *switch to*.
+Toggle: floating `fixed bottom-6 right-6` button. Uses Sun/Moon icon to indicate the mode you'll _switch to_.
 
 ---
 
 ## Voice & Copy
 
 - Section eyebrows: short, directional — `↳ Your CVs`, `✦ Your job search, tracked`
-- Motivation copy: understated — *"Every application is practice. Keep showing up."*
+- Motivation copy: understated — _"Every application is practice. Keep showing up."_
 - UI labels: direct, no filler — "Save Version", "Delete", "Dashboard"
 - Avoid: exclamation marks, marketing superlatives, emoji in UI chrome
 

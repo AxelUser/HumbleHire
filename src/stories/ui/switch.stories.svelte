@@ -10,11 +10,11 @@
 	});
 </script>
 
-<Story name="Off">
+<Story name="Off" asChild>
 		<Switch checked={false} />
 </Story>
 
-<Story name="On">
+<Story name="On" asChild>
 		<Switch checked={true} />
 </Story>
 

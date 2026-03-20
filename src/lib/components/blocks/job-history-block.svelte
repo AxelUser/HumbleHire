@@ -67,7 +67,7 @@
 				<div class="flex flex-col gap-2">
 					{#each job.achievements as _, index (index)}
 						<div class="flex items-start gap-2">
-							<span class="mt-2 text-muted-foreground select-none">•</span>
+							<span class="mt-[0.2rem] text-lg leading-none text-muted-foreground select-none">■</span>
 							<InlineTextarea
 								bind:value={job.achievements[index]}
 								placeholder="Describe an achievement..."

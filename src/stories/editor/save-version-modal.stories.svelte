@@ -11,6 +11,6 @@
 	});
 </script>
 
-<Story name="Open">
+<Story name="Open" asChild>
 		<SaveVersionModalWrapper />
 </Story>

@@ -27,7 +27,7 @@
 	{/snippet}
 </Story>
 
-<Story name="AllVariants">
+<Story name="AllVariants" asChild>
 	<div class="flex flex-wrap gap-3">
 		<Button variant="default">Default</Button>
 		<Button variant="destructive">Destructive</Button>
@@ -39,7 +39,7 @@
 	</div>
 </Story>
 
-<Story name="AllSizes">
+<Story name="AllSizes" asChild>
 	<div class="flex flex-wrap items-center gap-3">
 		<Button size="sm">Small</Button>
 		<Button size="default">Default</Button>
@@ -47,13 +47,13 @@
 	</div>
 </Story>
 
-<Story name="Disabled">
+<Story name="Disabled" asChild>
 	<div class="flex flex-wrap gap-3">
 		<Button disabled>Disabled Default</Button>
 		<Button variant="outline" disabled>Disabled Outline</Button>
 	</div>
 </Story>
 
-<Story name="AsLink">
+<Story name="AsLink" asChild>
 	<Button href="https://example.com" variant="outline">Open Link</Button>
 </Story>

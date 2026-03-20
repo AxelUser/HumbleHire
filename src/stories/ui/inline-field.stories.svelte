@@ -10,11 +10,11 @@
 	});
 </script>
 
-<Story name="Default">
+<Story name="Default" asChild>
 		<InlineField value="Aleksey Maltsev" placeholder="Enter name..." />
 </Story>
 
-<Story name="Empty">
+<Story name="Empty" asChild>
 		<InlineField value="" placeholder="Click to edit..." />
 </Story>
 

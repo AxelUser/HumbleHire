@@ -15,7 +15,7 @@
 	});
 </script>
 
-<Story name="Basic">
+<Story name="Basic" asChild>
 		<Card class="w-64">
 			<CardContent>
 				<p class="text-sm">Basic card content.</p>
@@ -23,7 +23,7 @@
 		</Card>
 </Story>
 
-<Story name="WithHeader">
+<Story name="WithHeader" asChild>
 		<Card class="w-64">
 			<CardHeader>
 				<CardTitle>Card Title</CardTitle>
@@ -35,7 +35,7 @@
 		</Card>
 </Story>
 
-<Story name="FullCard">
+<Story name="FullCard" asChild>
 		<Card class="w-64">
 			<CardHeader>
 				<CardTitle>Full Card</CardTitle>

@@ -10,11 +10,11 @@
 	});
 </script>
 
-<Story name="Default">
+<Story name="Default" asChild>
 		<Label>Full Name</Label>
 </Story>
 
-<Story name="PairedWithInput">
+<Story name="PairedWithInput" asChild>
 		<div class="flex flex-col gap-1.5 w-64">
 			<Label for="name-input">Full Name</Label>
 			<Input id="name-input" placeholder="Aleksey Maltsev" />

@@ -17,7 +17,7 @@
 	});
 </script>
 
-<Story name="Basic">
+<Story name="Basic" asChild>
 		<div class="p-8">
 			<Dialog>
 				<DialogTrigger>
@@ -40,7 +40,7 @@
 		</div>
 </Story>
 
-<Story name="NoCloseButton">
+<Story name="NoCloseButton" asChild>
 		<div class="p-8">
 			<Dialog>
 				<DialogTrigger>
