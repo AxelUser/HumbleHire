@@ -34,34 +34,36 @@
 </script>
 
 <BlockWrapper title="Job History" bind:visible>
-	<div class="flex flex-col">
+	<div class="flex flex-col gap-4">
 		{#each jobs as job (job.id)}
-			<div class="border rounded-lg p-4 mb-4">
-				<div class="flex items-start justify-between gap-2 mb-2">
-					<div class="flex flex-wrap items-baseline gap-2 flex-1">
-						<InlineField bind:value={job.company} placeholder="Company" class="font-semibold" />
-						<span class="text-muted-foreground">—</span>
-						<InlineField bind:value={job.role} placeholder="Role" class="flex-1" />
+			<div class="border rounded-lg p-4">
+				<div class="flex flex-col gap-2">
+					<div class="flex items-start justify-between gap-2">
+						<div class="flex flex-wrap items-baseline gap-2 flex-1">
+							<InlineField bind:value={job.company} placeholder="Company" class="font-semibold" />
+							<span class="text-muted-foreground">—</span>
+							<InlineField bind:value={job.role} placeholder="Role" class="flex-1" />
+						</div>
+						<Button
+							variant="ghost"
+							size="icon"
+							class="shrink-0 text-muted-foreground hover:text-destructive"
+							onclick={() => removeJob(job.id)}
+						>
+							<Trash2 class="h-4 w-4" />
+						</Button>
 					</div>
-					<Button
-						variant="ghost"
-						size="icon"
-						class="shrink-0 text-muted-foreground hover:text-destructive"
-						onclick={() => removeJob(job.id)}
-					>
-						<Trash2 class="h-4 w-4" />
-					</Button>
+					<div class="flex items-center gap-2">
+						<DatePickerField bind:value={job.startDate} placeholder="Start date" />
+						<span class="text-muted-foreground">–</span>
+						<DatePickerField bind:value={job.endDate} placeholder="End date" />
+					</div>
+					<EditableList
+						bind:items={job.achievements}
+						placeholder="Describe an achievement..."
+						addLabel="Add Achievement"
+					/>
 				</div>
-				<div class="flex items-center gap-2 mb-3">
-					<DatePickerField bind:value={job.startDate} placeholder="Start date" />
-					<span class="text-muted-foreground">–</span>
-					<DatePickerField bind:value={job.endDate} placeholder="End date" />
-				</div>
-				<EditableList
-					bind:items={job.achievements}
-					placeholder="Describe an achievement..."
-					addLabel="Add Achievement"
-				/>
 			</div>
 		{/each}
 		<Button variant="outline" size="sm" class="self-start" onclick={addJob}>

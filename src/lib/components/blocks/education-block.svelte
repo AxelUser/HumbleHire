@@ -32,33 +32,35 @@
 </script>
 
 <BlockWrapper title="Education" bind:visible>
-	<div class="flex flex-col">
+	<div class="flex flex-col gap-4">
 		{#each education as entry (entry.id)}
-			<div class="border rounded-lg p-4 mb-4">
-				<div class="flex items-start justify-between gap-2 mb-2">
+			<div class="border rounded-lg p-4">
+				<div class="flex flex-col gap-2">
+					<div class="flex items-start justify-between gap-2">
+						<InlineField
+							bind:value={entry.institution}
+							placeholder="Institution"
+							class="font-semibold flex-1"
+						/>
+						<Button
+							variant="ghost"
+							size="icon"
+							class="shrink-0 text-muted-foreground hover:text-destructive"
+							onclick={() => removeEducation(entry.id)}
+						>
+							<Trash2 class="h-4 w-4" />
+						</Button>
+					</div>
 					<InlineField
-						bind:value={entry.institution}
-						placeholder="Institution"
-						class="font-semibold flex-1"
+						bind:value={entry.degree}
+						placeholder="Degree / Field of study"
+						class="w-full"
 					/>
-					<Button
-						variant="ghost"
-						size="icon"
-						class="shrink-0 text-muted-foreground hover:text-destructive"
-						onclick={() => removeEducation(entry.id)}
-					>
-						<Trash2 class="h-4 w-4" />
-					</Button>
-				</div>
-				<InlineField
-					bind:value={entry.degree}
-					placeholder="Degree / Field of study"
-					class="w-full mb-2"
-				/>
-				<div class="flex items-center gap-2">
-					<DatePickerField bind:value={entry.startDate} placeholder="Start date" />
-					<span class="text-muted-foreground">–</span>
-					<DatePickerField bind:value={entry.endDate} placeholder="End date" />
+					<div class="flex items-center gap-2">
+						<DatePickerField bind:value={entry.startDate} placeholder="Start date" />
+						<span class="text-muted-foreground">–</span>
+						<DatePickerField bind:value={entry.endDate} placeholder="End date" />
+					</div>
 				</div>
 			</div>
 		{/each}

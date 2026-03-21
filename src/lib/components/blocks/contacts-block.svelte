@@ -37,7 +37,7 @@
 				</Button>
 			</div>
 		{/each}
-		<Button variant="outline" size="sm" class="mt-1 self-start" onclick={addContact}>
+		<Button variant="outline" size="sm" class="mt-2 self-start" onclick={addContact}>
 			<Plus class="h-4 w-4 mr-1" />
 			Add Contact
 		</Button>

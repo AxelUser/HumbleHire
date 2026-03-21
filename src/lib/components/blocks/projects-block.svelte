@@ -32,36 +32,38 @@
 </script>
 
 <BlockWrapper title="Projects" bind:visible>
-	<div class="flex flex-col">
+	<div class="flex flex-col gap-4">
 		{#each projects as project (project.id)}
-			<div class="border rounded-lg p-4 mb-4">
-				<div class="flex items-start justify-between gap-2 mb-2">
-					<InlineField bind:value={project.name} placeholder="Project name" class="font-semibold flex-1" />
-					<Button
-						variant="ghost"
-						size="icon"
-						class="shrink-0 text-muted-foreground hover:text-destructive"
-						onclick={() => removeProject(project.id)}
-					>
-						<Trash2 class="h-4 w-4" />
-					</Button>
+			<div class="border rounded-lg p-4">
+				<div class="flex flex-col gap-2">
+					<div class="flex items-start justify-between gap-2">
+						<InlineField bind:value={project.name} placeholder="Project name" class="font-semibold flex-1" />
+						<Button
+							variant="ghost"
+							size="icon"
+							class="shrink-0 text-muted-foreground hover:text-destructive"
+							onclick={() => removeProject(project.id)}
+						>
+							<Trash2 class="h-4 w-4" />
+						</Button>
+					</div>
+					<InlineTextarea
+						bind:value={project.description}
+						placeholder="Describe the project..."
+						class="w-full"
+						rows={3}
+					/>
+					<InlineField
+						bind:value={project.stack}
+						placeholder="Tech stack (e.g. TypeScript, Svelte, Postgres)"
+						class="text-sm text-muted-foreground w-full"
+					/>
+					<InlineField
+						bind:value={project.link}
+						placeholder="Link (optional)"
+						class="text-sm w-full"
+					/>
 				</div>
-				<InlineTextarea
-					bind:value={project.description}
-					placeholder="Describe the project..."
-					class="w-full mb-2"
-					rows={3}
-				/>
-				<InlineField
-					bind:value={project.stack}
-					placeholder="Tech stack (e.g. TypeScript, Svelte, Postgres)"
-					class="text-sm text-muted-foreground w-full mb-1"
-				/>
-				<InlineField
-					bind:value={project.link}
-					placeholder="Link (optional)"
-					class="text-sm w-full"
-				/>
 			</div>
 		{/each}
 		<Button variant="outline" size="sm" class="self-start" onclick={addProject}>

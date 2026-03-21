@@ -110,6 +110,40 @@ Sizing: `size="lg"` for primary CTAs (New CV, Get Started). `size="sm"` for inli
 
 `border-2` (never `border`). Focus ring: `ring-[3px]` with steel blue `--ring` token.
 
+### Block Spacing — CV Editor Internals
+
+Spacing inside CV block components follows a strict three-tier hierarchy. Use `gap` on parent flex containers, not `mb-*` on individual children.
+
+| Role | Class | px | Where |
+|---|---|---|---|
+| Entry card gap | `gap-4` | 16 | Between entry cards (education, jobs, projects) |
+| Field gap | `gap-2` | 8 | Between fields within a card; between flat list items |
+| List item gap | `gap-1.5` | 6 | Between bullet items in EditableList |
+| Inline gap | `gap-2` | 8 | Same-row elements (dates, label+value) |
+| Entry padding | `p-4` | 16 | Internal padding of entry cards |
+| Add button margin | `mt-2` | 8 | Above "Add" buttons in flat lists / EditableList |
+
+**Rules:**
+
+1. Entry card spacing is controlled by `gap-4` on the flex container, not `mb-4` on individual cards.
+2. All fields within an entry card sit in `flex flex-col gap-2`. No individual margin classes on fields.
+3. EditableList uses `gap-1.5` internally — bullet items are denser content.
+4. In entry card blocks, the add button is a sibling in the `gap-4` container (inherits 16px space). In flat lists and EditableList, use `mt-2`.
+5. Entry cards use `border rounded-lg p-4`. No margin classes on cards.
+
+```
+PanelCard (px-4 py-4)
+  └─ Block content
+       ├─ Cards container (gap-4)
+       │    └─ Card (p-4, border rounded-lg)
+       │         └─ Fields (gap-2)
+       │              ├─ Header row (gap-2 inline)
+       │              ├─ Text fields
+       │              ├─ Date row (gap-2 inline)
+       │              └─ EditableList (gap-1.5)
+       └─ Add button (inherits gap-4)
+```
+
 ### Bullet Points
 
 List items with bullet points use a geometric square (■) to maintain Neo-Brutalist rectangular aesthetic:
