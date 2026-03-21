@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { InlineField } from '$lib/components/ui/inline-field';
-	import { InlineTextarea } from '$lib/components/ui/inline-textarea';
 	import { DatePickerField } from '$lib/components/ui/date-picker';
+	import { EditableList } from '$lib/components/ui/editable-list';
 	import { BlockWrapper } from '$lib/components/ui/block-wrapper';
 	import { Button } from '$lib/components/ui/button';
 	import { Trash2, Plus } from '@lucide/svelte';
@@ -31,14 +31,6 @@
 	function removeJob(id: string) {
 		jobs = jobs.filter((j) => j.id !== id);
 	}
-
-	function addAchievement(job: JobEntry) {
-		job.achievements = [...job.achievements, ''];
-	}
-
-	function removeAchievement(job: JobEntry, index: number) {
-		job.achievements = job.achievements.filter((_, i) => i !== index);
-	}
 </script>
 
 <BlockWrapper title="Job History" bind:visible>
@@ -65,36 +57,11 @@
 					<span class="text-muted-foreground">–</span>
 					<DatePickerField bind:value={job.endDate} placeholder="End date" />
 				</div>
-				<div class="flex flex-col gap-2">
-					{#each job.achievements as _, index (index)}
-						<div class="flex items-start gap-2">
-							<span class="mt-[0.2rem] text-lg leading-none text-muted-foreground select-none">■</span>
-							<InlineTextarea
-								bind:value={job.achievements[index]}
-								placeholder="Describe an achievement..."
-								class="flex-1"
-								rows={2}
-							/>
-							<Button
-								variant="ghost"
-								size="icon"
-								class="shrink-0 mt-1 text-muted-foreground hover:text-destructive"
-								onclick={() => removeAchievement(job, index)}
-							>
-								<Trash2 class="h-4 w-4" />
-							</Button>
-						</div>
-					{/each}
-					<Button
-						variant="outline"
-						size="sm"
-						class="mt-1 self-start"
-						onclick={() => addAchievement(job)}
-					>
-						<Plus class="h-4 w-4 mr-1" />
-						Add Achievement
-					</Button>
-				</div>
+				<EditableList
+					bind:items={job.achievements}
+					placeholder="Describe an achievement..."
+					addLabel="Add Achievement"
+				/>
 			</div>
 		{/each}
 		<Button variant="outline" size="sm" class="self-start" onclick={addJob}>

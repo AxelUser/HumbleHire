@@ -6,10 +6,9 @@
 
 	interface Props {
 		cvName: string;
-		onSaveVersion: () => void;
 	}
 
-	let { cvName = $bindable(), onSaveVersion }: Props = $props();
+	let { cvName = $bindable() }: Props = $props();
 
 	const cvStore = getCVStoreContext();
 
@@ -47,8 +46,6 @@
 					{/if}
 				</Badge>
 			{/if}
-
-			<Button variant="default" size="sm" onclick={onSaveVersion}>Save Version</Button>
 		</div>
 	</div>
 </div>

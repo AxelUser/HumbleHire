@@ -11,4 +11,4 @@
 	let cvName = $state('Senior Developer — Stripe');
 </script>
 
-<CvEditorToolbar bind:cvName onSaveVersion={() => {}} />
+<CvEditorToolbar bind:cvName />

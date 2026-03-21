@@ -51,15 +51,6 @@ export interface EducationEntry {
 	endDate: Date | undefined;
 }
 
-export interface CVVersion {
-	id: string;
-	cvId: string;
-	name: string;
-	notes?: string;
-	createdAt: number;
-	snapshot: CVBlocks;
-}
-
 export function createEmptyCV(id: string, name: string): CV {
 	return {
 		id,

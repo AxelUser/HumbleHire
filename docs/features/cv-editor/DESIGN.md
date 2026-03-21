@@ -59,8 +59,8 @@ interface JobEntry {
 	id: string;
 	company: string;
 	role: string;
-	startDate: Date;
-	endDate: Date;
+	startDate: Date | undefined;
+	endDate: Date | undefined;
 	achievements: string[];
 }
 
@@ -69,30 +69,15 @@ interface ProjectEntry {
 	name: string;
 	description: string;
 	stack: string; // comma-separated or free text
-	link?: string;
+	link: string;
 }
 
 interface EducationEntry {
 	id: string;
 	institution: string;
 	degree: string;
-	startDate: Date;
-	endDate: Date;
-}
-```
-
-### Named versions
-
-Versions are stored in a separate IndexedDB table (not nested inside the CV document) to keep the main CV record lightweight:
-
-```ts
-interface CVVersion {
-	id: string; // uuid
-	cvId: string; // FK → CV.id
-	name: string; // user-provided label
-	notes?: string; // optional description
-	createdAt: number;
-	snapshot: CVBlocks; // deep copy of blocks at save time
+	startDate: Date | undefined;
+	endDate: Date | undefined;
 }
 ```
 
@@ -107,13 +92,11 @@ import Dexie, { type Table } from 'dexie';
 
 class HumbleHireDB extends Dexie {
 	cvs!: Table<CV>;
-	versions!: Table<CVVersion>;
 
 	constructor() {
 		super('humblehire');
 		this.version(1).stores({
-			cvs: 'id, updatedAt',
-			versions: 'id, cvId, createdAt'
+			cvs: 'id, updatedAt'
 		});
 	}
 }
@@ -127,29 +110,28 @@ export const db = new HumbleHireDB();
 
 State lives in Svelte 5 runes; no external state library.
 
-### `src/lib/stores/cv.svelte.ts` — per-editor reactive state
+### `src/lib/stores/cv.svelte.ts` — CVStore class
+
+`CVStore` is a class shared through Svelte context:
 
 ```ts
-// Reactive state for the currently open CV
-let cv = $state<CV | null>(null);
-let saveStatus = $state<'idle' | 'saving' | 'saved'>('idle');
-let lastSavedAt = $state<number | null>(null);
+export class CVStore {
+	cv = $state<CV | null>(null);
+	saveStatus = $state<'idle' | 'saving' | 'saved'>('idle');
+	lastSavedAt = $state<number | null>(null);
+
+	constructor() {
+		$effect(() => {
+			// auto-save with 1s debounce
+		});
+	}
+}
+
+export function setCVStoreContext(store: CVStore): void { ... }
+export function getCVStoreContext(): CVStore { ... }
 ```
 
-Auto-save is implemented using `$effect` with a debounce:
-
-```ts
-$effect(() => {
-	if (!cv) return;
-	const timer = setTimeout(async () => {
-		saveStatus = 'saving';
-		await db.cvs.put({ ...cv, updatedAt: Date.now() });
-		saveStatus = 'saved';
-		lastSavedAt = Date.now();
-	}, 1000);
-	return () => clearTimeout(timer);
-});
-```
+The editor page creates the store and sets context. Children call `getCVStoreContext()` to read/write. Auto-save is an `$effect` in the constructor that snapshots the full CV (for deep reactive tracking) and debounces writes to IndexedDB by 1 second.
 
 ---
 
@@ -169,10 +151,8 @@ lib/components/
     NewCvButton.svelte      ← creates new CV and navigates to editor
 
   editor/
-    CvEditorToolbar.svelte  ← top bar: CV name, Save Version button, save status
+    CvEditorToolbar.svelte  ← top bar: CV name, save status
     CvPreview.svelte        ← rendered CV; manages inline edit activation
-    SaveVersionModal.svelte ← modal for naming a version
-    VersionHistoryPanel.svelte ← collapsible list of past versions
 
   blocks/
     FullNameBlock.svelte
@@ -194,7 +174,7 @@ lib/components/
 
 ## Inline editing pattern
 
-`InlineField.svelte` is the core primitive. It renders as plain styled text by default, and converts to a native `<input>` when activated:
+`InlineField.svelte` renders as plain text and swaps to a native `<input>` on click:
 
 ```svelte
 <script lang="ts">
@@ -244,15 +224,6 @@ Delete shows a confirmation dialog (Shadcn `AlertDialog`) before calling `db.cvs
 
 ---
 
-## Save version flow
-
-1. User clicks "Save Version" in `CvEditorToolbar`.
-2. `SaveVersionModal` opens, user enters name (required) + optional notes.
-3. On confirm: write a `CVVersion` row to `db.versions` with a deep copy of `cv.blocks`.
-4. `VersionHistoryPanel` reactively re-queries `db.versions.where('cvId').equals(cv.id)` via a Dexie live-query.
-
----
-
 ## File layout
 
 ```
@@ -283,18 +254,15 @@ Plain HTML handles inline inputs and block text. Everything below needs a shadcn
 | Component    | Used in                                                                 | Notes                                       |
 | ------------ | ----------------------------------------------------------------------- | ------------------------------------------- |
 | Button       | `NewCvButton`, toolbar actions, add/remove rows in list blocks          | Buttons                                     |
-| Card         | `CvCard` on the dashboard; job, project, and education entry containers | Consistent structured layout                |
+| Card         | `CvCard` on the dashboard; job, project, and education entry containers | Wraps each entry with consistent spacing    |
 | Alert Dialog | Delete CV confirmation                                                  | Blocks the user before a destructive action |
-| Dialog       | `SaveVersionModal`                                                      | Overlay for version name + notes            |
-| Input        | `InlineField` (edit mode), version name field in Dialog                 | Single-line text                            |
-| Textarea     | `InlineTextarea` (edit mode), version notes field in Dialog             | Multiline text                              |
-| Label        | Form fields inside Dialog                                               | Accessible label pairing                    |
+| Input        | `InlineField` (edit mode)                                               | Single-line text                            |
+| Textarea     | `InlineTextarea` (edit mode)                                            | Multiline text                              |
 | Switch       | Block visibility toggle in `BlockWrapper`                               | On/off maps to show/hide                    |
 | Badge        | Save status (`idle` / `saving` / `saved`) in `CvEditorToolbar`          | Compact status indicator                    |
 | Skeleton     | Dashboard while CVs load from IndexedDB                                 | Loading placeholder for CV cards            |
-| Collapsible  | `VersionHistoryPanel`                                                   | Expand/collapse without navigating away     |
 | Separator    | Between CV sections in `CvPreview`                                      | Visual section divider                      |
-| Sonner       | Auto-save errors, version save confirmation                             | Toasts that don't interrupt editing         |
+| Sonner       | Auto-save error notifications                                           | Toasts that don't interrupt editing         |
 
 ---
 
@@ -305,6 +273,6 @@ Plain HTML handles inline inputs and block text. Everything below needs a shadcn
 | Local storage engine     | IndexedDB via Dexie.js                    | See ADR-001                                                          |
 | State management         | Svelte 5 runes (`$state`, `$effect`)      | No extra library needed; runes are fine-grained and reactive         |
 | Inline editing primitive | Click-to-edit `<input>`/`<textarea>` swap | Matches the "preview is the editor" UX; simpler than contenteditable |
-| Version storage          | Separate `versions` table                 | Keeps the main CV record small; versions are append-only             |
+| No version snapshots     | Deferred to Branching feature             | Snapshots only meaningful in branching context; autosave covers v1   |
 | Block order              | Fixed                                     | Reduces scope and complexity for v1; blocks are semantically ordered |
 | UUID generation          | `crypto.randomUUID()`                     | Built into modern browsers; no library needed                        |

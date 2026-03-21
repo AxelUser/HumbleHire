@@ -2,7 +2,9 @@
 
 ## Overview
 
-The CV Editor is the core feature of HumbleHire. Users create and manage multiple CVs through an inline block editor: click any field to edit it, see changes immediately, and have edits auto-saved. Named version checkpoints are also supported. All data lives in IndexedDB.
+The CV Editor is the core feature of HumbleHire. Users create and manage CVs through an inline block editor: click any field to edit it, see changes immediately, and have edits auto-saved. All data lives in IndexedDB.
+
+The CV Editor handles a single CV at a time. Branching, version snapshots, and cross-CV sync are covered by the separate [Branching & Versioning](../branching/PRD.md) feature.
 
 ---
 
@@ -10,12 +12,12 @@ The CV Editor is the core feature of HumbleHire. Users create and manage multipl
 
 - Let users create, name, and switch between multiple CVs from a dashboard.
 - Provide a click-to-edit inline experience where the preview _is_ the editor.
-- Persist all changes automatically; let users also create named version checkpoints.
+- Persist all changes automatically via debounced auto-save.
 - Support toggling block visibility without losing content.
 
 ## Non-goals
 
-- Version branching, diffing, and merging (separate feature).
+- Branching, version snapshots, diffing, and merging (see [Branching & Versioning](../branching/PRD.md)).
 - Export to PDF/HTML/Markdown (separate feature).
 - Cloud sync or multi-device support.
 - Custom block types beyond the fixed set.
@@ -48,7 +50,6 @@ The CV Editor is the core feature of HumbleHire. Users create and manage multipl
 ### Persistence
 
 - As a user, my edits are automatically saved to local storage a short time after I stop typing — I never have to think about saving.
-- As a user, I can explicitly save a named version checkpoint ("Save Version") with an optional description, so I can return to meaningful milestones later.
 - As a user, I can see when the CV was last auto-saved.
 
 ---
@@ -89,12 +90,6 @@ Block order is fixed. Users cannot reorder blocks.
 - Changes are debounced with a 1-second delay.
 - A subtle status indicator shows: `Saving…` → `Saved just now` → `Saved X minutes ago`.
 
-### Save Version
-
-- A "Save Version" button is always visible in the editor toolbar.
-- Clicking it opens a modal asking for a version name (required, e.g. "Applied to Stripe") and optional notes.
-- Saved versions are listed in a "Version History" panel (collapsed by default).
-
 ---
 
 ## Acceptance criteria
@@ -110,5 +105,4 @@ Block order is fixed. Users cannot reorder blocks.
 | AC-7  | Each block can be toggled hidden/visible; hidden blocks are not rendered in preview.            |
 | AC-8  | Repeatable blocks support adding and deleting individual entries.                               |
 | AC-9  | Contacts block stores free-form label + value pairs.                                            |
-| AC-10 | "Save Version" creates a named snapshot with timestamp; listed in Version History panel.        |
-| AC-11 | All data survives a full browser/page refresh (persisted in IndexedDB).                         |
+| AC-10 | All data survives a full browser/page refresh (persisted in IndexedDB).                         |

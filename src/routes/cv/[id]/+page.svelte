@@ -6,12 +6,10 @@
 	import { db } from '$lib/db/index';
 	import { CVStore, setCVStoreContext } from '$lib/stores/cv.svelte';
 	import { Skeleton } from '$lib/components/ui/skeleton';
-	import { CvEditorToolbar, CvPreview, SaveVersionModal, VersionHistoryPanel } from '$lib/components/editor';
+	import { CvEditorToolbar, CvPreview } from '$lib/components/editor';
 
 	const cvStore = new CVStore();
 	setCVStoreContext(cvStore);
-
-	let saveVersionOpen = $state(false);
 
 	onMount(async () => {
 		const id = page.params.id;
@@ -31,10 +29,6 @@
 		<Skeleton class="h-32 w-full" />
 	</div>
 {:else}
-	<CvEditorToolbar bind:cvName={cvStore.cv.name} onSaveVersion={() => (saveVersionOpen = true)} />
+	<CvEditorToolbar bind:cvName={cvStore.cv.name} />
 	<CvPreview bind:cv={cvStore.cv} />
-	<div class="mx-auto max-w-3xl px-6 py-4">
-		<VersionHistoryPanel cvId={cvStore.cv.id} />
-	</div>
-	<SaveVersionModal bind:open={saveVersionOpen} />
 {/if}

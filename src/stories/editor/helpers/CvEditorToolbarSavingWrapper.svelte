@@ -11,4 +11,4 @@
 	let cvName = $state('Frontend Lead — Vercel');
 </script>
 
-<CvEditorToolbar bind:cvName onSaveVersion={() => {}} />
+<CvEditorToolbar bind:cvName />

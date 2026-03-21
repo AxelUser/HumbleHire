@@ -1,6 +1,6 @@
 import { getContext, setContext } from 'svelte';
 import { db } from '$lib/db/index';
-import type { CV, CVBlocks, CVVersion } from '$lib/types/cv';
+import type { CV } from '$lib/types/cv';
 import { toast } from 'svelte-sonner';
 
 const CV_STORE_KEY = Symbol('cv-store');
@@ -36,19 +36,6 @@ export class CVStore {
 		});
 	}
 
-	async saveVersion(name: string, notes?: string): Promise<void> {
-		if (!this.cv) return;
-		const version: CVVersion = {
-			id: crypto.randomUUID(),
-			cvId: this.cv.id,
-			name,
-			notes,
-			createdAt: Date.now(),
-			snapshot: $state.snapshot(this.cv.blocks) as CVBlocks
-		};
-		await db.versions.add(version);
-		toast.success(`Version "${name}" saved.`);
-	}
 }
 
 export function setCVStoreContext(store: CVStore): void {
