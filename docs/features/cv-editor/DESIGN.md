@@ -59,8 +59,8 @@ interface JobEntry {
 	id: string;
 	company: string;
 	role: string;
-	startDate: string; // "YYYY-MM" or free text
-	endDate: string; // "YYYY-MM" | "Present"
+	startDate: Date;
+	endDate: Date;
 	achievements: string[];
 }
 
@@ -76,8 +76,8 @@ interface EducationEntry {
 	id: string;
 	institution: string;
 	degree: string;
-	startDate: string;
-	endDate: string;
+	startDate: Date;
+	endDate: Date;
 }
 ```
 

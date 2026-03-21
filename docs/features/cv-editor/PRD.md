@@ -9,14 +9,14 @@ The CV Editor is the core feature of HumbleHire. Users create and manage multipl
 ## Goals
 
 - Let users create, name, and switch between multiple CVs from a dashboard.
-- Provide a click-to-edit inline experience where the preview *is* the editor.
+- Provide a click-to-edit inline experience where the preview _is_ the editor.
 - Persist all changes automatically; let users also create named version checkpoints.
 - Support toggling block visibility without losing content.
 
 ## Non-goals
 
 - Version branching, diffing, and merging (separate feature).
-- Export to PDF/HTML (separate feature).
+- Export to PDF/HTML/Markdown (separate feature).
 - Cloud sync or multi-device support.
 - Custom block types beyond the fixed set.
 - Block reordering (order is fixed per block type).
@@ -55,16 +55,16 @@ The CV Editor is the core feature of HumbleHire. Users create and manage multipl
 
 ## CV blocks (fixed set, fixed order)
 
-| # | Block       | Repeatable | Notes                                        |
-|---|-------------|------------|----------------------------------------------|
-| 1 | Full Name   | No         | Single text field                            |
-| 2 | Position    | No         | Single text field (target job title)         |
-| 3 | Location    | No         | Single text field                            |
-| 4 | Contacts    | Yes        | List of label + value pairs                  |
-| 5 | Highlights  | Yes        | Ordered list of bullet-point strings         |
-| 6 | Job History | Yes        | Company, dates, role, achievements list      |
-| 7 | Projects    | Yes        | Name, description, tech stack, optional link |
-| 8 | Education   | Yes        | Institution, degree, dates                   |
+| #   | Block       | Repeatable | Notes                                        |
+| --- | ----------- | ---------- | -------------------------------------------- |
+| 1   | Full Name   | No         | Single text field                            |
+| 2   | Position    | No         | Single text field (target job title)         |
+| 3   | Location    | No         | Single text field                            |
+| 4   | Contacts    | Yes        | List of label + value pairs                  |
+| 5   | Highlights  | Yes        | Ordered list of bullet-point strings         |
+| 6   | Job History | Yes        | Company, dates, role, achievements list      |
+| 7   | Projects    | Yes        | Name, description, tech stack, optional link |
+| 8   | Education   | Yes        | Institution, degree, dates                   |
 
 Block order is fixed. Users cannot reorder blocks.
 
@@ -99,16 +99,16 @@ Block order is fixed. Users cannot reorder blocks.
 
 ## Acceptance criteria
 
-| ID   | Criterion                                                                                      |
-|------|-----------------------------------------------------------------------------------------------|
-| AC-1 | Dashboard lists all CVs with name and last-edited timestamp; empty state shown when none exist. |
-| AC-2 | New CV can be created from dashboard; opens immediately in editor with all blocks empty.        |
-| AC-3 | CV can be renamed and deleted from dashboard (with confirmation for delete).                    |
-| AC-4 | Clicking any editable field activates an inline input at that location.                         |
-| AC-5 | Changes appear in preview in real time as the user types.                                       |
-| AC-6 | Changes are persisted to IndexedDB within 1 second of the user stopping input.                  |
-| AC-7 | Each block can be toggled hidden/visible; hidden blocks are not rendered in preview.            |
-| AC-8 | Repeatable blocks support adding and deleting individual entries.                               |
-| AC-9 | Contacts block stores free-form label + value pairs.                                            |
-| AC-10| "Save Version" creates a named snapshot with timestamp; listed in Version History panel.        |
-| AC-11| All data survives a full browser/page refresh (persisted in IndexedDB).                         |
+| ID    | Criterion                                                                                       |
+| ----- | ----------------------------------------------------------------------------------------------- |
+| AC-1  | Dashboard lists all CVs with name and last-edited timestamp; empty state shown when none exist. |
+| AC-2  | New CV can be created from dashboard; opens immediately in editor with all blocks empty.        |
+| AC-3  | CV can be renamed and deleted from dashboard (with confirmation for delete).                    |
+| AC-4  | Clicking any editable field activates an inline input at that location.                         |
+| AC-5  | Changes appear in preview in real time as the user types.                                       |
+| AC-6  | Changes are persisted to IndexedDB within 1 second of the user stopping input.                  |
+| AC-7  | Each block can be toggled hidden/visible; hidden blocks are not rendered in preview.            |
+| AC-8  | Repeatable blocks support adding and deleting individual entries.                               |
+| AC-9  | Contacts block stores free-form label + value pairs.                                            |
+| AC-10 | "Save Version" creates a named snapshot with timestamp; listed in Version History panel.        |
+| AC-11 | All data survives a full browser/page refresh (persisted in IndexedDB).                         |
