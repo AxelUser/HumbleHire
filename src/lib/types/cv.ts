@@ -30,8 +30,8 @@ export interface JobEntry {
 	id: string;
 	company: string;
 	role: string;
-	startDate: string;
-	endDate: string;
+	startDate: Date | undefined;
+	endDate: Date | undefined;
 	achievements: string[];
 }
 
@@ -47,8 +47,8 @@ export interface EducationEntry {
 	id: string;
 	institution: string;
 	degree: string;
-	startDate: string;
-	endDate: string;
+	startDate: Date | undefined;
+	endDate: Date | undefined;
 }
 
 export interface CVVersion {

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { InlineField } from '$lib/components/ui/inline-field';
+	import { DatePickerField } from '$lib/components/ui/date-picker';
 	import { BlockWrapper } from '$lib/components/ui/block-wrapper';
 	import { Button } from '$lib/components/ui/button';
 	import { Trash2, Plus } from '@lucide/svelte';
@@ -19,8 +20,8 @@
 				id: crypto.randomUUID(),
 				institution: '',
 				degree: '',
-				startDate: '',
-				endDate: ''
+				startDate: undefined,
+				endDate: undefined
 			}
 		];
 	}
@@ -54,10 +55,10 @@
 					placeholder="Degree / Field of study"
 					class="w-full mb-2"
 				/>
-				<div class="flex items-center gap-2 text-sm text-muted-foreground">
-					<InlineField bind:value={entry.startDate} placeholder="Start date" />
-					<span>–</span>
-					<InlineField bind:value={entry.endDate} placeholder="End date" />
+				<div class="flex items-center gap-2">
+					<DatePickerField bind:value={entry.startDate} placeholder="Start date" />
+					<span class="text-muted-foreground">–</span>
+					<DatePickerField bind:value={entry.endDate} placeholder="End date" />
 				</div>
 			</div>
 		{/each}

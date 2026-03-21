@@ -17,8 +17,8 @@
 						id: '1',
 						institution: 'MIT',
 						degree: 'BSc Computer Science',
-						startDate: 'Sep 2014',
-						endDate: 'Jun 2017'
+						startDate: new Date(Date.UTC(2014, 8, 1)),
+						endDate: new Date(Date.UTC(2017, 5, 1))
 					}
 				]
 	);

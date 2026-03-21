@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { InlineField } from '$lib/components/ui/inline-field';
 	import { InlineTextarea } from '$lib/components/ui/inline-textarea';
+	import { DatePickerField } from '$lib/components/ui/date-picker';
 	import { BlockWrapper } from '$lib/components/ui/block-wrapper';
 	import { Button } from '$lib/components/ui/button';
 	import { Trash2, Plus } from '@lucide/svelte';
@@ -20,8 +21,8 @@
 				id: crypto.randomUUID(),
 				company: '',
 				role: '',
-				startDate: '',
-				endDate: '',
+				startDate: undefined,
+				endDate: undefined,
 				achievements: []
 			}
 		];
@@ -59,10 +60,10 @@
 						<Trash2 class="h-4 w-4" />
 					</Button>
 				</div>
-				<div class="flex items-center gap-2 mb-3 text-sm text-muted-foreground">
-					<InlineField bind:value={job.startDate} placeholder="Start date" />
-					<span>–</span>
-					<InlineField bind:value={job.endDate} placeholder="End date" />
+				<div class="flex items-center gap-2 mb-3">
+					<DatePickerField bind:value={job.startDate} placeholder="Start date" />
+					<span class="text-muted-foreground">–</span>
+					<DatePickerField bind:value={job.endDate} placeholder="End date" />
 				</div>
 				<div class="flex flex-col gap-2">
 					{#each job.achievements as _, index (index)}
