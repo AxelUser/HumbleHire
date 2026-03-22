@@ -43,8 +43,8 @@
 </script>
 
 <BlockWrapper title="Projects" bind:visible>
-	<div class="flex flex-col gap-4">
-		<DragDropProvider {onDragEnd} {onDragOver}>
+	<DragDropProvider {onDragEnd} {onDragOver}>
+		<div class="flex flex-col gap-4">
 			{#each projects as project, index (project.id)}
 				{@const sortable = createSortable({ id: project.id, index: (() => index) as any })}
 				<div
@@ -97,22 +97,22 @@
 				<Plus class="mr-1 h-4 w-4" />
 				Add Project
 			</Button>
-			<DragOverlay>
-				{#snippet children(source: any)}
-					{@const project = projects.find((p) => p.id === source.id)}
-					{#if project}
-						<div class="bg-background rounded-lg border p-4 shadow-lg">
-							<div class="flex items-start gap-2">
-								<GripVertical class="text-muted-foreground mt-1 h-4 w-4 shrink-0" />
-								<span class="flex-1 text-sm font-semibold">{project.name || 'Project name'}</span>
-							</div>
-							{#if project.description}
-								<p class="text-muted-foreground mt-1 line-clamp-2 text-sm">{project.description}</p>
-							{/if}
+		</div>
+		<DragOverlay>
+			{#snippet children(source: any)}
+				{@const project = projects.find((p) => p.id === source.id)}
+				{#if project}
+					<div class="bg-background rounded-lg border p-4 shadow-lg">
+						<div class="flex items-start gap-2">
+							<GripVertical class="text-muted-foreground mt-1 h-4 w-4 shrink-0" />
+							<span class="flex-1 text-sm font-semibold">{project.name || 'Project name'}</span>
 						</div>
-					{/if}
-				{/snippet}
-			</DragOverlay>
-		</DragDropProvider>
-	</div>
+						{#if project.description}
+							<p class="text-muted-foreground mt-1 line-clamp-2 text-sm">{project.description}</p>
+						{/if}
+					</div>
+				{/if}
+			{/snippet}
+		</DragOverlay>
+	</DragDropProvider>
 </BlockWrapper>

@@ -45,8 +45,8 @@
 </script>
 
 <BlockWrapper title="Job History" bind:visible>
-	<div class="flex flex-col gap-4">
-		<DragDropProvider {onDragEnd} {onDragOver}>
+	<DragDropProvider {onDragEnd} {onDragOver}>
+		<div class="flex flex-col gap-4">
 			{#each jobs as job, index (job.id)}
 				{@const sortable = createSortable({ id: job.id, index: (() => index) as any })}
 				<div
@@ -94,23 +94,23 @@
 				<Plus class="mr-1 h-4 w-4" />
 				Add Job
 			</Button>
-			<DragOverlay>
-				{#snippet children(source: any)}
-					{@const job = jobs.find((j) => j.id === source.id)}
-					{#if job}
-						<div class="bg-background rounded-lg border p-4 shadow-lg">
-							<div class="flex items-start gap-2">
-								<GripVertical class="text-muted-foreground mt-1 h-4 w-4 shrink-0" />
-								<div class="flex flex-wrap items-baseline gap-2">
-									<span class="text-sm font-semibold">{job.company || 'Company'}</span>
-									<span class="text-muted-foreground">—</span>
-									<span class="text-sm">{job.role || 'Role'}</span>
-								</div>
+		</div>
+		<DragOverlay>
+			{#snippet children(source: any)}
+				{@const job = jobs.find((j) => j.id === source.id)}
+				{#if job}
+					<div class="bg-background rounded-lg border p-4 shadow-lg">
+						<div class="flex items-start gap-2">
+							<GripVertical class="text-muted-foreground mt-1 h-4 w-4 shrink-0" />
+							<div class="flex flex-wrap items-baseline gap-2">
+								<span class="text-sm font-semibold">{job.company || 'Company'}</span>
+								<span class="text-muted-foreground">—</span>
+								<span class="text-sm">{job.role || 'Role'}</span>
 							</div>
 						</div>
-					{/if}
-				{/snippet}
-			</DragOverlay>
-		</DragDropProvider>
-	</div>
+					</div>
+				{/if}
+			{/snippet}
+		</DragOverlay>
+	</DragDropProvider>
 </BlockWrapper>

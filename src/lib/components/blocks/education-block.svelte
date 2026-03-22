@@ -43,8 +43,8 @@
 </script>
 
 <BlockWrapper title="Education" bind:visible>
-	<div class="flex flex-col gap-4">
-		<DragDropProvider {onDragEnd} {onDragOver}>
+	<DragDropProvider {onDragEnd} {onDragOver}>
+		<div class="flex flex-col gap-4">
 			{#each education as entry, index (entry.id)}
 				{@const sortable = createSortable({ id: entry.id, index: (() => index) as any })}
 				<div
@@ -91,26 +91,26 @@
 				<Plus class="mr-1 h-4 w-4" />
 				Add Education
 			</Button>
-			<DragOverlay>
-				{#snippet children(source: any)}
-					{@const entry = education.find((e) => e.id === source.id)}
-					{#if entry}
-						<div class="bg-background rounded-lg border p-4 shadow-lg">
-							<div class="flex flex-col gap-2">
-								<div class="flex items-start gap-2">
-									<GripVertical class="text-muted-foreground mt-1 h-4 w-4 shrink-0" />
-									<span class="flex-1 text-sm font-semibold"
-										>{entry.institution || 'Institution'}</span
-									>
-								</div>
-								<span class="text-muted-foreground text-sm"
-									>{entry.degree || 'Degree / Field of study'}</span
+		</div>
+		<DragOverlay>
+			{#snippet children(source: any)}
+				{@const entry = education.find((e) => e.id === source.id)}
+				{#if entry}
+					<div class="bg-background rounded-lg border p-4 shadow-lg">
+						<div class="flex flex-col gap-2">
+							<div class="flex items-start gap-2">
+								<GripVertical class="text-muted-foreground mt-1 h-4 w-4 shrink-0" />
+								<span class="flex-1 text-sm font-semibold"
+									>{entry.institution || 'Institution'}</span
 								>
 							</div>
+							<span class="text-muted-foreground text-sm"
+								>{entry.degree || 'Degree / Field of study'}</span
+							>
 						</div>
-					{/if}
-				{/snippet}
-			</DragOverlay>
-		</DragDropProvider>
-	</div>
+					</div>
+				{/if}
+			{/snippet}
+		</DragOverlay>
+	</DragDropProvider>
 </BlockWrapper>
