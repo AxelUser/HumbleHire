@@ -1,0 +1,1110 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>HumbleHire — Design Preview</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap"
+			rel="stylesheet"
+		/>
+
+		<style>
+			/* ─────────────── CSS VARIABLES ─────────────── */
+			:root {
+				--radius: 0.125rem;
+				--background: oklch(0.97 0.006 255);
+				--foreground: oklch(0.12 0.025 262);
+				--card: oklch(1 0 0);
+				--card-foreground: oklch(0.12 0.025 262);
+				--primary: oklch(0.22 0.04 264);
+				--primary-foreground: oklch(0.97 0.006 255);
+				--secondary: oklch(0.88 0.018 255);
+				--secondary-foreground: oklch(0.22 0.04 264);
+				--muted: oklch(0.93 0.01 255);
+				--muted-foreground: oklch(0.48 0.04 258);
+				--accent: oklch(0.52 0.16 252);
+				--accent-foreground: oklch(0.97 0.006 255);
+				--destructive: oklch(0.577 0.245 27.325);
+				--border: oklch(0.22 0.025 262);
+				--input: oklch(0.22 0.025 262);
+				--ring: oklch(0.52 0.16 252);
+
+				--shadow-brutal: 4px 4px 0px 0px oklch(0.12 0.025 262);
+				--shadow-brutal-sm: 2px 2px 0px 0px oklch(0.12 0.025 262);
+				--shadow-brutal-hover: 6px 6px 0px 0px oklch(0.12 0.025 262);
+				--shadow-brutal-accent: 4px 4px 0px 0px oklch(0.52 0.16 252);
+			}
+
+			/* ─────────────── RESET / BASE ─────────────── */
+			*,
+			*::before,
+			*::after {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
+
+			body {
+				font-family: 'Space Grotesk', system-ui, sans-serif;
+				background-color: var(--background);
+				color: var(--foreground);
+				min-height: 100vh;
+				line-height: 1.6;
+			}
+
+			h1,
+			h2,
+			h3,
+			h4,
+			h5,
+			h6 {
+				font-weight: 700;
+				line-height: 1.2;
+			}
+
+			/* ─────────────── UTILITY CLASSES ─────────────── */
+			.shadow-brutal {
+				box-shadow: var(--shadow-brutal);
+			}
+			.shadow-brutal-sm {
+				box-shadow: var(--shadow-brutal-sm);
+			}
+			.shadow-brutal-accent {
+				box-shadow: var(--shadow-brutal-accent);
+			}
+
+			.hover-brutal {
+				transition:
+					transform 150ms ease,
+					box-shadow 150ms ease;
+			}
+			.hover-brutal:hover {
+				transform: translate(-2px, -2px);
+				box-shadow: var(--shadow-brutal-hover);
+			}
+			.hover-brutal:active {
+				transform: translate(0, 0);
+				box-shadow: var(--shadow-brutal-sm);
+			}
+
+			/* ─────────────── NAV ─────────────── */
+			nav {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 1rem 2rem;
+				border-bottom: 2px solid var(--border);
+				background: var(--card);
+			}
+
+			.nav-logo {
+				font-size: 1.25rem;
+				font-weight: 800;
+				letter-spacing: -0.03em;
+				display: flex;
+				align-items: center;
+				gap: 0.4rem;
+			}
+
+			.nav-logo span.accent {
+				color: var(--accent);
+			}
+
+			.nav-links {
+				display: flex;
+				gap: 0.5rem;
+				list-style: none;
+			}
+
+			/* ─────────────── BUTTONS ─────────────── */
+			.btn {
+				font-family: inherit;
+				font-weight: 700;
+				font-size: 0.875rem;
+				padding: 0.5rem 1rem;
+				border: 2px solid var(--border);
+				border-radius: var(--radius);
+				cursor: pointer;
+				display: inline-flex;
+				align-items: center;
+				gap: 0.4rem;
+				text-decoration: none;
+			}
+
+			.btn-default {
+				background: var(--primary);
+				color: var(--primary-foreground);
+				box-shadow: var(--shadow-brutal-sm);
+			}
+
+			.btn-default.hover-brutal:hover {
+				box-shadow: var(--shadow-brutal-hover);
+			}
+
+			.btn-outline {
+				background: transparent;
+				color: var(--foreground);
+			}
+
+			.btn-secondary {
+				background: var(--secondary);
+				color: var(--secondary-foreground);
+			}
+
+			.btn-accent {
+				background: var(--accent);
+				color: var(--accent-foreground);
+				box-shadow: var(--shadow-brutal-sm);
+			}
+
+			.btn-lg {
+				font-size: 1rem;
+				padding: 0.75rem 1.5rem;
+				box-shadow: var(--shadow-brutal);
+			}
+
+			/* ─────────────── BADGE ─────────────── */
+			.badge {
+				font-family: inherit;
+				font-weight: 700;
+				font-size: 0.75rem;
+				padding: 0.25rem 0.625rem;
+				border: 2px solid var(--border);
+				border-radius: 0;
+				display: inline-flex;
+				align-items: center;
+				gap: 0.3rem;
+			}
+
+			.badge-default {
+				background: var(--foreground);
+				color: var(--background);
+			}
+
+			.badge-secondary {
+				background: var(--secondary);
+				color: var(--secondary-foreground);
+			}
+
+			.badge-accent {
+				background: var(--accent);
+				color: var(--accent-foreground);
+			}
+
+			.badge-muted {
+				background: var(--muted);
+				color: var(--muted-foreground);
+			}
+
+			/* ─────────────── CARD ─────────────── */
+			.card {
+				background: var(--card);
+				color: var(--card-foreground);
+				border: 2px solid var(--border);
+				border-radius: var(--radius);
+				padding: 1.5rem;
+				box-shadow: var(--shadow-brutal);
+			}
+
+			.card-title {
+				font-weight: 700;
+				font-size: 1.05rem;
+				letter-spacing: -0.01em;
+				margin-bottom: 0.25rem;
+			}
+
+			.card-meta {
+				font-size: 0.8rem;
+				color: var(--muted-foreground);
+				font-weight: 500;
+				margin-bottom: 1rem;
+			}
+
+			/* ─────────────── INPUTS ─────────────── */
+			.input,
+			.textarea {
+				font-family: inherit;
+				font-size: 0.875rem;
+				font-weight: 500;
+				width: 100%;
+				padding: 0.5rem 0.75rem;
+				border: 2px solid var(--border);
+				border-radius: var(--radius);
+				background: var(--card);
+				color: var(--foreground);
+				outline: none;
+				transition: box-shadow 150ms ease;
+			}
+
+			.input:focus,
+			.textarea:focus {
+				box-shadow: 0 0 0 3px var(--ring);
+			}
+
+			.textarea {
+				resize: vertical;
+				min-height: 80px;
+			}
+
+			label {
+				font-weight: 700;
+				font-size: 0.8rem;
+				display: block;
+				margin-bottom: 0.35rem;
+			}
+
+			.form-group {
+				margin-bottom: 1.25rem;
+			}
+
+			/* ─────────────── BLOCK WRAPPER ─────────────── */
+			.block-wrapper {
+				border-left: 4px solid var(--foreground);
+				padding-left: 0.75rem;
+				margin-bottom: 1.5rem;
+			}
+
+			.block-wrapper-title {
+				font-weight: 700;
+				font-size: 0.8rem;
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+				color: var(--foreground);
+				margin-bottom: 0.75rem;
+			}
+
+			/* ─────────────── LAYOUT ─────────────── */
+			.container {
+				max-width: 1100px;
+				margin: 0 auto;
+				padding: 0 1.5rem;
+			}
+
+			.grid-3 {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 1.25rem;
+			}
+
+			.grid-2 {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: 1.25rem;
+			}
+
+			@media (max-width: 768px) {
+				.grid-3,
+				.grid-2 {
+					grid-template-columns: 1fr;
+				}
+			}
+
+			section {
+				padding: 3rem 0;
+			}
+
+			.section-label {
+				font-size: 0.7rem;
+				font-weight: 800;
+				letter-spacing: 0.12em;
+				text-transform: uppercase;
+				color: var(--accent);
+				margin-bottom: 0.5rem;
+			}
+
+			.section-title {
+				font-size: 1.75rem;
+				font-weight: 800;
+				letter-spacing: -0.03em;
+				margin-bottom: 0.5rem;
+			}
+
+			.section-sub {
+				color: var(--muted-foreground);
+				font-size: 0.9rem;
+				font-weight: 500;
+				margin-bottom: 2rem;
+			}
+
+			.divider {
+				border: none;
+				border-top: 2px solid var(--border);
+			}
+
+			/* ─────────────── HERO ─────────────── */
+			.hero {
+				padding: 4rem 0 3.5rem;
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 3rem;
+				align-items: center;
+			}
+
+			@media (max-width: 768px) {
+				.hero {
+					grid-template-columns: 1fr;
+				}
+			}
+
+			.hero-eyebrow {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.5rem;
+				font-size: 0.75rem;
+				font-weight: 700;
+				letter-spacing: 0.1em;
+				text-transform: uppercase;
+				color: var(--accent);
+				border: 2px solid var(--accent);
+				padding: 0.2rem 0.6rem;
+				margin-bottom: 1.25rem;
+				border-radius: var(--radius);
+			}
+
+			.hero-title {
+				font-size: clamp(2.2rem, 5vw, 3.2rem);
+				font-weight: 800;
+				letter-spacing: -0.04em;
+				line-height: 1.1;
+				margin-bottom: 1.25rem;
+			}
+
+			.hero-title em {
+				font-style: normal;
+				color: var(--accent);
+			}
+
+			.hero-desc {
+				color: var(--muted-foreground);
+				font-size: 1rem;
+				font-weight: 500;
+				margin-bottom: 2rem;
+				line-height: 1.7;
+			}
+
+			.hero-actions {
+				display: flex;
+				gap: 0.75rem;
+				flex-wrap: wrap;
+			}
+
+			/* ─────────────── STAT CARD ─────────────── */
+			.stat-card {
+				background: var(--card);
+				border: 2px solid var(--border);
+				border-radius: var(--radius);
+				padding: 1.25rem;
+				box-shadow: var(--shadow-brutal);
+			}
+
+			.stat-num {
+				font-size: 2rem;
+				font-weight: 800;
+				letter-spacing: -0.04em;
+				line-height: 1;
+				margin-bottom: 0.25rem;
+			}
+
+			.stat-label {
+				font-size: 0.8rem;
+				font-weight: 600;
+				color: var(--muted-foreground);
+			}
+
+			/* ─────────────── TOOLBAR MOCK ─────────────── */
+			.toolbar {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 1rem;
+				padding: 0.75rem 1rem;
+				border: 2px solid var(--border);
+				border-radius: var(--radius);
+				background: var(--card);
+				box-shadow: var(--shadow-brutal-sm);
+				margin-bottom: 1.5rem;
+				flex-wrap: wrap;
+			}
+
+			.toolbar-name {
+				font-weight: 800;
+				font-size: 1.05rem;
+				letter-spacing: -0.02em;
+				border: none;
+				background: transparent;
+				color: var(--foreground);
+				font-family: inherit;
+				outline: none;
+				min-width: 200px;
+			}
+
+			.toolbar-actions {
+				display: flex;
+				gap: 0.5rem;
+			}
+
+			/* ─────────────── SKELETON ─────────────── */
+			.skeleton {
+				background: var(--muted);
+				border: 2px solid var(--border);
+				border-radius: 0;
+				animation: pulse 1.5s ease-in-out infinite;
+			}
+
+			@keyframes pulse {
+				0%,
+				100% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0.5;
+				}
+			}
+
+			/* ─────────────── PROGRESS ─────────────── */
+			.progress-bar {
+				width: 100%;
+				height: 8px;
+				background: var(--muted);
+				border: 2px solid var(--border);
+				border-radius: 0;
+				overflow: hidden;
+				margin-top: 0.5rem;
+			}
+
+			.progress-fill {
+				height: 100%;
+				background: var(--accent);
+				transition: width 0.5s ease;
+			}
+
+			/* ─────────────── TAG CHIP ─────────────── */
+			.tag-list {
+				display: flex;
+				gap: 0.4rem;
+				flex-wrap: wrap;
+				margin-top: 0.75rem;
+			}
+
+			/* ─────────────── DARK TOGGLE ─────────────── */
+			#dark-toggle {
+				position: fixed;
+				bottom: 1.5rem;
+				right: 1.5rem;
+				z-index: 100;
+			}
+
+			/* ─────────────── DARK MODE ─────────────── */
+			body.dark {
+				--background: oklch(0.13 0.03 264);
+				--foreground: oklch(0.95 0.008 255);
+				--card: oklch(0.18 0.03 264);
+				--card-foreground: oklch(0.95 0.008 255);
+				--primary: oklch(0.9 0.015 255);
+				--primary-foreground: oklch(0.18 0.03 264);
+				--secondary: oklch(0.26 0.038 262);
+				--secondary-foreground: oklch(0.9 0.015 255);
+				--muted: oklch(0.26 0.038 262);
+				--muted-foreground: oklch(0.62 0.04 258);
+				--accent: oklch(0.58 0.18 252);
+				--accent-foreground: oklch(0.97 0.006 255);
+				--border: oklch(0.95 0.008 255 / 18%);
+				--input: oklch(0.95 0.008 255 / 22%);
+				--ring: oklch(0.58 0.18 252);
+				--shadow-brutal: 4px 4px 0px 0px oklch(0.95 0.008 255 / 30%);
+				--shadow-brutal-sm: 2px 2px 0px 0px oklch(0.95 0.008 255 / 30%);
+				--shadow-brutal-hover: 6px 6px 0px 0px oklch(0.95 0.008 255 / 30%);
+			}
+
+			/* ─────────────── SEPARATOR LINES ─────────────── */
+			.section-divider {
+				border: none;
+				border-top: 2px solid var(--border);
+				margin: 0;
+			}
+
+			/* ─────────────── CV ROW ─────────────── */
+			.cv-row {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 1rem 1.25rem;
+				border: 2px solid var(--border);
+				border-radius: var(--radius);
+				background: var(--card);
+				box-shadow: var(--shadow-brutal-sm);
+				margin-bottom: 0.75rem;
+				transition:
+					transform 150ms ease,
+					box-shadow 150ms ease;
+			}
+
+			.cv-row:hover {
+				transform: translate(-2px, -2px);
+				box-shadow: var(--shadow-brutal);
+			}
+
+			.cv-row-left {
+				display: flex;
+				align-items: center;
+				gap: 0.75rem;
+			}
+
+			.cv-icon {
+				width: 36px;
+				height: 36px;
+				background: var(--muted);
+				border: 2px solid var(--border);
+				border-radius: var(--radius);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 1rem;
+			}
+
+			.cv-name {
+				font-weight: 700;
+				font-size: 0.95rem;
+			}
+			.cv-date {
+				font-size: 0.75rem;
+				color: var(--muted-foreground);
+				font-weight: 500;
+			}
+
+			.cv-row-right {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+			}
+		</style>
+	</head>
+	<body>
+		<!-- ──────────────────── NAV ──────────────────── -->
+		<nav>
+			<div class="nav-logo">◈ Humble<span class="accent">Hire</span></div>
+			<ul class="nav-links">
+				<li><button class="btn btn-outline hover-brutal">Dashboard</button></li>
+				<li><button class="btn btn-outline hover-brutal">CV Editor</button></li>
+				<li><button class="btn btn-default hover-brutal">+ New CV</button></li>
+			</ul>
+		</nav>
+
+		<!-- ──────────────────── HERO ──────────────────── -->
+		<div class="container">
+			<div class="hero">
+				<div>
+					<div class="hero-eyebrow">✦ Design Preview — Soft Neo-Brutalism</div>
+					<h1 class="hero-title">Land your next<br />role with <em>quiet</em><br />confidence.</h1>
+					<p class="hero-desc">
+						HumbleHire helps you craft CVs that don't shout — they speak. Build, track, and iterate
+						your job search with calm, focused tools.
+					</p>
+					<div class="hero-actions">
+						<button class="btn btn-default btn-lg hover-brutal">Get started →</button>
+						<button class="btn btn-outline btn-lg hover-brutal">See templates</button>
+					</div>
+				</div>
+
+				<!-- Stat cluster -->
+				<div style="display: flex; flex-direction: column; gap: 1rem">
+					<div class="grid-2" style="gap: 1rem">
+						<div class="stat-card hover-brutal">
+							<div class="stat-num">12</div>
+							<div class="stat-label">CVs created</div>
+						</div>
+						<div class="stat-card hover-brutal">
+							<div class="stat-num" style="color: var(--accent)">3</div>
+							<div class="stat-label">Interviews booked</div>
+						</div>
+					</div>
+					<div class="stat-card hover-brutal">
+						<div
+							style="
+								display: flex;
+								justify-content: space-between;
+								align-items: flex-end;
+								margin-bottom: 0.25rem;
+							"
+						>
+							<span class="stat-label">Application score</span>
+							<span style="font-weight: 800; font-size: 0.95rem">78%</span>
+						</div>
+						<div class="progress-bar"><div class="progress-fill" style="width: 78%"></div></div>
+					</div>
+					<div class="stat-card hover-brutal">
+						<div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem">
+							<span class="badge badge-accent">NEW</span>
+							<span style="font-weight: 700; font-size: 0.875rem">AI Suggestions ready</span>
+						</div>
+						<p style="font-size: 0.8rem; color: var(--muted-foreground); font-weight: 500">
+							3 improvements found in your Senior Developer CV
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<hr class="section-divider" />
+
+		<!-- ──────────────────── DASHBOARD ──────────────────── -->
+		<div class="container">
+			<section>
+				<div class="section-label">↳ Your CVs</div>
+				<div
+					style="
+						display: flex;
+						align-items: flex-end;
+						justify-content: space-between;
+						margin-bottom: 2rem;
+						flex-wrap: wrap;
+						gap: 1rem;
+					"
+				>
+					<div>
+						<h2 class="section-title">Dashboard</h2>
+						<p class="section-sub">Manage and iterate your applications.</p>
+					</div>
+					<button class="btn btn-default btn-lg hover-brutal">+ New CV</button>
+				</div>
+
+				<!-- CV list -->
+				<div class="cv-row">
+					<div class="cv-row-left">
+						<div class="cv-icon">📄</div>
+						<div>
+							<div class="cv-name">Senior Developer — Stripe</div>
+							<div class="cv-date">Last edited 2 hours ago</div>
+						</div>
+					</div>
+					<div class="cv-row-right">
+						<span class="badge badge-accent">Active</span>
+						<button
+							class="btn btn-outline hover-brutal"
+							style="font-size: 0.8rem; padding: 0.3rem 0.75rem"
+						>
+							Edit
+						</button>
+					</div>
+				</div>
+
+				<div class="cv-row">
+					<div class="cv-row-left">
+						<div class="cv-icon">📄</div>
+						<div>
+							<div class="cv-name">Product Manager — Linear</div>
+							<div class="cv-date">Last edited yesterday</div>
+						</div>
+					</div>
+					<div class="cv-row-right">
+						<span class="badge badge-secondary">Draft</span>
+						<button
+							class="btn btn-outline hover-brutal"
+							style="font-size: 0.8rem; padding: 0.3rem 0.75rem"
+						>
+							Edit
+						</button>
+					</div>
+				</div>
+
+				<div class="cv-row">
+					<div class="cv-row-left">
+						<div class="cv-icon">📄</div>
+						<div>
+							<div class="cv-name">Backend Eng — Vercel</div>
+							<div class="cv-date">Last edited 3 days ago</div>
+						</div>
+					</div>
+					<div class="cv-row-right">
+						<span class="badge badge-muted">Archived</span>
+						<button
+							class="btn btn-outline hover-brutal"
+							style="font-size: 0.8rem; padding: 0.3rem 0.75rem"
+						>
+							Edit
+						</button>
+					</div>
+				</div>
+
+				<!-- Skeleton loading state -->
+				<div style="margin-top: 1.5rem">
+					<div
+						style="
+							font-size: 0.75rem;
+							font-weight: 700;
+							color: var(--muted-foreground);
+							text-transform: uppercase;
+							letter-spacing: 0.08em;
+							margin-bottom: 0.75rem;
+						"
+					>
+						Loading state example
+					</div>
+					<div
+						style="
+							display: grid;
+							grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+							gap: 1rem;
+						"
+					>
+						<div style="height: 120px" class="skeleton"></div>
+						<div style="height: 120px" class="skeleton"></div>
+						<div style="height: 120px" class="skeleton"></div>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<hr class="section-divider" />
+
+		<!-- ──────────────────── CV EDITOR MOCK ──────────────────── -->
+		<div class="container">
+			<section>
+				<div class="section-label">↳ CV Editor</div>
+				<h2 class="section-title" style="margin-bottom: 2rem">Editor view</h2>
+
+				<!-- Toolbar -->
+				<div class="toolbar">
+					<input class="toolbar-name" type="text" value="Senior Developer — Stripe" />
+					<div class="toolbar-actions">
+						<button class="btn btn-secondary hover-brutal">Preview</button>
+						<button class="btn btn-default hover-brutal">Save</button>
+						<button class="btn btn-accent hover-brutal">Export PDF</button>
+					</div>
+				</div>
+
+				<!-- Editor body -->
+				<div class="grid-2" style="align-items: start">
+					<div>
+						<!-- Block wrapper: Experience -->
+						<div class="block-wrapper">
+							<div class="block-wrapper-title">Experience</div>
+
+							<div class="card hover-brutal" style="margin-bottom: 1rem">
+								<div
+									style="
+										display: flex;
+										justify-content: space-between;
+										align-items: flex-start;
+										flex-wrap: wrap;
+										gap: 0.5rem;
+									"
+								>
+									<div>
+										<div class="card-title">Software Engineer II</div>
+										<div class="card-meta">Stripe · San Francisco, CA</div>
+									</div>
+									<span class="badge badge-secondary">2022–Present</span>
+								</div>
+								<p style="font-size: 0.875rem; color: var(--muted-foreground); font-weight: 500">
+									Led infrastructure migrations reducing latency by 34%. Owned deployment pipeline
+									for 6 microservices.
+								</p>
+								<div class="tag-list">
+									<span class="badge badge-muted">TypeScript</span>
+									<span class="badge badge-muted">Go</span>
+									<span class="badge badge-muted">Kubernetes</span>
+								</div>
+							</div>
+
+							<div class="card hover-brutal">
+								<div
+									style="
+										display: flex;
+										justify-content: space-between;
+										align-items: flex-start;
+										flex-wrap: wrap;
+										gap: 0.5rem;
+									"
+								>
+									<div>
+										<div class="card-title">Frontend Engineer</div>
+										<div class="card-meta">Vercel · Remote</div>
+									</div>
+									<span class="badge badge-secondary">2020–2022</span>
+								</div>
+								<p style="font-size: 0.875rem; color: var(--muted-foreground); font-weight: 500">
+									Built edge-deployed React apps. Contributed to Next.js open source.
+								</p>
+								<div class="tag-list">
+									<span class="badge badge-muted">React</span>
+									<span class="badge badge-muted">Next.js</span>
+									<span class="badge badge-muted">Rust</span>
+								</div>
+							</div>
+						</div>
+
+						<!-- Block wrapper: Education -->
+						<div class="block-wrapper">
+							<div class="block-wrapper-title">Education</div>
+							<div class="card hover-brutal">
+								<div class="card-title">BSc Computer Science</div>
+								<div class="card-meta">University of Edinburgh · 2016–2020</div>
+								<p style="font-size: 0.875rem; color: var(--muted-foreground); font-weight: 500">
+									First class honours. Dissertation: Distributed consensus in edge networks.
+								</p>
+							</div>
+						</div>
+					</div>
+
+					<!-- Right: form + badges -->
+					<div>
+						<div class="block-wrapper">
+							<div class="block-wrapper-title">Personal details</div>
+							<div class="card">
+								<div class="form-group">
+									<label>Full name</label>
+									<input class="input" type="text" value="Alex Mercer" />
+								</div>
+								<div class="form-group">
+									<label>Role / headline</label>
+									<input class="input" type="text" value="Senior Software Engineer" />
+								</div>
+								<div class="form-group">
+									<label>Summary</label>
+									<textarea class="textarea">
+Pragmatic engineer with 5 years building reliable distributed systems. I like hard problems and shipping things that last.</textarea
+									>
+								</div>
+								<div class="form-group" style="margin-bottom: 0">
+									<label>Location</label>
+									<input class="input" type="text" value="London, UK (open to remote)" />
+								</div>
+							</div>
+						</div>
+
+						<div class="block-wrapper">
+							<div class="block-wrapper-title">Skills</div>
+							<div class="card">
+								<div class="tag-list">
+									<span class="badge badge-default">TypeScript</span>
+									<span class="badge badge-default">Go</span>
+									<span class="badge badge-default">Rust</span>
+									<span class="badge badge-accent">Kubernetes</span>
+									<span class="badge badge-accent">Terraform</span>
+									<span class="badge badge-secondary">React</span>
+									<span class="badge badge-secondary">Next.js</span>
+									<span class="badge badge-muted">PostgreSQL</span>
+									<span class="badge badge-muted">Redis</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<hr class="section-divider" />
+
+		<!-- ──────────────────── COMPONENT SHOWCASE ──────────────────── -->
+		<div class="container">
+			<section>
+				<div class="section-label">↳ Component tokens</div>
+				<h2 class="section-title">Buttons, badges & inputs</h2>
+				<p class="section-sub">
+					All interactive elements follow the same border + hard shadow language.
+				</p>
+
+				<div class="grid-3" style="margin-bottom: 2.5rem">
+					<!-- Buttons -->
+					<div class="card">
+						<div
+							class="block-wrapper-title"
+							style="
+								margin-bottom: 1rem;
+								font-size: 0.75rem;
+								font-weight: 700;
+								text-transform: uppercase;
+								letter-spacing: 0.08em;
+							"
+						>
+							Buttons
+						</div>
+						<div style="display: flex; flex-direction: column; gap: 0.75rem">
+							<button class="btn btn-default hover-brutal">Default</button>
+							<button class="btn btn-secondary hover-brutal">Secondary</button>
+							<button class="btn btn-accent hover-brutal">Accent / CTA</button>
+							<button class="btn btn-outline hover-brutal">Outline</button>
+						</div>
+					</div>
+
+					<!-- Badges -->
+					<div class="card">
+						<div
+							class="block-wrapper-title"
+							style="
+								margin-bottom: 1rem;
+								font-size: 0.75rem;
+								font-weight: 700;
+								text-transform: uppercase;
+								letter-spacing: 0.08em;
+							"
+						>
+							Badges
+						</div>
+						<div
+							style="display: flex; flex-direction: column; gap: 0.6rem; align-items: flex-start"
+						>
+							<span class="badge badge-default">Default</span>
+							<span class="badge badge-accent">Steel Blue Accent</span>
+							<span class="badge badge-secondary">Secondary</span>
+							<span class="badge badge-muted">Muted</span>
+						</div>
+					</div>
+
+					<!-- Inputs -->
+					<div class="card">
+						<div
+							class="block-wrapper-title"
+							style="
+								margin-bottom: 1rem;
+								font-size: 0.75rem;
+								font-weight: 700;
+								text-transform: uppercase;
+								letter-spacing: 0.08em;
+							"
+						>
+							Inputs
+						</div>
+						<div class="form-group">
+							<label>Text input</label>
+							<input class="input" type="text" placeholder="Type something…" />
+						</div>
+						<div class="form-group" style="margin-bottom: 0">
+							<label>Textarea</label>
+							<textarea
+								class="textarea"
+								placeholder="Longer form text…"
+								style="min-height: 60px"
+							></textarea>
+						</div>
+					</div>
+				</div>
+
+				<!-- Color palette -->
+				<div class="card">
+					<div
+						class="block-wrapper-title"
+						style="
+							margin-bottom: 1rem;
+							font-size: 0.75rem;
+							font-weight: 700;
+							text-transform: uppercase;
+							letter-spacing: 0.08em;
+						"
+					>
+						Cool & Concrete palette
+					</div>
+					<div
+						style="
+							display: grid;
+							grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+							gap: 0.75rem;
+						"
+					>
+						<div>
+							<div
+								style="
+									height: 56px;
+									background: var(--background);
+									border: 2px solid var(--border);
+									border-radius: var(--radius);
+									margin-bottom: 0.3rem;
+								"
+							></div>
+							<div style="font-size: 0.7rem; font-weight: 700">Background</div>
+						</div>
+						<div>
+							<div
+								style="
+									height: 56px;
+									background: var(--card);
+									border: 2px solid var(--border);
+									border-radius: var(--radius);
+									margin-bottom: 0.3rem;
+								"
+							></div>
+							<div style="font-size: 0.7rem; font-weight: 700">Card</div>
+						</div>
+						<div>
+							<div
+								style="
+									height: 56px;
+									background: var(--primary);
+									border: 2px solid var(--border);
+									border-radius: var(--radius);
+									margin-bottom: 0.3rem;
+								"
+							></div>
+							<div style="font-size: 0.7rem; font-weight: 700">Primary</div>
+						</div>
+						<div>
+							<div
+								style="
+									height: 56px;
+									background: var(--accent);
+									border: 2px solid var(--border);
+									border-radius: var(--radius);
+									margin-bottom: 0.3rem;
+								"
+							></div>
+							<div style="font-size: 0.7rem; font-weight: 700">Accent ✦</div>
+						</div>
+						<div>
+							<div
+								style="
+									height: 56px;
+									background: var(--secondary);
+									border: 2px solid var(--border);
+									border-radius: var(--radius);
+									margin-bottom: 0.3rem;
+								"
+							></div>
+							<div style="font-size: 0.7rem; font-weight: 700">Secondary</div>
+						</div>
+						<div>
+							<div
+								style="
+									height: 56px;
+									background: var(--muted);
+									border: 2px solid var(--border);
+									border-radius: var(--radius);
+									margin-bottom: 0.3rem;
+								"
+							></div>
+							<div style="font-size: 0.7rem; font-weight: 700">Muted</div>
+						</div>
+						<div>
+							<div
+								style="
+									height: 56px;
+									background: var(--foreground);
+									border: 2px solid var(--border);
+									border-radius: var(--radius);
+									margin-bottom: 0.3rem;
+								"
+							></div>
+							<div style="font-size: 0.7rem; font-weight: 700; color: var(--muted-foreground)">
+								Foreground
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<!-- ──────────────────── DARK MODE TOGGLE ──────────────────── -->
+		<div id="dark-toggle">
+			<button
+				class="btn btn-default hover-brutal"
+				onclick="document.body.classList.toggle('dark')"
+				style="font-size: 0.85rem; padding: 0.5rem 0.9rem"
+			>
+				◑ Toggle dark
+			</button>
+		</div>
+	</body>
+</html>
