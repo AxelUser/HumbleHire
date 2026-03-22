@@ -22,6 +22,10 @@
 	});
 </script>
 
+<svelte:head>
+	<title>{cvStore.cv?.name ? `${cvStore.cv.name} - HumbleHire` : 'HumbleHire'}</title>
+</svelte:head>
+
 {#if cvStore.cv === null}
 	<div class="mx-auto max-w-5xl space-y-4 px-6 py-10">
 		<Skeleton class="h-12 w-full" />

@@ -27,6 +27,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>HumbleHire</title>
+</svelte:head>
+
 <!-- Hero -->
 <div class="border-foreground bg-card border-b-2 px-6 py-10">
 	<div class="mx-auto max-w-5xl">
