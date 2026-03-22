@@ -128,19 +128,19 @@ A read-only, timestamped copy of a CV's blocks captured automatically when the u
 
 ## Acceptance criteria
 
-| ID   | Criterion                                                                                                    |
-| ---- | ------------------------------------------------------------------------------------------------------------ |
-| BR-1 | A branch can be created from any CV; the branch contains a full copy of the source's blocks and visibility.  |
-| BR-2 | Branch records its source CV ID and the timestamp at which it was branched.                                   |
-| BR-3 | Editing a branch does not modify the source CV.                                                              |
-| BR-4 | Dashboard shows branch lineage (which CV a branch derives from).                                             |
-| BR-5 | Dashboard shows an "updates available" indicator when the source CV changed after branching.                  |
-| BR-6 | Sync view shows block-level differences between branch and current source.                                   |
-| BR-7 | User can accept or skip each block change individually during sync.                                          |
-| BR-8 | After sync review, the "updates available" indicator clears.                                                 |
-| BR-9 | Exporting a CV automatically creates a timestamped, read-only snapshot.                                      |
-| BR-10| Export snapshots can be tagged with a company name or job title.                                              |
-| BR-11| Past export snapshots are viewable in a read-only mode from the CV's detail view.                            |
+| ID    | Criterion                                                                                                   |
+| ----- | ----------------------------------------------------------------------------------------------------------- |
+| BR-1  | A branch can be created from any CV; the branch contains a full copy of the source's blocks and visibility. |
+| BR-2  | Branch records its source CV ID and the timestamp at which it was branched.                                 |
+| BR-3  | Editing a branch does not modify the source CV.                                                             |
+| BR-4  | Dashboard shows branch lineage (which CV a branch derives from).                                            |
+| BR-5  | Dashboard shows an "updates available" indicator when the source CV changed after branching.                |
+| BR-6  | Sync view shows block-level differences between branch and current source.                                  |
+| BR-7  | User can accept or skip each block change individually during sync.                                         |
+| BR-8  | After sync review, the "updates available" indicator clears.                                                |
+| BR-9  | Exporting a CV automatically creates a timestamped, read-only snapshot.                                     |
+| BR-10 | Export snapshots can be tagged with a company name or job title.                                            |
+| BR-11 | Past export snapshots are viewable in a read-only mode from the CV's detail view.                           |
 
 ---
 

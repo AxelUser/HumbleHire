@@ -11,5 +11,5 @@
 </script>
 
 <Story name="Default" asChild>
-		<Header />
+	<Header />
 </Story>

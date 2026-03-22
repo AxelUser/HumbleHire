@@ -11,9 +11,9 @@
 </script>
 
 <Story name="Visible" asChild>
-		<BlockWrapperWrapper startVisible={true} />
+	<BlockWrapperWrapper startVisible={true} />
 </Story>
 
 <Story name="Hidden" asChild>
-		<BlockWrapperWrapper startVisible={false} />
+	<BlockWrapperWrapper startVisible={false} />
 </Story>

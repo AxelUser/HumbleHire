@@ -13,8 +13,7 @@
 		class?: string;
 	}
 
-	let { value = $bindable(), placeholder = 'Select date', class: className = '' }: Props =
-		$props();
+	let { value = $bindable(), placeholder = 'Select date', class: className = '' }: Props = $props();
 
 	let open = $state(false);
 
@@ -27,11 +26,7 @@
 
 	function toCalendarDate(date: Date | undefined): CalendarDate | undefined {
 		if (!date) return undefined;
-		return new CalendarDate(
-			date.getUTCFullYear(),
-			date.getUTCMonth() + 1,
-			date.getUTCDate()
-		);
+		return new CalendarDate(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
 	}
 
 	let calendarValue = $state<CalendarDate | undefined>(toCalendarDate(value));
@@ -52,7 +47,11 @@
 				{...props}
 				variant="outline"
 				size="sm"
-				class={cn('justify-start gap-1.5 font-normal', !value && 'text-muted-foreground', className)}
+				class={cn(
+					'justify-start gap-1.5 font-normal',
+					!value && 'text-muted-foreground',
+					className
+				)}
 			>
 				<CalendarIcon class="size-3.5 shrink-0" />
 				{value ? df.format(value) : placeholder}

@@ -50,25 +50,25 @@
 				<div
 					{@attach sortable.attach}
 					class="rounded-lg p-4 {sortable.isDragging
-						? 'border-2 border-dashed border-muted'
+						? 'border-muted border-2 border-dashed'
 						: 'border'}"
 				>
 					<div class="flex flex-col gap-2 {sortable.isDragging ? 'invisible' : ''}">
 						<div class="flex items-start justify-between gap-2">
 							<span
 								{@attach sortable.attachHandle}
-								class="shrink-0 text-muted-foreground cursor-grab mt-1"
+								class="text-muted-foreground mt-1 shrink-0 cursor-grab"
 								><GripVertical class="h-4 w-4" /></span
 							>
 							<InlineField
 								bind:value={entry.institution}
 								placeholder="Institution"
-								class="font-semibold flex-1"
+								class="flex-1 font-semibold"
 							/>
 							<Button
 								variant="ghost"
 								size="icon"
-								class="shrink-0 text-muted-foreground hover:text-destructive"
+								class="text-muted-foreground hover:text-destructive shrink-0"
 								onclick={() => removeEducation(entry.id)}
 							>
 								<Trash2 class="h-4 w-4" />
@@ -88,20 +88,24 @@
 				</div>
 			{/each}
 			<Button variant="outline" size="sm" class="self-start" onclick={addEducation}>
-				<Plus class="h-4 w-4 mr-1" />
+				<Plus class="mr-1 h-4 w-4" />
 				Add Education
 			</Button>
 			<DragOverlay>
 				{#snippet children(source: any)}
 					{@const entry = education.find((e) => e.id === source.id)}
 					{#if entry}
-						<div class="border rounded-lg p-4 bg-background shadow-lg">
+						<div class="bg-background rounded-lg border p-4 shadow-lg">
 							<div class="flex flex-col gap-2">
 								<div class="flex items-start gap-2">
-									<GripVertical class="h-4 w-4 shrink-0 text-muted-foreground mt-1" />
-									<span class="font-semibold flex-1 text-sm">{entry.institution || 'Institution'}</span>
+									<GripVertical class="text-muted-foreground mt-1 h-4 w-4 shrink-0" />
+									<span class="flex-1 text-sm font-semibold"
+										>{entry.institution || 'Institution'}</span
+									>
 								</div>
-								<span class="text-sm text-muted-foreground">{entry.degree || 'Degree / Field of study'}</span>
+								<span class="text-muted-foreground text-sm"
+									>{entry.degree || 'Degree / Field of study'}</span
+								>
 							</div>
 						</div>
 					{/if}

@@ -14,24 +14,78 @@
 			name: 'Senior Developer — Stripe',
 			createdAt: now - 86400000 * 5,
 			updatedAt: now - 3600000,
-			blocks: { fullName: 'Aleksey Maltsev', position: 'Senior Software Engineer', location: 'San Francisco, CA', contacts: [], highlights: [], jobHistory: [], projects: [], education: [] },
-			blockVisibility: { fullName: true, position: true, location: true, contacts: true, highlights: true, jobHistory: true, projects: true, education: true }
+			blocks: {
+				fullName: 'Aleksey Maltsev',
+				position: 'Senior Software Engineer',
+				location: 'San Francisco, CA',
+				contacts: [],
+				highlights: [],
+				jobHistory: [],
+				projects: [],
+				education: []
+			},
+			blockVisibility: {
+				fullName: true,
+				position: true,
+				location: true,
+				contacts: true,
+				highlights: true,
+				jobHistory: true,
+				projects: true,
+				education: true
+			}
 		},
 		{
 			id: 'cv-2',
 			name: 'Frontend Lead — Vercel',
 			createdAt: now - 86400000 * 2,
 			updatedAt: now - 7200000,
-			blocks: { fullName: 'Aleksey Maltsev', position: 'Frontend Lead', location: 'Remote', contacts: [], highlights: [], jobHistory: [], projects: [], education: [] },
-			blockVisibility: { fullName: true, position: true, location: true, contacts: true, highlights: true, jobHistory: true, projects: true, education: true }
+			blocks: {
+				fullName: 'Aleksey Maltsev',
+				position: 'Frontend Lead',
+				location: 'Remote',
+				contacts: [],
+				highlights: [],
+				jobHistory: [],
+				projects: [],
+				education: []
+			},
+			blockVisibility: {
+				fullName: true,
+				position: true,
+				location: true,
+				contacts: true,
+				highlights: true,
+				jobHistory: true,
+				projects: true,
+				education: true
+			}
 		},
 		{
 			id: 'cv-3',
 			name: 'Untitled CV',
 			createdAt: now - 3600000,
 			updatedAt: now - 1800000,
-			blocks: { fullName: '', position: '', location: '', contacts: [], highlights: [], jobHistory: [], projects: [], education: [] },
-			blockVisibility: { fullName: true, position: true, location: true, contacts: true, highlights: true, jobHistory: true, projects: true, education: true }
+			blocks: {
+				fullName: '',
+				position: '',
+				location: '',
+				contacts: [],
+				highlights: [],
+				jobHistory: [],
+				projects: [],
+				education: []
+			},
+			blockVisibility: {
+				fullName: true,
+				position: true,
+				location: true,
+				contacts: true,
+				highlights: true,
+				jobHistory: true,
+				projects: true,
+				education: true
+			}
 		}
 	];
 

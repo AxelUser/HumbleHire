@@ -11,17 +11,17 @@
 </script>
 
 <Story name="WithTitle" asChild>
-		<PanelCard title="Work Experience" class="w-72">
-			<p class="text-sm text-muted-foreground">Panel body content.</p>
-		</PanelCard>
+	<PanelCard title="Work Experience" class="w-72">
+		<p class="text-muted-foreground text-sm">Panel body content.</p>
+	</PanelCard>
 </Story>
 
 <Story name="WithTitleAndAction" asChild>
-		<PanelCardWithActionWrapper />
+	<PanelCardWithActionWrapper />
 </Story>
 
 <Story name="NoHeader" asChild>
-		<PanelCard class="w-72">
-			<p class="text-sm text-muted-foreground">No header, just content.</p>
-		</PanelCard>
+	<PanelCard class="w-72">
+		<p class="text-muted-foreground text-sm">No header, just content.</p>
+	</PanelCard>
 </Story>

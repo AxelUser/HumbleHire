@@ -11,9 +11,9 @@
 </script>
 
 <Story name="Default" asChild>
-		<LocationWrapper startVisible={true} />
+	<LocationWrapper startVisible={true} />
 </Story>
 
 <Story name="Hidden" asChild>
-		<LocationWrapper startVisible={false} />
+	<LocationWrapper startVisible={false} />
 </Story>

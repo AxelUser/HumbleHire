@@ -11,13 +11,13 @@
 </script>
 
 <Story name="Default" asChild>
-		<EducationWrapper startVisible={true} />
+	<EducationWrapper startVisible={true} />
 </Story>
 
 <Story name="Hidden" asChild>
-		<EducationWrapper startVisible={false} />
+	<EducationWrapper startVisible={false} />
 </Story>
 
 <Story name="Empty" asChild>
-		<EducationWrapper startEmpty={true} />
+	<EducationWrapper startEmpty={true} />
 </Story>

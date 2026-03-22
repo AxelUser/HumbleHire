@@ -12,7 +12,11 @@
 
 <Story name="Default" asChild>
 	<EditableList
-		items={['Strong communication skills', 'Led cross-functional teams', 'Shipped 3 major features']}
+		items={[
+			'Strong communication skills',
+			'Led cross-functional teams',
+			'Shipped 3 major features'
+		]}
 		placeholder="Add an item..."
 		addLabel="Add Item"
 	/>

@@ -114,14 +114,14 @@ Sizing: `size="lg"` for primary CTAs (New CV, Get Started). `size="sm"` for inli
 
 Spacing inside CV block components follows a strict three-tier hierarchy. Use `gap` on parent flex containers, not `mb-*` on individual children.
 
-| Role | Class | px | Where |
-|---|---|---|---|
-| Entry card gap | `gap-4` | 16 | Between entry cards (education, jobs, projects) |
-| Field gap | `gap-2` | 8 | Between fields within a card; between flat list items |
-| List item gap | `gap-1.5` | 6 | Between bullet items in EditableList |
-| Inline gap | `gap-2` | 8 | Same-row elements (dates, label+value) |
-| Entry padding | `p-4` | 16 | Internal padding of entry cards |
-| Add button margin | `mt-2` | 8 | Above "Add" buttons in flat lists / EditableList |
+| Role              | Class     | px  | Where                                                 |
+| ----------------- | --------- | --- | ----------------------------------------------------- |
+| Entry card gap    | `gap-4`   | 16  | Between entry cards (education, jobs, projects)       |
+| Field gap         | `gap-2`   | 8   | Between fields within a card; between flat list items |
+| List item gap     | `gap-1.5` | 6   | Between bullet items in EditableList                  |
+| Inline gap        | `gap-2`   | 8   | Same-row elements (dates, label+value)                |
+| Entry padding     | `p-4`     | 16  | Internal padding of entry cards                       |
+| Add button margin | `mt-2`    | 8   | Above "Add" buttons in flat lists / EditableList      |
 
 **Rules:**
 

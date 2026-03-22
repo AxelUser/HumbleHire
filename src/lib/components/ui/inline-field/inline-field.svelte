@@ -46,7 +46,7 @@
 	<span
 		role="button"
 		tabindex="0"
-		class="hover:outline hover:outline-1 hover:outline-ring/40 cursor-text {className ?? ''}"
+		class="hover:outline-ring/40 cursor-text hover:outline hover:outline-1 {className ?? ''}"
 		onclick={activate}
 		onkeydown={onSpanKeydown}
 	>

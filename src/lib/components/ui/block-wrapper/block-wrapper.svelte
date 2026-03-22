@@ -17,7 +17,7 @@
 		<button
 			type="button"
 			onclick={() => (visible = !visible)}
-			class="cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+			class="text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
 			aria-label={visible ? 'Hide section' : 'Show section'}
 		>
 			{#if visible}
@@ -30,6 +30,6 @@
 	{#if visible}
 		{@render children()}
 	{:else}
-		<p class="py-2 text-xs italic text-muted-foreground">Section hidden</p>
+		<p class="text-muted-foreground py-2 text-xs italic">Section hidden</p>
 	{/if}
 </PanelCard>

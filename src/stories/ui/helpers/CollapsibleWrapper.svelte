@@ -24,6 +24,6 @@
 		</CollapsibleTrigger>
 	</div>
 	<CollapsibleContent>
-		<p class="mt-2 text-sm text-muted-foreground">Hidden content revealed when open.</p>
+		<p class="text-muted-foreground mt-2 text-sm">Hidden content revealed when open.</p>
 	</CollapsibleContent>
 </Collapsible>

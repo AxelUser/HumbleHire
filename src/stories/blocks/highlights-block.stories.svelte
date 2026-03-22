@@ -11,13 +11,13 @@
 </script>
 
 <Story name="Default" asChild>
-		<HighlightsWrapper startVisible={true} />
+	<HighlightsWrapper startVisible={true} />
 </Story>
 
 <Story name="Hidden" asChild>
-		<HighlightsWrapper startVisible={false} />
+	<HighlightsWrapper startVisible={false} />
 </Story>
 
 <Story name="Empty" asChild>
-		<HighlightsWrapper startEmpty={true} />
+	<HighlightsWrapper startEmpty={true} />
 </Story>

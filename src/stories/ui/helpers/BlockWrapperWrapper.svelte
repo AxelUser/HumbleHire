@@ -10,5 +10,5 @@
 </script>
 
 <BlockWrapper title="Example Section" bind:visible>
-	<p class="text-sm text-muted-foreground">This is the block content.</p>
+	<p class="text-muted-foreground text-sm">This is the block content.</p>
 </BlockWrapper>

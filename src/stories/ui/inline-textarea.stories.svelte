@@ -11,13 +11,17 @@
 </script>
 
 <Story name="Default" asChild>
-		<InlineTextarea value="Pragmatic engineer with a bias for shipping." placeholder="Enter text..." rows={3} />
+	<InlineTextarea
+		value="Pragmatic engineer with a bias for shipping."
+		placeholder="Enter text..."
+		rows={3}
+	/>
 </Story>
 
-<Story name="Empty" asChild	>
-		<InlineTextarea value="" placeholder="Click to edit..." rows={3} />
+<Story name="Empty" asChild>
+	<InlineTextarea value="" placeholder="Click to edit..." rows={3} />
 </Story>
 
 <Story name="Interactive" asChild>
-		<InlineTextareaWrapper />
+	<InlineTextareaWrapper />
 </Story>

@@ -11,13 +11,13 @@
 </script>
 
 <Story name="Default" asChild>
-		<ProjectsWrapper startVisible={true} />
+	<ProjectsWrapper startVisible={true} />
 </Story>
 
 <Story name="Hidden" asChild>
-		<ProjectsWrapper startVisible={false} />
+	<ProjectsWrapper startVisible={false} />
 </Story>
 
 <Story name="Empty" asChild>
-		<ProjectsWrapper startEmpty={true} />
+	<ProjectsWrapper startEmpty={true} />
 </Story>

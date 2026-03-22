@@ -7,5 +7,5 @@
 	{#snippet action()}
 		<Button variant="ghost" size="icon-sm">✎</Button>
 	{/snippet}
-	<p class="text-sm text-muted-foreground">Panel content goes here.</p>
+	<p class="text-muted-foreground text-sm">Panel content goes here.</p>
 </PanelCard>

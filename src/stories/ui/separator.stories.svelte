@@ -10,17 +10,17 @@
 </script>
 
 <Story name="Horizontal" asChild>
-		<div class="w-64">
-			<p class="text-sm">Above</p>
-			<Separator class="my-2" />
-			<p class="text-sm">Below</p>
-		</div>
+	<div class="w-64">
+		<p class="text-sm">Above</p>
+		<Separator class="my-2" />
+		<p class="text-sm">Below</p>
+	</div>
 </Story>
 
 <Story name="Vertical" asChild>
-		<div class="flex items-center gap-3 h-8">
-			<span class="text-sm">Left</span>
-			<Separator orientation="vertical" />
-			<span class="text-sm">Right</span>
-		</div>
+	<div class="flex h-8 items-center gap-3">
+		<span class="text-sm">Left</span>
+		<Separator orientation="vertical" />
+		<span class="text-sm">Right</span>
+	</div>
 </Story>

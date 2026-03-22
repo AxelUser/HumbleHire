@@ -11,13 +11,13 @@
 </script>
 
 <Story name="Default" asChild>
-		<JobHistoryWrapper startVisible={true} />
+	<JobHistoryWrapper startVisible={true} />
 </Story>
 
 <Story name="Hidden" asChild>
-		<JobHistoryWrapper startVisible={false} />
+	<JobHistoryWrapper startVisible={false} />
 </Story>
 
 <Story name="Empty" asChild>
-		<JobHistoryWrapper startEmpty={true} />
+	<JobHistoryWrapper startEmpty={true} />
 </Story>

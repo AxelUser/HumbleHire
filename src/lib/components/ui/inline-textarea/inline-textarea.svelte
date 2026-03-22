@@ -48,7 +48,8 @@
 	<span
 		role="button"
 		tabindex="0"
-		class="hover:outline-1 hover:outline-ring/40 rounded cursor-text whitespace-pre-wrap {className ?? ''}"
+		class="hover:outline-ring/40 cursor-text rounded whitespace-pre-wrap hover:outline-1 {className ??
+			''}"
 		onclick={activate}
 		onkeydown={onSpanKeydown}
 	>

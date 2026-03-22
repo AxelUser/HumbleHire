@@ -20,25 +20,25 @@
 </script>
 
 <Story name="DestructiveConfirmation" asChild>
-		<div class="p-8">
-			<AlertDialog>
-				<AlertDialogTrigger>
-					{#snippet child({ props })}
-						<Button variant="destructive" {...props}>Delete Item</Button>
-					{/snippet}
-				</AlertDialogTrigger>
-				<AlertDialogContent>
-					<AlertDialogHeader>
-						<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-						<AlertDialogDescription>
-							This action cannot be undone. This will permanently delete your item.
-						</AlertDialogDescription>
-					</AlertDialogHeader>
-					<AlertDialogFooter>
-						<AlertDialogCancel>Cancel</AlertDialogCancel>
-						<AlertDialogAction>Yes, delete</AlertDialogAction>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialog>
-		</div>
+	<div class="p-8">
+		<AlertDialog>
+			<AlertDialogTrigger>
+				{#snippet child({ props })}
+					<Button variant="destructive" {...props}>Delete Item</Button>
+				{/snippet}
+			</AlertDialogTrigger>
+			<AlertDialogContent>
+				<AlertDialogHeader>
+					<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+					<AlertDialogDescription>
+						This action cannot be undone. This will permanently delete your item.
+					</AlertDialogDescription>
+				</AlertDialogHeader>
+				<AlertDialogFooter>
+					<AlertDialogCancel>Cancel</AlertDialogCancel>
+					<AlertDialogAction>Yes, delete</AlertDialogAction>
+				</AlertDialogFooter>
+			</AlertDialogContent>
+		</AlertDialog>
+	</div>
 </Story>

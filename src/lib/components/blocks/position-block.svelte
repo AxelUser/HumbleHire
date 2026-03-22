@@ -11,5 +11,9 @@
 </script>
 
 <BlockWrapper title="Position" bind:visible>
-	<InlineField bind:value placeholder="Your position / job title" class="text-xl text-muted-foreground" />
+	<InlineField
+		bind:value
+		placeholder="Your position / job title"
+		class="text-muted-foreground text-xl"
+	/>
 </BlockWrapper>

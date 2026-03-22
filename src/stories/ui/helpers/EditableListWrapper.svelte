@@ -13,5 +13,5 @@
 
 <div class="flex flex-col gap-4">
 	<EditableList bind:items placeholder="Add an item..." addLabel="Add Item" />
-	<pre class="text-xs text-muted-foreground">{JSON.stringify(items, null, 2)}</pre>
+	<pre class="text-muted-foreground text-xs">{JSON.stringify(items, null, 2)}</pre>
 </div>

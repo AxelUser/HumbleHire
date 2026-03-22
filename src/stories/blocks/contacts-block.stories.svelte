@@ -11,13 +11,13 @@
 </script>
 
 <Story name="Default" asChild>
-		<ContactsWrapper startVisible={true} />
+	<ContactsWrapper startVisible={true} />
 </Story>
 
 <Story name="Hidden" asChild>
-		<ContactsWrapper startVisible={false} />
+	<ContactsWrapper startVisible={false} />
 </Story>
 
 <Story name="Empty" asChild>
-		<ContactsWrapper startEmpty={true} />
+	<ContactsWrapper startEmpty={true} />
 </Story>

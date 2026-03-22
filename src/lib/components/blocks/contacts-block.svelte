@@ -39,12 +39,15 @@
 				{@const sortable = createSortable({ id: contact.id, index: (() => index) as any })}
 				<div
 					class="flex items-center gap-2 {sortable.isDragging
-						? 'border-2 border-dashed border-muted rounded'
+						? 'border-muted rounded border-2 border-dashed'
 						: ''}"
 					{@attach sortable.attach}
 				>
-					<div class="flex items-center gap-2 flex-1 {sortable.isDragging ? 'invisible' : ''}">
-						<span {@attach sortable.attachHandle} class="shrink-0 text-muted-foreground cursor-grab">
+					<div class="flex flex-1 items-center gap-2 {sortable.isDragging ? 'invisible' : ''}">
+						<span
+							{@attach sortable.attachHandle}
+							class="text-muted-foreground shrink-0 cursor-grab"
+						>
 							<GripVertical class="h-4 w-4" />
 						</span>
 						<InlineField bind:value={contact.label} placeholder="Label" class="w-32 shrink-0" />
@@ -52,7 +55,7 @@
 						<Button
 							variant="ghost"
 							size="icon"
-							class="shrink-0 text-muted-foreground hover:text-destructive"
+							class="text-muted-foreground hover:text-destructive shrink-0"
 							onclick={() => removeContact(contact.id)}
 						>
 							<Trash2 class="h-4 w-4" />
@@ -60,22 +63,22 @@
 					</div>
 				</div>
 			{/each}
-			<Button variant="outline" size="sm" class="mt-2 self-start" onclick={addContact}>
-				<Plus class="h-4 w-4 mr-1" />
-				Add Contact
-			</Button>
 			<DragOverlay>
 				{#snippet children(source: any)}
 					{@const contact = contacts.find((c) => c.id === source.id)}
 					{#if contact}
-						<div class="flex items-center gap-2 bg-background shadow-lg rounded px-2 py-1">
-							<GripVertical class="h-4 w-4 shrink-0 text-muted-foreground" />
+						<div class="bg-background flex items-center gap-2 rounded px-2 py-1 shadow-lg">
+							<GripVertical class="text-muted-foreground h-4 w-4 shrink-0" />
 							<span class="w-32 shrink-0 text-sm">{contact.label || 'Label'}</span>
-							<span class="flex-1 text-sm text-muted-foreground">{contact.value || 'Value'}</span>
+							<span class="text-muted-foreground flex-1 text-sm">{contact.value || 'Value'}</span>
 						</div>
 					{/if}
 				{/snippet}
 			</DragOverlay>
 		</DragDropProvider>
+		<Button variant="outline" size="sm" class="mt-2 self-start" onclick={addContact}>
+			<Plus class="mr-1 h-4 w-4" />
+			Add Contact
+		</Button>
 	</div>
 </BlockWrapper>

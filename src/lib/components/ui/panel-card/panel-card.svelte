@@ -25,18 +25,18 @@
 	const hasHeader = $derived(title !== undefined || titleSlot !== undefined);
 </script>
 
-<div class={cn('border-2 border-foreground bg-card shadow-brutal', className)}>
+<div class={cn('border-foreground bg-card shadow-brutal border-2', className)}>
 	{#if hasHeader}
 		<div
 			class={cn(
-				'flex items-center justify-between border-b-2 border-foreground px-4 py-2',
+				'border-foreground flex items-center justify-between border-b-2 px-4 py-2',
 				headerClass
 			)}
 		>
 			{#if titleSlot}
 				{@render titleSlot()}
 			{:else}
-				<span class="text-xs font-bold uppercase tracking-widest text-foreground">{title}</span>
+				<span class="text-foreground text-xs font-bold tracking-widest uppercase">{title}</span>
 			{/if}
 			{#if action}
 				{@render action()}

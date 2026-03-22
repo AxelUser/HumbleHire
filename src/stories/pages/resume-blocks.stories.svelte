@@ -16,16 +16,16 @@
 </script>
 
 <Story name="FullResume">
-		<div class="min-h-screen bg-background p-6">
-			<div class="mx-auto max-w-3xl flex flex-col gap-4">
-				<FullNameWrapper />
-				<PositionWrapper />
-				<LocationWrapper />
-				<ContactsWrapper />
-				<HighlightsWrapper />
-				<JobHistoryWrapper />
-				<EducationWrapper />
-				<ProjectsWrapper />
-			</div>
+	<div class="bg-background min-h-screen p-6">
+		<div class="mx-auto flex max-w-3xl flex-col gap-4">
+			<FullNameWrapper />
+			<PositionWrapper />
+			<LocationWrapper />
+			<ContactsWrapper />
+			<HighlightsWrapper />
+			<JobHistoryWrapper />
+			<EducationWrapper />
+			<ProjectsWrapper />
 		</div>
+	</div>
 </Story>

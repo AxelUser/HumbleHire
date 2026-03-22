@@ -18,46 +18,46 @@
 </script>
 
 <Story name="Basic" asChild>
-		<div class="p-8">
-			<Dialog>
-				<DialogTrigger>
-					{#snippet child({ props })}
-						<Button variant="outline" {...props}>Open Dialog</Button>
-					{/snippet}
-				</DialogTrigger>
-				<DialogContent>
-					<DialogHeader>
-						<DialogTitle>Dialog Title</DialogTitle>
-						<DialogDescription>This is a dialog description.</DialogDescription>
-					</DialogHeader>
-					<p class="text-sm">Dialog body content goes here.</p>
-					<DialogFooter>
-						<Button variant="outline">Cancel</Button>
-						<Button>Confirm</Button>
-					</DialogFooter>
-				</DialogContent>
-			</Dialog>
-		</div>
+	<div class="p-8">
+		<Dialog>
+			<DialogTrigger>
+				{#snippet child({ props })}
+					<Button variant="outline" {...props}>Open Dialog</Button>
+				{/snippet}
+			</DialogTrigger>
+			<DialogContent>
+				<DialogHeader>
+					<DialogTitle>Dialog Title</DialogTitle>
+					<DialogDescription>This is a dialog description.</DialogDescription>
+				</DialogHeader>
+				<p class="text-sm">Dialog body content goes here.</p>
+				<DialogFooter>
+					<Button variant="outline">Cancel</Button>
+					<Button>Confirm</Button>
+				</DialogFooter>
+			</DialogContent>
+		</Dialog>
+	</div>
 </Story>
 
 <Story name="NoCloseButton" asChild>
-		<div class="p-8">
-			<Dialog>
-				<DialogTrigger>
-					{#snippet child({ props })}
-						<Button variant="outline" {...props}>Open Dialog</Button>
-					{/snippet}
-				</DialogTrigger>
-				<DialogContent>
-					<DialogHeader>
-						<DialogTitle>Confirm Action</DialogTitle>
-						<DialogDescription>Are you sure you want to proceed?</DialogDescription>
-					</DialogHeader>
-					<DialogFooter>
-						<Button variant="outline">No</Button>
-						<Button>Yes, proceed</Button>
-					</DialogFooter>
-				</DialogContent>
-			</Dialog>
-		</div>
+	<div class="p-8">
+		<Dialog>
+			<DialogTrigger>
+				{#snippet child({ props })}
+					<Button variant="outline" {...props}>Open Dialog</Button>
+				{/snippet}
+			</DialogTrigger>
+			<DialogContent>
+				<DialogHeader>
+					<DialogTitle>Confirm Action</DialogTitle>
+					<DialogDescription>Are you sure you want to proceed?</DialogDescription>
+				</DialogHeader>
+				<DialogFooter>
+					<Button variant="outline">No</Button>
+					<Button>Yes, proceed</Button>
+				</DialogFooter>
+			</DialogContent>
+		</Dialog>
+	</div>
 </Story>

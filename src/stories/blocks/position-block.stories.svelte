@@ -11,9 +11,9 @@
 </script>
 
 <Story name="Default" asChild>
-		<PositionWrapper startVisible={true} />
+	<PositionWrapper startVisible={true} />
 </Story>
 
 <Story name="Hidden" asChild>
-		<PositionWrapper startVisible={false} />
+	<PositionWrapper startVisible={false} />
 </Story>

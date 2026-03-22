@@ -11,13 +11,13 @@
 </script>
 
 <Story name="Default" asChild>
-		<InlineField value="Aleksey Maltsev" placeholder="Enter name..." />
+	<InlineField value="Aleksey Maltsev" placeholder="Enter name..." />
 </Story>
 
 <Story name="Empty" asChild>
-		<InlineField value="" placeholder="Click to edit..." />
+	<InlineField value="" placeholder="Click to edit..." />
 </Story>
 
 <Story name="Interactive" asChild>
-		<InlineFieldWrapper />
+	<InlineFieldWrapper />
 </Story>

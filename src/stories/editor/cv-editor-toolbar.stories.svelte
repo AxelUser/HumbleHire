@@ -12,9 +12,9 @@
 </script>
 
 <Story name="SavedState" asChild>
-		<CvEditorToolbarWrapper />
+	<CvEditorToolbarWrapper />
 </Story>
 
 <Story name="SavingState" asChild>
-		<CvEditorToolbarSavingWrapper />
+	<CvEditorToolbarSavingWrapper />
 </Story>

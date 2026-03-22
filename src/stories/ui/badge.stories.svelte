@@ -11,18 +11,18 @@
 </script>
 
 <Story name="AllVariants" asChild>
-		<div class="flex flex-wrap gap-3">
-			<Badge variant="default">Default</Badge>
-			<Badge variant="secondary">Secondary</Badge>
-			<Badge variant="destructive">Destructive</Badge>
-			<Badge variant="outline">Outline</Badge>
-		</div>
+	<div class="flex flex-wrap gap-3">
+		<Badge variant="default">Default</Badge>
+		<Badge variant="secondary">Secondary</Badge>
+		<Badge variant="destructive">Destructive</Badge>
+		<Badge variant="outline">Outline</Badge>
+	</div>
 </Story>
 
 <Story name="WithIcon" asChild>
-		<Badge variant="default"><Mail />New Message</Badge>
+	<Badge variant="default"><Mail />New Message</Badge>
 </Story>
 
 <Story name="AsLink" asChild>
-		<Badge href="https://example.com" variant="outline">Clickable Badge</Badge>
+	<Badge href="https://example.com" variant="outline">Clickable Badge</Badge>
 </Story>

@@ -11,13 +11,13 @@
 </script>
 
 <Story name="Off" asChild>
-		<Switch checked={false} />
+	<Switch checked={false} />
 </Story>
 
 <Story name="On" asChild>
-		<Switch checked={true} />
+	<Switch checked={true} />
 </Story>
 
 <Story name="Interactive" asChild>
-		<SwitchWrapper />
+	<SwitchWrapper />
 </Story>

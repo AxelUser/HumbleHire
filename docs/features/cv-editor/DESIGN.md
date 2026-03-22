@@ -178,27 +178,27 @@ lib/components/
 
 ```svelte
 <script lang="ts">
-  let { value = $bindable(), placeholder = '' }: { value: string; placeholder?: string } = $props();
-  let editing = $state(false);
+	let { value = $bindable(), placeholder = '' }: { value: string; placeholder?: string } = $props();
+	let editing = $state(false);
 </script>
 
 {#if editing}
-  <input
-    bind:value
-    {placeholder}
-    onblur={() => (editing = false)}
-    onkeydown={(e) => e.key === 'Escape' && (editing = false)}
-    autofocus
-  />
+	<input
+		bind:value
+		{placeholder}
+		onblur={() => (editing = false)}
+		onkeydown={(e) => e.key === 'Escape' && (editing = false)}
+		autofocus
+	/>
 {:else}
-  <span
-    role="button"
-    tabindex="0"
-    onclick={() => (editing = true)}
-    onkeydown={(e) => e.key === 'Enter' && (editing = true)}
-  >
-    {value || placeholder}
-  </span>
+	<span
+		role="button"
+		tabindex="0"
+		onclick={() => (editing = true)}
+		onkeydown={(e) => e.key === 'Enter' && (editing = true)}
+	>
+		{value || placeholder}
+	</span>
 {/if}
 ```
 

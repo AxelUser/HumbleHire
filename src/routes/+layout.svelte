@@ -20,7 +20,7 @@
 
 <button
 	onclick={toggleMode}
-	class="fixed bottom-6 right-6 z-50 flex items-center gap-2 border-2 border-foreground bg-card px-3 py-2 text-sm font-bold shadow-brutal hover-brutal"
+	class="border-foreground bg-card shadow-brutal hover-brutal fixed right-6 bottom-6 z-50 flex items-center gap-2 border-2 px-3 py-2 text-sm font-bold"
 	aria-label="Toggle theme"
 >
 	{#if mode.current === 'dark'}

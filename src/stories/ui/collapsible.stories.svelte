@@ -11,13 +11,13 @@
 </script>
 
 <Story name="Collapsed" asChild>
-		<CollapsibleWrapper startOpen={false} />
+	<CollapsibleWrapper startOpen={false} />
 </Story>
 
 <Story name="Expanded" asChild>
-		<CollapsibleWrapper startOpen={true} />
+	<CollapsibleWrapper startOpen={true} />
 </Story>
 
 <Story name="Interactive" asChild>
-		<CollapsibleWrapper />
+	<CollapsibleWrapper />
 </Story>

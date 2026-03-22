@@ -54,41 +54,38 @@
 </script>
 
 <DragDropProvider {onDragEnd} {onDragOver}>
-	<div class={cn('flex flex-col gap-1.5', className)}>
-		{#each items as _, index (ids[index])}
-			{@const sortable = createSortable({ id: ids[index], index: (() => index) as any })}
-			<div
-				class="flex items-center gap-2 {sortable.isDragging
-					? 'border-2 border-dashed border-muted rounded'
-					: ''}"
-				{@attach sortable.attach}
-			>
-				<div class="flex items-center gap-2 flex-1 {sortable.isDragging ? 'invisible' : ''}">
-					<span
-						class="cursor-grab text-muted-foreground select-none"
-						{@attach sortable.attachHandle}
-					>
-						<GripVertical class="size-4" />
-					</span>
-					<InlineTextarea
-						bind:value={items[index]}
-						{placeholder}
-						class="flex-1"
-						rows={2}
-					/>
-					<Button
-						variant="ghost"
-						size="icon"
-						class="shrink-0 -mt-1 text-muted-foreground hover:text-destructive"
-						onclick={() => removeItem(index)}
-					>
-						<Trash2 class="size-4" />
-					</Button>
+	<div class={cn('flex flex-col', className)}>
+		<div class="flex flex-col gap-1.5">
+			{#each items as _, index (ids[index])}
+				{@const sortable = createSortable({ id: ids[index], index })}
+				<div
+					class="flex items-center gap-2 {sortable.isDragging
+						? 'border-muted rounded border-2 border-dashed'
+						: ''}"
+					{@attach sortable.attach}
+				>
+					<div class="flex flex-1 items-center gap-2 {sortable.isDragging ? 'invisible' : ''}">
+						<span
+							class="text-muted-foreground cursor-grab select-none"
+							{@attach sortable.attachHandle}
+						>
+							<GripVertical class="size-4" />
+						</span>
+						<InlineTextarea bind:value={items[index]} {placeholder} class="flex-1" rows={2} />
+						<Button
+							variant="ghost"
+							size="icon"
+							class="text-muted-foreground hover:text-destructive -mt-1 shrink-0"
+							onclick={() => removeItem(index)}
+						>
+							<Trash2 class="size-4" />
+						</Button>
+					</div>
 				</div>
-			</div>
-		{/each}
+			{/each}
+		</div>
 		<Button variant="outline" size="sm" class="mt-2 self-start" onclick={addItem}>
-			<Plus class="size-4 mr-1" />
+			<Plus class="mr-1 size-4" />
 			{addLabel}
 		</Button>
 	</div>
@@ -96,8 +93,8 @@
 		{#snippet children(source: any)}
 			{@const idx = ids.indexOf(source.id)}
 			{#if idx !== -1}
-				<div class="flex items-center gap-2 bg-background shadow-lg rounded px-1 py-1">
-					<GripVertical class="size-4 shrink-0 text-muted-foreground" />
+				<div class="bg-background flex items-center gap-2 rounded px-1 py-1 shadow-lg">
+					<GripVertical class="text-muted-foreground size-4 shrink-0" />
 					<span class="flex-1 text-sm">{items[idx] || placeholder}</span>
 				</div>
 			{/if}

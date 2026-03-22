@@ -16,37 +16,37 @@
 </script>
 
 <Story name="Basic" asChild>
-		<Card class="w-64">
-			<CardContent>
-				<p class="text-sm">Basic card content.</p>
-			</CardContent>
-		</Card>
+	<Card class="w-64">
+		<CardContent>
+			<p class="text-sm">Basic card content.</p>
+		</CardContent>
+	</Card>
 </Story>
 
 <Story name="WithHeader" asChild>
-		<Card class="w-64">
-			<CardHeader>
-				<CardTitle>Card Title</CardTitle>
-				<CardDescription>A short description of the card.</CardDescription>
-			</CardHeader>
-			<CardContent>
-				<p class="text-sm">Card content goes here.</p>
-			</CardContent>
-		</Card>
+	<Card class="w-64">
+		<CardHeader>
+			<CardTitle>Card Title</CardTitle>
+			<CardDescription>A short description of the card.</CardDescription>
+		</CardHeader>
+		<CardContent>
+			<p class="text-sm">Card content goes here.</p>
+		</CardContent>
+	</Card>
 </Story>
 
 <Story name="FullCard" asChild>
-		<Card class="w-64">
-			<CardHeader>
-				<CardTitle>Full Card</CardTitle>
-				<CardDescription>With header, content, and footer.</CardDescription>
-			</CardHeader>
-			<CardContent>
-				<p class="text-sm">This card has all sections filled in.</p>
-			</CardContent>
-			<CardFooter class="flex gap-2">
-				<Button variant="outline" size="sm">Cancel</Button>
-				<Button size="sm">Confirm</Button>
-			</CardFooter>
-		</Card>
+	<Card class="w-64">
+		<CardHeader>
+			<CardTitle>Full Card</CardTitle>
+			<CardDescription>With header, content, and footer.</CardDescription>
+		</CardHeader>
+		<CardContent>
+			<p class="text-sm">This card has all sections filled in.</p>
+		</CardContent>
+		<CardFooter class="flex gap-2">
+			<Button variant="outline" size="sm">Cancel</Button>
+			<Button size="sm">Confirm</Button>
+		</CardFooter>
+	</Card>
 </Story>

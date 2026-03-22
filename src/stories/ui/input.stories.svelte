@@ -10,17 +10,17 @@
 </script>
 
 <Story name="Default" asChild>
-		<Input placeholder="Enter text..." class="w-64" />
+	<Input placeholder="Enter text..." class="w-64" />
 </Story>
 
 <Story name="WithValue" asChild>
-		<Input value="Aleksey Maltsev" class="w-64" />
+	<Input value="Aleksey Maltsev" class="w-64" />
 </Story>
 
 <Story name="Disabled" asChild>
-		<Input placeholder="Disabled input" disabled class="w-64" />
+	<Input placeholder="Disabled input" disabled class="w-64" />
 </Story>
 
 <Story name="Password" asChild>
-		<Input type="password" placeholder="Enter password" class="w-64" />
+	<Input type="password" placeholder="Enter password" class="w-64" />
 </Story>

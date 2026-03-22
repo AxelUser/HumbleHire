@@ -13,24 +13,78 @@
 			name: 'Senior Developer — Stripe',
 			createdAt: now - 86400000 * 5,
 			updatedAt: now - 3600000,
-			blocks: { fullName: 'Aleksey Maltsev', position: 'Senior Software Engineer', location: 'San Francisco, CA', contacts: [], highlights: [], jobHistory: [], projects: [], education: [] },
-			blockVisibility: { fullName: true, position: true, location: true, contacts: true, highlights: true, jobHistory: true, projects: true, education: true }
+			blocks: {
+				fullName: 'Aleksey Maltsev',
+				position: 'Senior Software Engineer',
+				location: 'San Francisco, CA',
+				contacts: [],
+				highlights: [],
+				jobHistory: [],
+				projects: [],
+				education: []
+			},
+			blockVisibility: {
+				fullName: true,
+				position: true,
+				location: true,
+				contacts: true,
+				highlights: true,
+				jobHistory: true,
+				projects: true,
+				education: true
+			}
 		},
 		{
 			id: 'cv-2',
 			name: 'Frontend Lead — Vercel',
 			createdAt: now - 86400000 * 2,
 			updatedAt: now - 7200000,
-			blocks: { fullName: 'Aleksey Maltsev', position: 'Frontend Lead', location: 'Remote', contacts: [], highlights: [], jobHistory: [], projects: [], education: [] },
-			blockVisibility: { fullName: true, position: true, location: true, contacts: true, highlights: true, jobHistory: true, projects: true, education: true }
+			blocks: {
+				fullName: 'Aleksey Maltsev',
+				position: 'Frontend Lead',
+				location: 'Remote',
+				contacts: [],
+				highlights: [],
+				jobHistory: [],
+				projects: [],
+				education: []
+			},
+			blockVisibility: {
+				fullName: true,
+				position: true,
+				location: true,
+				contacts: true,
+				highlights: true,
+				jobHistory: true,
+				projects: true,
+				education: true
+			}
 		},
 		{
 			id: 'cv-3',
 			name: 'Open Source Contributor',
 			createdAt: now - 86400000,
 			updatedAt: now - 900000,
-			blocks: { fullName: 'Aleksey Maltsev', position: 'Open Source Contributor', location: 'Edinburgh, UK', contacts: [], highlights: [], jobHistory: [], projects: [], education: [] },
-			blockVisibility: { fullName: true, position: true, location: true, contacts: true, highlights: true, jobHistory: true, projects: true, education: true }
+			blocks: {
+				fullName: 'Aleksey Maltsev',
+				position: 'Open Source Contributor',
+				location: 'Edinburgh, UK',
+				contacts: [],
+				highlights: [],
+				jobHistory: [],
+				projects: [],
+				education: []
+			},
+			blockVisibility: {
+				fullName: true,
+				position: true,
+				location: true,
+				contacts: true,
+				highlights: true,
+				jobHistory: true,
+				projects: true,
+				education: true
+			}
 		}
 	];
 
@@ -41,33 +95,33 @@
 </script>
 
 <Story name="WithCVs">
-		<div class="min-h-screen bg-background flex flex-col">
-			<Header />
-			<main class="flex-1 px-6 py-8">
-				<div class="mx-auto max-w-5xl">
-					<div class="mb-8">
-						<h1 class="text-3xl font-extrabold mb-2">My CVs</h1>
-						<p class="text-muted-foreground">Create and manage your resumes.</p>
-					</div>
-					<CvList cvs={mockCVs} onDelete={fn()} />
+	<div class="bg-background flex min-h-screen flex-col">
+		<Header />
+		<main class="flex-1 px-6 py-8">
+			<div class="mx-auto max-w-5xl">
+				<div class="mb-8">
+					<h1 class="mb-2 text-3xl font-extrabold">My CVs</h1>
+					<p class="text-muted-foreground">Create and manage your resumes.</p>
 				</div>
-			</main>
-			<Footer />
-		</div>
+				<CvList cvs={mockCVs} onDelete={fn()} />
+			</div>
+		</main>
+		<Footer />
+	</div>
 </Story>
 
 <Story name="EmptyState">
-		<div class="min-h-screen bg-background flex flex-col">
-			<Header />
-			<main class="flex-1 px-6 py-8">
-				<div class="mx-auto max-w-5xl">
-					<div class="mb-8">
-						<h1 class="text-3xl font-extrabold mb-2">My CVs</h1>
-						<p class="text-muted-foreground">Create and manage your resumes.</p>
-					</div>
-					<CvList cvs={[]} onDelete={fn()} />
+	<div class="bg-background flex min-h-screen flex-col">
+		<Header />
+		<main class="flex-1 px-6 py-8">
+			<div class="mx-auto max-w-5xl">
+				<div class="mb-8">
+					<h1 class="mb-2 text-3xl font-extrabold">My CVs</h1>
+					<p class="text-muted-foreground">Create and manage your resumes.</p>
 				</div>
-			</main>
-			<Footer />
-		</div>
+				<CvList cvs={[]} onDelete={fn()} />
+			</div>
+		</main>
+		<Footer />
+	</div>
 </Story>

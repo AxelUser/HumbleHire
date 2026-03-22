@@ -1,6 +1,6 @@
-<footer class="border-t-2 border-foreground bg-card px-6 py-3">
+<footer class="border-foreground bg-card border-t-2 px-6 py-3">
 	<div class="mx-auto flex max-w-5xl flex-col items-center gap-1.5">
-		<p class="text-sm font-bold tracking-wide text-muted-foreground">
+		<p class="text-muted-foreground text-sm font-bold tracking-wide">
 			Built by
 			<a
 				href="https://maltsev.space"
@@ -10,7 +10,7 @@
 			>
 				Aleksey Maltsev
 			</a>
-			<span class="mx-1.5 text-accent">·</span>
+			<span class="text-accent mx-1.5">·</span>
 			{new Date().getFullYear()}
 		</p>
 	</div>

@@ -51,16 +51,19 @@
 				{@const sortable = createSortable({ id: job.id, index: (() => index) as any })}
 				<div
 					class="rounded-lg p-4 {sortable.isDragging
-						? 'border-2 border-dashed border-muted'
+						? 'border-muted border-2 border-dashed'
 						: 'border'}"
 					{@attach sortable.attach}
 				>
 					<div class="flex flex-col gap-2 {sortable.isDragging ? 'invisible' : ''}">
 						<div class="flex items-start justify-between gap-2">
-							<span {@attach sortable.attachHandle} class="shrink-0 text-muted-foreground cursor-grab mt-1">
+							<span
+								{@attach sortable.attachHandle}
+								class="text-muted-foreground mt-1 shrink-0 cursor-grab"
+							>
 								<GripVertical class="h-4 w-4" />
 							</span>
-							<div class="flex flex-wrap items-baseline gap-2 flex-1">
+							<div class="flex flex-1 flex-wrap items-baseline gap-2">
 								<InlineField bind:value={job.company} placeholder="Company" class="font-semibold" />
 								<span class="text-muted-foreground">—</span>
 								<InlineField bind:value={job.role} placeholder="Role" class="flex-1" />
@@ -68,7 +71,7 @@
 							<Button
 								variant="ghost"
 								size="icon"
-								class="shrink-0 text-muted-foreground hover:text-destructive"
+								class="text-muted-foreground hover:text-destructive shrink-0"
 								onclick={() => removeJob(job.id)}
 							>
 								<Trash2 class="h-4 w-4" />
@@ -88,18 +91,18 @@
 				</div>
 			{/each}
 			<Button variant="outline" size="sm" class="self-start" onclick={addJob}>
-				<Plus class="h-4 w-4 mr-1" />
+				<Plus class="mr-1 h-4 w-4" />
 				Add Job
 			</Button>
 			<DragOverlay>
 				{#snippet children(source: any)}
 					{@const job = jobs.find((j) => j.id === source.id)}
 					{#if job}
-						<div class="border rounded-lg p-4 bg-background shadow-lg">
+						<div class="bg-background rounded-lg border p-4 shadow-lg">
 							<div class="flex items-start gap-2">
-								<GripVertical class="h-4 w-4 shrink-0 text-muted-foreground mt-1" />
+								<GripVertical class="text-muted-foreground mt-1 h-4 w-4 shrink-0" />
 								<div class="flex flex-wrap items-baseline gap-2">
-									<span class="font-semibold text-sm">{job.company || 'Company'}</span>
+									<span class="text-sm font-semibold">{job.company || 'Company'}</span>
 									<span class="text-muted-foreground">—</span>
 									<span class="text-sm">{job.role || 'Role'}</span>
 								</div>

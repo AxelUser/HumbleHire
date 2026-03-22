@@ -35,7 +35,6 @@ export class CVStore {
 			return () => clearTimeout(timer);
 		});
 	}
-
 }
 
 export function setCVStoreContext(store: CVStore): void {
