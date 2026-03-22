@@ -1,18 +1,12 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { mode } from 'mode-watcher';
+	import { Logo } from '$lib/components/ui/logo';
 </script>
 
 <header class="border-foreground bg-card sticky top-0 z-20 border-b-2 px-6 py-3">
 	<div class="mx-auto flex max-w-5xl items-center justify-between">
 		<a href="/" class="flex items-center gap-1.5 text-lg font-extrabold tracking-tight">
-			<img
-				src={mode.current === 'dark'
-					? '/logo/humblehire_logo_dark.avif'
-					: '/logo/humblehire_logo_light.avif'}
-				alt="HumbleHire"
-				class="h-10 w-auto"
-			/>
+			<Logo class="h-10 w-auto" />
 			<span>Humble<span class="text-accent">Hire</span></span>
 		</a>
 
