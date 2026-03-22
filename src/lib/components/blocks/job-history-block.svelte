@@ -4,7 +4,10 @@
 	import { EditableList } from '$lib/components/ui/editable-list';
 	import { BlockWrapper } from '$lib/components/ui/block-wrapper';
 	import { Button } from '$lib/components/ui/button';
-	import { Trash2, Plus } from '@lucide/svelte';
+	import { Trash2, Plus, GripVertical } from '@lucide/svelte';
+	import { DragDropProvider, DragOverlay } from '@dnd-kit/svelte';
+	import { createSortable } from '@dnd-kit/svelte/sortable';
+	import { move } from '@dnd-kit/helpers';
 	import type { JobEntry } from '$lib/types/cv';
 
 	interface Props {
@@ -31,44 +34,80 @@
 	function removeJob(id: string) {
 		jobs = jobs.filter((j) => j.id !== id);
 	}
+
+	function onDragOver(event: any) {
+		jobs = move(jobs, event);
+	}
+
+	function onDragEnd(event: any) {
+		jobs = move(jobs, event);
+	}
 </script>
 
 <BlockWrapper title="Job History" bind:visible>
 	<div class="flex flex-col gap-4">
-		{#each jobs as job (job.id)}
-			<div class="border rounded-lg p-4">
-				<div class="flex flex-col gap-2">
-					<div class="flex items-start justify-between gap-2">
-						<div class="flex flex-wrap items-baseline gap-2 flex-1">
-							<InlineField bind:value={job.company} placeholder="Company" class="font-semibold" />
-							<span class="text-muted-foreground">—</span>
-							<InlineField bind:value={job.role} placeholder="Role" class="flex-1" />
+		<DragDropProvider {onDragEnd} {onDragOver}>
+			{#each jobs as job, index (job.id)}
+				{@const sortable = createSortable({ id: job.id, index: (() => index) as any })}
+				<div
+					class="rounded-lg p-4 {sortable.isDragging
+						? 'border-2 border-dashed border-muted'
+						: 'border'}"
+					{@attach sortable.attach}
+				>
+					<div class="flex flex-col gap-2 {sortable.isDragging ? 'invisible' : ''}">
+						<div class="flex items-start justify-between gap-2">
+							<span {@attach sortable.attachHandle} class="shrink-0 text-muted-foreground cursor-grab mt-1">
+								<GripVertical class="h-4 w-4" />
+							</span>
+							<div class="flex flex-wrap items-baseline gap-2 flex-1">
+								<InlineField bind:value={job.company} placeholder="Company" class="font-semibold" />
+								<span class="text-muted-foreground">—</span>
+								<InlineField bind:value={job.role} placeholder="Role" class="flex-1" />
+							</div>
+							<Button
+								variant="ghost"
+								size="icon"
+								class="shrink-0 text-muted-foreground hover:text-destructive"
+								onclick={() => removeJob(job.id)}
+							>
+								<Trash2 class="h-4 w-4" />
+							</Button>
 						</div>
-						<Button
-							variant="ghost"
-							size="icon"
-							class="shrink-0 text-muted-foreground hover:text-destructive"
-							onclick={() => removeJob(job.id)}
-						>
-							<Trash2 class="h-4 w-4" />
-						</Button>
+						<div class="flex items-center gap-2">
+							<DatePickerField bind:value={job.startDate} placeholder="Start date" />
+							<span class="text-muted-foreground">–</span>
+							<DatePickerField bind:value={job.endDate} placeholder="End date" />
+						</div>
+						<EditableList
+							bind:items={job.achievements}
+							placeholder="Describe an achievement..."
+							addLabel="Add Achievement"
+						/>
 					</div>
-					<div class="flex items-center gap-2">
-						<DatePickerField bind:value={job.startDate} placeholder="Start date" />
-						<span class="text-muted-foreground">–</span>
-						<DatePickerField bind:value={job.endDate} placeholder="End date" />
-					</div>
-					<EditableList
-						bind:items={job.achievements}
-						placeholder="Describe an achievement..."
-						addLabel="Add Achievement"
-					/>
 				</div>
-			</div>
-		{/each}
-		<Button variant="outline" size="sm" class="self-start" onclick={addJob}>
-			<Plus class="h-4 w-4 mr-1" />
-			Add Job
-		</Button>
+			{/each}
+			<Button variant="outline" size="sm" class="self-start" onclick={addJob}>
+				<Plus class="h-4 w-4 mr-1" />
+				Add Job
+			</Button>
+			<DragOverlay>
+				{#snippet children(source: any)}
+					{@const job = jobs.find((j) => j.id === source.id)}
+					{#if job}
+						<div class="border rounded-lg p-4 bg-background shadow-lg">
+							<div class="flex items-start gap-2">
+								<GripVertical class="h-4 w-4 shrink-0 text-muted-foreground mt-1" />
+								<div class="flex flex-wrap items-baseline gap-2">
+									<span class="font-semibold text-sm">{job.company || 'Company'}</span>
+									<span class="text-muted-foreground">—</span>
+									<span class="text-sm">{job.role || 'Role'}</span>
+								</div>
+							</div>
+						</div>
+					{/if}
+				{/snippet}
+			</DragOverlay>
+		</DragDropProvider>
 	</div>
 </BlockWrapper>

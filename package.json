@@ -71,6 +71,8 @@
 		]
 	},
 	"dependencies": {
+		"@dnd-kit/helpers": "^0.3.2",
+		"@dnd-kit/svelte": "^0.3.2",
 		"dexie": "^4.3.0"
 	}
 }
