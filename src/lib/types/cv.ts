@@ -13,6 +13,7 @@ export interface CVBlocks {
 	location: string;
 	contacts: ContactEntry[];
 	highlights: string[];
+	skills: SkillCategory[];
 	jobHistory: JobEntry[];
 	projects: ProjectEntry[];
 	education: EducationEntry[];
@@ -33,14 +34,21 @@ export interface JobEntry {
 	startDate: Date | undefined;
 	endDate: Date | undefined;
 	achievements: string[];
+	skills: string[];
 }
 
 export interface ProjectEntry {
 	id: string;
 	name: string;
 	description: string;
-	stack: string;
+	stack: string[];
 	link: string;
+}
+
+export interface SkillCategory {
+	id: string;
+	name: string;
+	skills: string[];
 }
 
 export interface EducationEntry {
@@ -63,6 +71,7 @@ export function createEmptyCV(id: string, name: string): CV {
 			location: '',
 			contacts: [],
 			highlights: [],
+			skills: [],
 			jobHistory: [],
 			projects: [],
 			education: []
@@ -73,6 +82,7 @@ export function createEmptyCV(id: string, name: string): CV {
 			location: true,
 			contacts: true,
 			highlights: true,
+			skills: true,
 			jobHistory: true,
 			projects: true,
 			education: true

@@ -20,6 +20,7 @@
 				location: 'San Francisco, CA',
 				contacts: [],
 				highlights: [],
+				skills: [],
 				jobHistory: [],
 				projects: [],
 				education: []
@@ -30,6 +31,7 @@
 				location: true,
 				contacts: true,
 				highlights: true,
+				skills: true,
 				jobHistory: true,
 				projects: true,
 				education: true
@@ -46,6 +48,7 @@
 				location: 'Remote',
 				contacts: [],
 				highlights: [],
+				skills: [],
 				jobHistory: [],
 				projects: [],
 				education: []
@@ -56,6 +59,7 @@
 				location: true,
 				contacts: true,
 				highlights: true,
+				skills: true,
 				jobHistory: true,
 				projects: true,
 				education: true
@@ -72,6 +76,7 @@
 				location: '',
 				contacts: [],
 				highlights: [],
+				skills: [],
 				jobHistory: [],
 				projects: [],
 				education: []
@@ -82,6 +87,7 @@
 				location: true,
 				contacts: true,
 				highlights: true,
+				skills: true,
 				jobHistory: true,
 				projects: true,
 				education: true

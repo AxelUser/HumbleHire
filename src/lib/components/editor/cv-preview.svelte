@@ -6,6 +6,7 @@
 		LocationBlock,
 		ContactsBlock,
 		HighlightsBlock,
+		SkillsBlock,
 		JobHistoryBlock,
 		ProjectsBlock,
 		EducationBlock
@@ -27,6 +28,7 @@
 		bind:highlights={cv.blocks.highlights}
 		bind:visible={cv.blockVisibility.highlights}
 	/>
+	<SkillsBlock bind:skills={cv.blocks.skills} bind:visible={cv.blockVisibility.skills} />
 	<JobHistoryBlock bind:jobs={cv.blocks.jobHistory} bind:visible={cv.blockVisibility.jobHistory} />
 	<ProjectsBlock bind:projects={cv.blocks.projects} bind:visible={cv.blockVisibility.projects} />
 	<EducationBlock

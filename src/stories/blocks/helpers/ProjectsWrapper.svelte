@@ -18,14 +18,14 @@
 						name: 'OpenMetrics',
 						description:
 							'An open-source observability toolkit for distributed systems. Built with Go and Prometheus.',
-						stack: 'Go, Prometheus, Grafana, Docker',
+						stack: ['Go', 'Prometheus', 'Grafana', 'Docker'],
 						link: 'github.com/alexchen/openmetrics'
 					},
 					{
 						id: '2',
 						name: 'HumbleHire',
 						description: 'A resume builder app with a brutalist design aesthetic.',
-						stack: 'SvelteKit, TypeScript, Tailwind CSS, Dexie',
+						stack: ['SvelteKit', 'TypeScript', 'Tailwind CSS', 'Dexie'],
 						link: 'humblehire.app'
 					}
 				]

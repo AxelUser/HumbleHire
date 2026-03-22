@@ -2,6 +2,7 @@
 	import { InlineField } from '$lib/components/ui/inline-field';
 	import { DatePickerField } from '$lib/components/ui/date-picker';
 	import { EditableList } from '$lib/components/ui/editable-list';
+	import { TagInput } from '$lib/components/ui/tag-input';
 	import { BlockWrapper } from '$lib/components/ui/block-wrapper';
 	import { Button } from '$lib/components/ui/button';
 	import { Trash2, Plus, GripVertical } from '@lucide/svelte';
@@ -26,7 +27,8 @@
 				role: '',
 				startDate: undefined,
 				endDate: undefined,
-				achievements: []
+				achievements: [],
+				skills: []
 			}
 		];
 	}
@@ -87,6 +89,7 @@
 							placeholder="Describe an achievement..."
 							addLabel="Add Achievement"
 						/>
+						<TagInput bind:tags={job.skills} placeholder="Add skill (e.g. React, AWS)" />
 					</div>
 				</div>
 			{/each}

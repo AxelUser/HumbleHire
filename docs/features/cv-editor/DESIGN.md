@@ -42,6 +42,7 @@ interface CVBlocks {
 	location: string;
 	contacts: ContactEntry[];
 	highlights: string[];
+	skills: SkillCategory[];
 	jobHistory: JobEntry[];
 	projects: ProjectEntry[];
 	education: EducationEntry[];
@@ -62,13 +63,20 @@ interface JobEntry {
 	startDate: Date | undefined;
 	endDate: Date | undefined;
 	achievements: string[];
+	skills: string[]; // skill tags for this job
+}
+
+interface SkillCategory {
+	id: string;
+	name: string; // empty string = uncategorized (flat mode)
+	skills: string[];
 }
 
 interface ProjectEntry {
 	id: string;
 	name: string;
 	description: string;
-	stack: string; // comma-separated or free text
+	stack: string[]; // tech stack as tag array
 	link: string;
 }
 
@@ -160,14 +168,16 @@ lib/components/
     LocationBlock.svelte
     ContactsBlock.svelte    ← list of ContactEntry rows + add/remove
     HighlightsBlock.svelte  ← ordered bullet list + add/remove
-    JobHistoryBlock.svelte  ← list of JobEntry cards + add/remove
-    ProjectsBlock.svelte    ← list of ProjectEntry cards + add/remove
+    SkillsBlock.svelte      ← tag badges with optional category grouping
+    JobHistoryBlock.svelte  ← list of JobEntry cards + add/remove; includes skill tags
+    ProjectsBlock.svelte    ← list of ProjectEntry cards + add/remove; includes tech stack tags
     EducationBlock.svelte   ← list of EducationEntry cards + add/remove
 
   ui/
     BlockWrapper.svelte     ← common shell: section heading + visibility toggle
     InlineField.svelte      ← click-to-edit text field (renders as text; becomes input on click)
     InlineTextarea.svelte   ← same as above for multiline content
+    TagInput.svelte         ← tag badge input with drag-and-drop reordering; uses Badge component
 ```
 
 ---
@@ -259,7 +269,7 @@ Plain HTML handles inline inputs and block text. Everything below needs a shadcn
 | Input        | `InlineField` (edit mode)                                               | Single-line text                            |
 | Textarea     | `InlineTextarea` (edit mode)                                            | Multiline text                              |
 | Switch       | Block visibility toggle in `BlockWrapper`                               | On/off maps to show/hide                    |
-| Badge        | Save status (`idle` / `saving` / `saved`) in `CvEditorToolbar`          | Compact status indicator                    |
+| Badge        | Save status in `CvEditorToolbar`; tag badges in `TagInput`               | Status indicator; skill/tech tag rendering  |
 | Skeleton     | Dashboard while CVs load from IndexedDB                                 | Loading placeholder for CV cards            |
 | Separator    | Between CV sections in `CvPreview`                                      | Visual section divider                      |
 | Sonner       | Auto-save error notifications                                           | Toasts that don't interrupt editing         |

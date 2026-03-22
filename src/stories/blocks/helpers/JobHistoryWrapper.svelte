@@ -22,7 +22,8 @@
 						achievements: [
 							'Built and maintained payment processing APIs handling $10B+ annually.',
 							'Reduced API latency by 40% through query optimization and caching.'
-						]
+						],
+						skills: ['Go', 'Kubernetes', 'PostgreSQL']
 					},
 					{
 						id: '2',
@@ -33,7 +34,8 @@
 						achievements: [
 							'Contributed to the Edge Runtime rollout across 50+ enterprise customers.',
 							'Improved CI/CD pipeline speed by 60% with parallelized test execution.'
-						]
+						],
+						skills: ['TypeScript', 'React', 'AWS']
 					}
 				]
 	);

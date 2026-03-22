@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { InlineField } from '$lib/components/ui/inline-field';
 	import { InlineTextarea } from '$lib/components/ui/inline-textarea';
+	import { TagInput } from '$lib/components/ui/tag-input';
 	import { BlockWrapper } from '$lib/components/ui/block-wrapper';
 	import { Button } from '$lib/components/ui/button';
 	import { Trash2, Plus, GripVertical } from '@lucide/svelte';
@@ -23,7 +24,7 @@
 				id: crypto.randomUUID(),
 				name: '',
 				description: '',
-				stack: '',
+				stack: [],
 				link: ''
 			}
 		];
@@ -80,11 +81,7 @@
 							class="w-full"
 							rows={3}
 						/>
-						<InlineField
-							bind:value={project.stack}
-							placeholder="Tech stack (e.g. TypeScript, Svelte, Postgres)"
-							class="text-muted-foreground w-full text-sm"
-						/>
+						<TagInput bind:tags={project.stack} placeholder="Add tech (e.g. TypeScript, Svelte)" />
 						<InlineField
 							bind:value={project.link}
 							placeholder="Link (optional)"

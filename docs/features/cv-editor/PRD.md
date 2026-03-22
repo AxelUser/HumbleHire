@@ -39,8 +39,24 @@ The CV Editor handles a single CV at a time. Branching, version snapshots, and c
 - As a user, I can click on any field in the CV preview to edit it in place.
 - As a user, I can see edits reflected in the preview immediately as I type.
 - As a user, I can toggle a block's visibility (show/hide) without deleting its content.
-- As a user, I can add multiple entries to repeatable blocks (Job History, Projects, Education).
+- As a user, I can add multiple entries to repeatable blocks (Job History, Skills, Projects, Education).
 - As a user, I can delete an individual entry from a repeatable block.
+
+### Tag-based inputs
+
+- As a user, I can add technologies to a project as tag badges by typing and pressing Enter or comma.
+- As a user, I can add skills to a job entry as tag badges.
+- As a user, I can remove a tag by clicking the cross button on its badge.
+- As a user, I can drag tag badges to reorder them.
+
+### Skills block
+
+- As a user, I can add skills as tag badges by typing and pressing Enter or comma.
+- As a user, I can remove a skill by clicking the cross button on its badge.
+- As a user, I can drag skill badges to reorder them.
+- As a user, I can optionally group skills into named categories (e.g. Frontend, Backend).
+- As a user, I can add and remove categories; removing a category removes its skills.
+- As a user, I can drag categories to reorder them.
 
 ### Contacts block
 
@@ -62,10 +78,11 @@ The CV Editor handles a single CV at a time. Branching, version snapshots, and c
 | 2   | Position    | No         | Single text field (target job title)         |
 | 3   | Location    | No         | Single text field                            |
 | 4   | Contacts    | Yes        | List of label + value pairs                  |
-| 5   | Highlights  | Yes        | Ordered list of bullet-point strings         |
-| 6   | Job History | Yes        | Company, dates, role, achievements list      |
-| 7   | Projects    | Yes        | Name, description, tech stack, optional link |
-| 8   | Education   | Yes        | Institution, degree, dates                   |
+| 5   | Highlights  | Yes        | Ordered list of bullet-point strings                                                    |
+| 6   | Skills      | Yes        | Tag badges; optional grouping into named categories (e.g. Frontend, Backend)            |
+| 7   | Job History | Yes        | Company, dates, role, achievements list, skill tags                                     |
+| 8   | Projects    | Yes        | Name, description, tech stack (tag badges), optional link                               |
+| 9   | Education   | Yes        | Institution, degree, dates                                                              |
 
 Block order is fixed. Users cannot reorder blocks.
 
