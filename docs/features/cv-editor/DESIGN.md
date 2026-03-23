@@ -283,6 +283,6 @@ Plain HTML handles inline inputs and block text. Everything below needs a shadcn
 | Local storage engine     | IndexedDB via Dexie.js                    | See ADR-001                                                          |
 | State management         | Svelte 5 runes (`$state`, `$effect`)      | No extra library needed; runes are fine-grained and reactive         |
 | Inline editing primitive | Click-to-edit `<input>`/`<textarea>` swap | Matches the "preview is the editor" UX; simpler than contenteditable |
-| No version snapshots     | Deferred to Branching feature             | Snapshots only meaningful in branching context; autosave covers v1   |
+| No version snapshots     | Deferred to Tailoring feature             | Snapshots only meaningful in tailoring context; autosave covers v1   |
 | Block order              | Fixed                                     | Reduces scope and complexity for v1; blocks are semantically ordered |
 | UUID generation          | `crypto.randomUUID()`                     | Built into modern browsers; no library needed                        |

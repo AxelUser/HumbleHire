@@ -4,8 +4,9 @@
 
 HumbleHire is a local-first, git-inspired CV builder with versioning support built with Svelte 5, SvelteKit (static adapter), Shadcn-Svelte, TailwindCSS.
 
-See docs/CODESTYLE.md for the full style guide.
-See docs/OVERVIEW.md for the project overview.
+See docs/OVERVIEW.md for the project overview to understand the main ideas and goals.
+See docs/CODESTYLE.md for the full coding style guide and conventions that should be followed when writing code.
+See docs/WEB_DESIGN.md for the web design principles and conventions that should be followed when designing the web interface.
 
 ## Commands
 

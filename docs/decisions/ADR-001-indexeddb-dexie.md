@@ -14,7 +14,7 @@ The data we need to persist:
 
 - Multiple `CV` documents, each containing structured block content.
 - `CVVersion` snapshots — append-only named checkpoints of a CV's blocks at a point in time.
-- Eventually: version branches and diffs (future feature).
+- Eventually: tailored CV metadata and diffs (future feature).
 
 This rules out any server-side or cloud storage option by design.
 
@@ -40,7 +40,7 @@ Use **IndexedDB** as the persistence backend, accessed exclusively through **[De
 ### Why IndexedDB over localStorage
 
 `localStorage` is synchronous and limited to ~5 MB of string data. HumbleHire will store arbitrarily many CVs, each potentially containing many job history entries and version snapshots.
-`localStorage` would require manual JSON serialization, lacks transactions, and would degrade user experience if the storage cap is hit silently.
+`localStorage` would require manual JSON serialization, lacks transactions, and would silently break once the storage cap is hit.
 
 IndexedDB is quota-based (browsers allocate gigabytes for well-behaved origins), supports structured JavaScript objects natively, and is fully asynchronous - it does not block the main thread.
 
@@ -60,7 +60,7 @@ Dexie wraps all of this in a clean Promise-based API with:
 
 OPFS is a lower-level file-system API suited for binary data or large file blobs. It lacks native structured querying; building an index over CV records would require re-implementing what IndexedDB already provides.
 
-PGlite (Postgres in WASM) brings full SQL and is impressive, but its bundle size (~3–7 MB gzipped depending on features) is disproportionate for a structured document store with a simple schema. SQL joins and aggregations are not a requirement for this application.
+PGlite runs Postgres in WASM, which is genuinely impressive, but its bundle size (~3–7 MB gzipped depending on features) is too large for a structured document store with a simple schema. SQL joins and aggregations are not a requirement for this application.
 
 ---
 
@@ -83,8 +83,8 @@ Dexie handles schema migrations through its versioning API:
 ```ts
 this.version(1).stores({ cvs: 'id, updatedAt', versions: 'id, cvId, createdAt' });
 
-// Future: add a 'branches' table
-this.version(2).stores({ cvs: 'id, updatedAt', versions: '...', branches: 'id, cvId' });
+// Future: add a 'tailoredCvs' table
+this.version(2).stores({ cvs: 'id, updatedAt', versions: '...', tailoredCvs: 'id, cvId' });
 ```
 
 Each `version()` call is additive; Dexie runs the upgrade only if the user's stored schema version is lower. Data migrations (transforming existing records) are done via an `.upgrade()` callback on the relevant version block.

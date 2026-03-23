@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { InlineField } from '$lib/components/ui/inline-field';
 	import { Badge } from '$lib/components/ui/badge';
-	import { Button } from '$lib/components/ui/button';
 	import { getCVStoreContext } from '$lib/stores/cv.svelte';
 
 	interface Props {

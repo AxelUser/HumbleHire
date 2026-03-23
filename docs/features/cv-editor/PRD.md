@@ -2,9 +2,9 @@
 
 ## Overview
 
-The CV Editor is the core feature of HumbleHire. Users create and manage CVs through an inline block editor: click any field to edit it, see changes immediately, and have edits auto-saved. All data lives in IndexedDB.
+The CV Editor is the core feature of HumbleHire. Users create and manage CVs through a click-to-edit block interface — edits appear in the preview immediately and save automatically. All data lives in IndexedDB.
 
-The CV Editor handles a single CV at a time. Branching, version snapshots, and cross-CV sync are covered by the separate [Branching & Versioning](../branching/PRD.md) feature.
+The CV Editor handles a single CV at a time. Tailoring, version snapshots, and cross-CV sync are covered by the separate [Tailoring & Versioning](../tailoring/PRD.md) feature.
 
 ---
 
@@ -17,7 +17,7 @@ The CV Editor handles a single CV at a time. Branching, version snapshots, and c
 
 ## Non-goals
 
-- Branching, version snapshots, diffing, and merging (see [Branching & Versioning](../branching/PRD.md)).
+- Tailoring, version snapshots, diffing, and merging (see [Tailoring & Versioning](../tailoring/PRD.md)).
 - Export to PDF/HTML/Markdown (separate feature).
 - Cloud sync or multi-device support.
 - Custom block types beyond the fixed set.

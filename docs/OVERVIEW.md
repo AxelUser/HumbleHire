@@ -2,25 +2,24 @@
 
 ## What Is It
 
-HumbleHire is a resume builder that treats your CV like source code - versioned, branchable, and tailored per opportunity.
-You maintain one canonical (master) CV and derive targeted variants from it, without losing track of any version.
+HumbleHire is a resume builder that keeps your CVs organised: one master CV, tailored copies for each opportunity, and a clear record of what you sent where.
 
 ---
 
 ## Why It Exists
 
 This project is a free (and open-source) alternative to my own Google Docs workflow, which required copy-pasting entire documents to create job-specific variants.
-You end up with a bunch of `cv_v3_google.pdf` files and no clear lineage, making it really chaotic to manage, especially when you have to update your master CV with new information.
-HumbleHire's intention is to replace that manual process with a structured, git-inspired workflow where every change is visual and traceable.
+You end up with a bunch of `cv_v3_backend.pdf` files and no clear lineage, making it really chaotic to manage, especially when you have to update your master CV with new information.
+HumbleHire aims to replace that manual process with a structured workflow where every change is visual and traceable.
 
 ---
 
 ## Goals
 
 - **Interactive block-based editor** - CV is composed of discrete, editable blocks (name, position, contacts, highlights, job history, projects, education).
-- **Version branching** - fork any CV version to create a tailored variant for a specific company or role, preserving full history.
+- **Tailoring** - create a tailored copy from any CV for a specific company or role, with sync back from the master CV.
 - **Local-first** - all data is stored locally on your machine, no need to sync with the cloud.
-- **Diff and merge** - compare versions side-by-side and selectively merge changes across branches.
+- **Diff and merge** - compare versions side-by-side and selectively merge changes across tailored copies.
 - **Export** - produce clean, formatted PDF/HTML output from any version.
 
 ## Non-Goals
@@ -55,8 +54,8 @@ I've tried to keep the blocks as minimal as possible, while still being able to 
 ### Versioning
 
 - As a user, I can create a new CV from scratch by filling in structured blocks.
-- As a user, I can branch my CV to create a variant tailored for a specific job posting.
-- As a user, I can view the full version history of any CV branch.
+- As a user, I can create a tailored copy of my CV for a specific job posting.
+- As a user, I can view the full version history of any CV.
 - As a user, I can compare two CV versions and see what changed.
 
 ### Editing
