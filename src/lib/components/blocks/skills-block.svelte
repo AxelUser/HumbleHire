@@ -7,41 +7,43 @@
 	import { DragDropProvider, DragOverlay } from '@dnd-kit/svelte';
 	import { createSortable } from '@dnd-kit/svelte/sortable';
 	import { move } from '@dnd-kit/helpers';
-	import type { SkillCategory } from '$lib/types/cv';
+	import type { SkillCategory, ObjectId } from '$lib/types/cv';
+	import { createObjectId } from '$lib/types/cv';
 
 	interface Props {
 		skills: SkillCategory[];
-		visible: boolean;
+		blockId: ObjectId;
+		hiddenBlockIds: ObjectId[];
 	}
 
-	let { skills = $bindable(), visible = $bindable() }: Props = $props();
+	let { skills = $bindable(), blockId, hiddenBlockIds = $bindable() }: Props = $props();
 
 	const isFlat = $derived(skills.length <= 1 && (skills.length === 0 || skills[0].name === ''));
 
 	$effect.pre(() => {
 		if (skills.length === 0) {
-			skills = [{ id: crypto.randomUUID(), name: '', skills: [] }];
+			skills = [{ objectId: createObjectId(), name: '', skills: [] }];
 		}
 	});
 
 	function addCategory() {
-		skills = [...skills, { id: crypto.randomUUID(), name: '', skills: [] }];
+		skills = [...skills, { objectId: createObjectId(), name: '', skills: [] }];
 	}
 
-	function removeCategory(id: string) {
-		skills = skills.filter((c) => c.id !== id);
+	function removeCategory(objectId: ObjectId) {
+		skills = skills.filter((c) => c.objectId !== objectId);
 	}
 
 	function onDragOver(event: any) {
-		skills = move(skills, event);
+		skills = move(skills as any, event) as SkillCategory[];
 	}
 
 	function onDragEnd(event: any) {
-		skills = move(skills, event);
+		skills = move(skills as any, event) as SkillCategory[];
 	}
 </script>
 
-<BlockWrapper title="Skills" bind:visible>
+<BlockWrapper title="Skills" {blockId} bind:hiddenBlockIds>
 	{#if isFlat}
 		<div class="flex flex-col gap-2">
 			<TagInput
@@ -56,8 +58,8 @@
 	{:else}
 		<DragDropProvider {onDragEnd} {onDragOver}>
 			<div class="flex flex-col gap-4">
-				{#each skills as category, index (category.id)}
-					{@const sortable = createSortable({ id: category.id, index: (() => index) as any })}
+				{#each skills as category, index (category.objectId)}
+					{@const sortable = createSortable({ id: category.objectId, index: (() => index) as any })}
 					<div
 						class="rounded-lg p-4 {sortable.isDragging
 							? 'border-muted border-2 border-dashed'
@@ -80,7 +82,7 @@
 									variant="ghost"
 									size="icon"
 									class="text-muted-foreground hover:text-destructive shrink-0"
-									onclick={() => removeCategory(category.id)}
+									onclick={() => removeCategory(category.objectId)}
 								>
 									<Trash2 class="h-4 w-4" />
 								</Button>
@@ -96,7 +98,7 @@
 			</div>
 			<DragOverlay>
 				{#snippet children(source: any)}
-					{@const category = skills.find((c) => c.id === source.id)}
+					{@const category = skills.find((c) => c.objectId === source.id)}
 					{#if category}
 						<div class="bg-background rounded-lg border p-4 shadow-lg">
 							<div class="flex items-start gap-2">

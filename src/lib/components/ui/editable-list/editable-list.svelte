@@ -6,9 +6,16 @@
 	import { DragDropProvider, DragOverlay } from '@dnd-kit/svelte';
 	import { createSortable } from '@dnd-kit/svelte/sortable';
 	import { move } from '@dnd-kit/helpers';
+	import { createObjectId } from '$lib/types/cv';
+	import type { ObjectId } from '$lib/types/cv';
+
+	interface ListItem {
+		objectId: ObjectId;
+		text: string;
+	}
 
 	interface Props {
-		items: string[];
+		items: ListItem[];
 		placeholder?: string;
 		addLabel?: string;
 		class?: string;
@@ -21,43 +28,28 @@
 		class: className
 	}: Props = $props();
 
-	let nextId = 0;
-	let ids = $state<number[]>(items.map(() => nextId++));
-
-	$effect(() => {
-		if (ids.length !== items.length) {
-			ids = items.map(() => nextId++);
-		}
-	});
-
 	function addItem() {
-		ids = [...ids, nextId++];
-		items = [...items, ''];
+		items = [...items, { objectId: createObjectId(), text: '' }];
 	}
 
 	function removeItem(index: number) {
-		ids = ids.filter((_, i) => i !== index);
 		items = items.filter((_, i) => i !== index);
 	}
 
 	function onDragOver(event: any) {
-		const idToItem = Object.fromEntries(ids.map((id, i) => [id, items[i]]));
-		ids = move(ids, event);
-		items = ids.map((id) => idToItem[id]);
+		items = move(items as any, event) as ListItem[];
 	}
 
 	function onDragEnd(event: any) {
-		const idToItem = Object.fromEntries(ids.map((id, i) => [id, items[i]]));
-		ids = move(ids, event);
-		items = ids.map((id) => idToItem[id]);
+		items = move(items as any, event) as ListItem[];
 	}
 </script>
 
 <DragDropProvider {onDragEnd} {onDragOver}>
 	<div class={cn('flex flex-col', className)}>
 		<div class="flex flex-col gap-1.5">
-			{#each items as _, index (ids[index])}
-				{@const sortable = createSortable({ id: ids[index], index })}
+			{#each items as item, index (item.objectId)}
+				{@const sortable = createSortable({ id: item.objectId, index: (() => index) as any })}
 				<div
 					class="flex items-center gap-2 {sortable.isDragging
 						? 'border-muted rounded border-2 border-dashed'
@@ -71,7 +63,7 @@
 						>
 							<GripVertical class="size-4" />
 						</span>
-						<InlineTextarea bind:value={items[index]} {placeholder} class="flex-1" rows={2} />
+						<InlineTextarea bind:value={items[index].text} {placeholder} class="flex-1" rows={2} />
 						<Button
 							variant="ghost"
 							size="icon"
@@ -91,11 +83,11 @@
 	</div>
 	<DragOverlay>
 		{#snippet children(source: any)}
-			{@const idx = ids.indexOf(source.id)}
-			{#if idx !== -1}
+			{@const item = items.find((i) => i.objectId === source.id)}
+			{#if item}
 				<div class="bg-background flex items-center gap-2 rounded px-1 py-1 shadow-lg">
 					<GripVertical class="text-muted-foreground size-4 shrink-0" />
-					<span class="flex-1 text-sm">{items[idx] || placeholder}</span>
+					<span class="flex-1 text-sm">{item.text || placeholder}</span>
 				</div>
 			{/if}
 		{/snippet}

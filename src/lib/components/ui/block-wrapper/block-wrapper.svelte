@@ -2,21 +2,33 @@
 	import type { Snippet } from 'svelte';
 	import { Eye, EyeOff } from '@lucide/svelte';
 	import { PanelCard } from '$lib/components/ui/panel-card';
+	import type { ObjectId } from '$lib/types/cv';
 
 	interface Props {
 		title: string;
-		visible: boolean;
+		blockId: ObjectId;
+		hiddenBlockIds: ObjectId[];
 		children: Snippet;
 	}
 
-	let { title, visible = $bindable(), children }: Props = $props();
+	let { title, blockId, hiddenBlockIds = $bindable(), children }: Props = $props();
+
+	const visible = $derived(!hiddenBlockIds.includes(blockId));
+
+	function toggle() {
+		if (visible) {
+			hiddenBlockIds = [...hiddenBlockIds, blockId];
+		} else {
+			hiddenBlockIds = hiddenBlockIds.filter((id) => id !== blockId);
+		}
+	}
 </script>
 
 <PanelCard {title}>
 	{#snippet action()}
 		<button
 			type="button"
-			onclick={() => (visible = !visible)}
+			onclick={toggle}
 			class="text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
 			aria-label={visible ? 'Hide section' : 'Show section'}
 		>

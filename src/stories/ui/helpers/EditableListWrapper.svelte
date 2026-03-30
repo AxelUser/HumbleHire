@@ -1,6 +1,12 @@
 <script lang="ts">
-	import { untrack } from 'svelte';
 	import { EditableList } from '$lib/components/ui/editable-list';
+	import { createObjectId } from '$lib/types/cv';
+	import type { ObjectId } from '$lib/types/cv';
+
+	interface ListItem {
+		objectId: ObjectId;
+		text: string;
+	}
 
 	interface Props {
 		startItems?: string[];
@@ -8,7 +14,7 @@
 
 	let { startItems = [] }: Props = $props();
 
-	let items: string[] = $state(untrack(() => [...startItems]));
+	let items = $state<ListItem[]>(startItems.map((text) => ({ objectId: createObjectId(), text })));
 </script>
 
 <div class="flex flex-col gap-4">

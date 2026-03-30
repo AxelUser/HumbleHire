@@ -1,13 +1,16 @@
 <script lang="ts">
-	import LocationBlock from '$lib/components/blocks/location-block.svelte';
+	import TextBlock from '$lib/components/blocks/text-block.svelte';
+	import { createObjectId } from '$lib/types/cv';
+	import type { ObjectId, TextBlock as TextBlockData } from '$lib/types/cv';
 
 	interface Props {
 		startVisible?: boolean;
 	}
 
 	let { startVisible = true }: Props = $props();
-	let value = $state('San Francisco, CA (open to remote)');
-	let visible = $state(startVisible);
+
+	let block = $state<TextBlockData>({ objectId: createObjectId(), value: 'San Francisco, CA (open to remote)' });
+	let hiddenBlockIds = $state<ObjectId[]>(startVisible ? [] : [block.objectId]);
 </script>
 
-<LocationBlock bind:value bind:visible />
+<TextBlock bind:block bind:hiddenBlockIds title="Location" placeholder="City, Country" />

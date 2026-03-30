@@ -1,0 +1,210 @@
+<script lang="ts">
+	import {
+		Dialog,
+		DialogContent,
+		DialogDescription,
+		DialogFooter,
+		DialogHeader,
+		DialogTitle
+	} from '$lib/components/ui/dialog';
+	import { Button } from '$lib/components/ui/button';
+	import { DiffItemRow } from '$lib/components/ui/diff-item-row';
+	import { diffCVs, CollectingDiffBuilder } from '$lib/features/tailoring/diff';
+	import { applySyncDecisions } from '$lib/features/tailoring/apply';
+	import { BLOCK_LABELS } from '$lib/features/tailoring/types';
+	import type { DiffItem, DiffViewItem } from '$lib/features/tailoring/types';
+	import type { CV, ObjectId } from '$lib/types/cv';
+
+	interface Props {
+		masterCv: CV;
+		tailoredCv: CV;
+		open: boolean;
+		onClose: () => void;
+	}
+
+	let { masterCv, tailoredCv, open = $bindable(), onClose }: Props = $props();
+
+	const diffItems = $derived.by((): DiffItem[] => {
+		const builder = new CollectingDiffBuilder();
+		diffCVs(masterCv, tailoredCv, builder);
+		return builder.items;
+	});
+
+	const viewItems = $derived.by((): DiffViewItem[] => {
+		const existing = tailoredCv.syncDecisions?.discarded ?? {};
+		return diffItems.map((item) => toDiffViewItem(item, existing));
+	});
+
+	let decisions = $state(new Map<ObjectId, 'accepted' | 'discarded'>());
+
+	function toDiffViewItem(
+		item: DiffItem,
+		existingDiscarded: Record<string, number>
+	): DiffViewItem {
+		const blockLabel =
+			BLOCK_LABELS[item.blockKey as keyof typeof BLOCK_LABELS] ?? String(item.blockKey);
+		const previouslyDiscarded = existingDiscarded[item.objectId] !== undefined;
+
+		switch (item.type) {
+			case 'textModified':
+				return {
+					objectId: item.objectId,
+					type: item.type,
+					blockKey: item.blockKey,
+					blockLabel,
+					description: `Changed ${blockLabel}`,
+					before: item.before || '(empty)',
+					after: item.after || '(empty)',
+					previouslyDiscarded
+				};
+			case 'entryAdded':
+				return {
+					objectId: item.objectId,
+					type: item.type,
+					blockKey: item.blockKey,
+					blockLabel,
+					description: `Added entry to ${blockLabel}${item.parentObjectId ? ' (nested)' : ''}`,
+					parentObjectId: item.parentObjectId,
+					previouslyDiscarded
+				};
+			case 'entryRemoved':
+				return {
+					objectId: item.objectId,
+					type: item.type,
+					blockKey: item.blockKey,
+					blockLabel,
+					description: `Removed entry from ${blockLabel}${item.parentObjectId ? ' (nested)' : ''}`,
+					parentObjectId: item.parentObjectId,
+					previouslyDiscarded
+				};
+			case 'entryModified': {
+				const changedKeys = Object.keys(item.after).join(', ');
+				const before = Object.entries(item.before)
+					.map(([k, v]) => `${k}: ${v}`)
+					.join(', ');
+				const after = Object.entries(item.after)
+					.map(([k, v]) => `${k}: ${v}`)
+					.join(', ');
+				return {
+					objectId: item.objectId,
+					type: item.type,
+					blockKey: item.blockKey,
+					blockLabel,
+					description: `Modified ${changedKeys} in ${blockLabel}`,
+					before,
+					after,
+					parentObjectId: item.parentObjectId,
+					previouslyDiscarded
+				};
+			}
+			case 'childrenReordered':
+				return {
+					objectId: item.objectId,
+					type: item.type,
+					blockKey: item.blockKey,
+					blockLabel,
+					description: `Reordered entries in ${blockLabel}${item.parentObjectId ? ' (nested)' : ''}`,
+					parentObjectId: item.parentObjectId,
+					previouslyDiscarded
+				};
+		}
+	}
+
+	function accept(objectId: ObjectId) {
+		decisions.set(objectId, 'accepted');
+		decisions = new Map(decisions);
+	}
+
+	function discard(objectId: ObjectId) {
+		decisions.set(objectId, 'discarded');
+		decisions = new Map(decisions);
+	}
+
+	function revert(objectId: ObjectId) {
+		decisions.delete(objectId);
+		decisions = new Map(decisions);
+	}
+
+	function acceptAll() {
+		for (const item of diffItems) {
+			decisions.set(item.objectId, 'accepted');
+		}
+		decisions = new Map(decisions);
+	}
+
+	function discardAll() {
+		for (const item of diffItems) {
+			decisions.set(item.objectId, 'discarded');
+		}
+		decisions = new Map(decisions);
+	}
+
+	function handleApply() {
+		applySyncDecisions(tailoredCv, masterCv, decisions);
+		decisions = new Map();
+		open = false;
+		onClose();
+	}
+
+	function handleClose() {
+		decisions = new Map();
+		open = false;
+		onClose();
+	}
+
+	const pendingCount = $derived(
+		diffItems.filter((item) => !decisions.has(item.objectId)).length
+	);
+</script>
+
+<Dialog bind:open>
+	<DialogContent class="flex max-h-[85vh] max-w-2xl flex-col">
+		<DialogHeader>
+			<DialogTitle>Sync from Master</DialogTitle>
+			<DialogDescription>
+				Review changes from <strong>{masterCv.name}</strong>. Accept or dismiss each change.
+			</DialogDescription>
+		</DialogHeader>
+
+		<div class="min-h-0 flex-1 overflow-y-auto py-2">
+			{#if diffItems.length === 0}
+				<div class="text-muted-foreground py-8 text-center text-sm">
+					<p>No relevant changes from the master CV.</p>
+					<p class="mt-1 text-xs">Closing will clear the sync indicator.</p>
+				</div>
+			{:else}
+				<div class="flex items-center justify-between gap-2 pb-3">
+					<span class="text-muted-foreground text-xs">
+						{diffItems.length} change{diffItems.length === 1 ? '' : 's'} ·
+						{pendingCount} pending
+					</span>
+					<div class="flex gap-2">
+						<Button variant="outline" size="sm" onclick={acceptAll}>Accept all</Button>
+						<Button variant="outline" size="sm" onclick={discardAll}>Dismiss all</Button>
+					</div>
+				</div>
+				<div class="flex flex-col gap-2">
+					{#each viewItems as item (item.objectId)}
+						<DiffItemRow
+							{item}
+							decision={decisions.get(item.objectId)}
+							onAccept={() => accept(item.objectId)}
+							onDiscard={() => discard(item.objectId)}
+							onRevert={() => revert(item.objectId)}
+						/>
+					{/each}
+				</div>
+			{/if}
+		</div>
+
+		<DialogFooter>
+			<Button variant="outline" onclick={handleClose}>Close</Button>
+			<Button onclick={handleApply} disabled={diffItems.length > 0 && pendingCount > 0}>
+				Apply changes
+				{#if pendingCount > 0}
+					<span class="text-muted-foreground ml-1 text-xs">({pendingCount} pending)</span>
+				{/if}
+			</Button>
+		</DialogFooter>
+	</DialogContent>
+</Dialog>

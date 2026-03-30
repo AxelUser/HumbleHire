@@ -1,11 +1,11 @@
 <script module>
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import PositionBlock from '$lib/components/blocks/position-block.svelte';
+	import TextBlock from '$lib/components/blocks/text-block.svelte';
 	import PositionWrapper from './helpers/PositionWrapper.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Blocks/Position',
-		component: PositionBlock,
+		component: TextBlock,
 		tags: ['autodocs']
 	});
 </script>

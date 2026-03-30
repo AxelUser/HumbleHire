@@ -1,11 +1,9 @@
 <script lang="ts">
 	import type { CV } from '$lib/types/cv';
 	import {
-		FullNameBlock,
-		PositionBlock,
-		LocationBlock,
+		TextBlock,
+		BulletListBlock,
 		ContactsBlock,
-		HighlightsBlock,
 		SkillsBlock,
 		JobHistoryBlock,
 		ProjectsBlock,
@@ -20,19 +18,54 @@
 </script>
 
 <div class="mx-auto max-w-3xl space-y-4 px-6 py-8">
-	<FullNameBlock bind:value={cv.blocks.fullName} bind:visible={cv.blockVisibility.fullName} />
-	<PositionBlock bind:value={cv.blocks.position} bind:visible={cv.blockVisibility.position} />
-	<LocationBlock bind:value={cv.blocks.location} bind:visible={cv.blockVisibility.location} />
-	<ContactsBlock bind:contacts={cv.blocks.contacts} bind:visible={cv.blockVisibility.contacts} />
-	<HighlightsBlock
-		bind:highlights={cv.blocks.highlights}
-		bind:visible={cv.blockVisibility.highlights}
+	<TextBlock
+		bind:block={cv.blocks.fullName}
+		bind:hiddenBlockIds={cv.hiddenBlockIds}
+		title="Full Name"
+		placeholder="Your full name"
+		class="text-3xl font-bold"
 	/>
-	<SkillsBlock bind:skills={cv.blocks.skills} bind:visible={cv.blockVisibility.skills} />
-	<JobHistoryBlock bind:jobs={cv.blocks.jobHistory} bind:visible={cv.blockVisibility.jobHistory} />
-	<ProjectsBlock bind:projects={cv.blocks.projects} bind:visible={cv.blockVisibility.projects} />
+	<TextBlock
+		bind:block={cv.blocks.position}
+		bind:hiddenBlockIds={cv.hiddenBlockIds}
+		title="Position"
+		placeholder="Your position / job title"
+		class="text-muted-foreground text-xl"
+	/>
+	<TextBlock
+		bind:block={cv.blocks.location}
+		bind:hiddenBlockIds={cv.hiddenBlockIds}
+		title="Location"
+		placeholder="City, Country"
+	/>
+	<ContactsBlock
+		bind:contacts={cv.blocks.contacts}
+		blockId={cv.blocks.contactsBlockId}
+		bind:hiddenBlockIds={cv.hiddenBlockIds}
+	/>
+	<BulletListBlock
+		bind:highlights={cv.blocks.highlights}
+		blockId={cv.blocks.highlightsBlockId}
+		bind:hiddenBlockIds={cv.hiddenBlockIds}
+	/>
+	<SkillsBlock
+		bind:skills={cv.blocks.skills}
+		blockId={cv.blocks.skillsBlockId}
+		bind:hiddenBlockIds={cv.hiddenBlockIds}
+	/>
+	<JobHistoryBlock
+		bind:jobs={cv.blocks.jobHistory}
+		blockId={cv.blocks.jobHistoryBlockId}
+		bind:hiddenBlockIds={cv.hiddenBlockIds}
+	/>
+	<ProjectsBlock
+		bind:projects={cv.blocks.projects}
+		blockId={cv.blocks.projectsBlockId}
+		bind:hiddenBlockIds={cv.hiddenBlockIds}
+	/>
 	<EducationBlock
 		bind:education={cv.blocks.education}
-		bind:visible={cv.blockVisibility.education}
+		blockId={cv.blocks.educationBlockId}
+		bind:hiddenBlockIds={cv.hiddenBlockIds}
 	/>
 </div>

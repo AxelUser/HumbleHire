@@ -7,7 +7,7 @@ class HumbleHireDB extends Dexie {
 	constructor() {
 		super('humblehire');
 		this.version(1).stores({
-			cvs: 'id, updatedAt'
+			cvs: 'id, updatedAt, sourceId'
 		});
 	}
 }

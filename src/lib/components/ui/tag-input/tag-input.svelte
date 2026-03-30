@@ -5,9 +5,11 @@
 	import { DragDropProvider, DragOverlay } from '@dnd-kit/svelte';
 	import { createSortable } from '@dnd-kit/svelte/sortable';
 	import { move } from '@dnd-kit/helpers';
+	import { createObjectId } from '$lib/types/cv';
+	import type { Tag } from '$lib/types/cv';
 
 	interface Props {
-		tags: string[];
+		tags: Tag[];
 		placeholder?: string;
 		class?: string;
 	}
@@ -15,42 +17,28 @@
 	let { tags = $bindable(), placeholder = 'Add a tag...', class: className }: Props = $props();
 
 	let inputValue = $state('');
-	let nextId = 0;
-	let ids = $state<number[]>(tags.map(() => nextId++));
-
-	$effect(() => {
-		if (ids.length !== tags.length) {
-			ids = tags.map(() => nextId++);
-		}
-	});
 
 	function addTags(raw: string) {
-		const newTags = raw
+		const newValues = raw
 			.split(',')
 			.map((s) => s.trim())
 			.filter(Boolean);
-		if (newTags.length > 0) {
-			ids = [...ids, ...newTags.map(() => nextId++)];
-			tags = [...tags, ...newTags];
+		if (newValues.length > 0) {
+			tags = [...tags, ...newValues.map((value) => ({ objectId: createObjectId(), value }))];
 		}
 		inputValue = '';
 	}
 
 	function removeTag(index: number) {
-		ids = ids.filter((_, i) => i !== index);
 		tags = tags.filter((_, i) => i !== index);
 	}
 
 	function onDragOver(event: any) {
-		const idToItem = Object.fromEntries(ids.map((id, i) => [id, tags[i]]));
-		ids = move(ids, event);
-		tags = ids.map((id) => idToItem[id]);
+		tags = move(tags as any, event) as Tag[];
 	}
 
 	function onDragEnd(event: any) {
-		const idToItem = Object.fromEntries(ids.map((id, i) => [id, tags[i]]));
-		ids = move(ids, event);
-		tags = ids.map((id) => idToItem[id]);
+		tags = move(tags as any, event) as Tag[];
 	}
 
 	function handleKeydown(event: KeyboardEvent) {
@@ -77,14 +65,14 @@
 			className
 		)}
 	>
-		{#each tags as tag, index (ids[index])}
-			{@const sortable = createSortable({ id: ids[index], index })}
+		{#each tags as tag, index (tag.objectId)}
+			{@const sortable = createSortable({ id: tag.objectId, index: (() => index) as any })}
 			<div
 				class={sortable.isDragging ? 'border-muted rounded border-2 border-dashed' : ''}
 				{@attach sortable.attach}
 			>
 				<Badge variant="secondary" class="gap-1 {sortable.isDragging ? 'invisible' : ''}">
-					<span {@attach sortable.attachHandle} class="cursor-grab select-none">{tag}</span>
+					<span {@attach sortable.attachHandle} class="cursor-grab select-none">{tag.value}</span>
 					<button
 						type="button"
 						class="text-muted-foreground hover:text-foreground ml-0.5 cursor-pointer"
@@ -106,10 +94,10 @@
 	</div>
 	<DragOverlay>
 		{#snippet children(source: any)}
-			{@const idx = ids.indexOf(source.id)}
-			{#if idx !== -1}
+			{@const tag = tags.find((t) => t.objectId === source.id)}
+			{#if tag}
 				<Badge variant="secondary" class="gap-1 shadow-lg">
-					<span>{tags[idx]}</span>
+					<span>{tag.value}</span>
 					<X class="h-3 w-3" />
 				</Badge>
 			{/if}

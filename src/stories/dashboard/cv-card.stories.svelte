@@ -3,43 +3,46 @@
 	import CvCard from '$lib/components/dashboard/cv-card.svelte';
 	import { fn } from 'storybook/test';
 	import type { ComponentProps } from 'svelte';
+	import type { CV } from '$lib/types/cv';
 
 	type Props = ComponentProps<typeof CvCard>;
 
-	const mockCV = {
+	function mkBlocks(name: string, position: string, location: string) {
+		return {
+			fullName: { objectId: `${name}-fn` as any, value: name },
+			position: { objectId: `${name}-pos` as any, value: position },
+			location: { objectId: `${name}-loc` as any, value: location },
+			contactsBlockId: `${name}-cb` as any,
+			contacts: [],
+			highlightsBlockId: `${name}-hb` as any,
+			highlights: [],
+			skillsBlockId: `${name}-sb` as any,
+			skills: [],
+			jobHistoryBlockId: `${name}-jb` as any,
+			jobHistory: [],
+			projectsBlockId: `${name}-pb` as any,
+			projects: [],
+			educationBlockId: `${name}-eb` as any,
+			education: []
+		};
+	}
+
+	const mockCV: CV = {
 		id: 'cv-1',
 		name: 'Senior Developer — Stripe',
+		notes: '',
+		version: 3,
 		createdAt: Date.now() - 86400000 * 3,
 		updatedAt: Date.now() - 3600000,
-		blocks: {
-			fullName: 'Aleksey Maltsev',
-			position: 'Senior Software Engineer',
-			location: 'San Francisco, CA',
-			contacts: [],
-			highlights: [],
-			skills: [],
-			jobHistory: [],
-			projects: [],
-			education: []
-		},
-		blockVisibility: {
-			fullName: true,
-			position: true,
-			location: true,
-			contacts: true,
-			highlights: true,
-			skills: true,
-			jobHistory: true,
-			projects: true,
-			education: true
-		}
+		blocks: mkBlocks('Aleksey Maltsev', 'Senior Software Engineer', 'San Francisco, CA'),
+		hiddenBlockIds: []
 	};
 
 	const { Story } = defineMeta({
 		title: 'Dashboard/CvCard',
 		component: CvCard,
 		tags: ['autodocs'],
-		args: { cv: mockCV, onDelete: fn() }
+		args: { cv: mockCV, allCvs: [mockCV], onDelete: fn(), onTailor: fn(), onSync: fn() }
 	});
 </script>
 

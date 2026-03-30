@@ -6,38 +6,40 @@
 	import { DragDropProvider, DragOverlay } from '@dnd-kit/svelte';
 	import { createSortable } from '@dnd-kit/svelte/sortable';
 	import { move } from '@dnd-kit/helpers';
-	import type { ContactEntry } from '$lib/types/cv';
+	import type { ContactEntry, ObjectId } from '$lib/types/cv';
+	import { createObjectId } from '$lib/types/cv';
 
 	interface Props {
 		contacts: ContactEntry[];
-		visible: boolean;
+		blockId: ObjectId;
+		hiddenBlockIds: ObjectId[];
 	}
 
-	let { contacts = $bindable(), visible = $bindable() }: Props = $props();
+	let { contacts = $bindable(), blockId, hiddenBlockIds = $bindable() }: Props = $props();
 
 	function addContact() {
-		contacts = [...contacts, { id: crypto.randomUUID(), label: '', value: '' }];
+		contacts = [...contacts, { objectId: createObjectId(), label: '', value: '' }];
 	}
 
-	function removeContact(id: string) {
-		contacts = contacts.filter((c) => c.id !== id);
+	function removeContact(objectId: ObjectId) {
+		contacts = contacts.filter((c) => c.objectId !== objectId);
 	}
 
 	function onDragOver(event: any) {
-		contacts = move(contacts, event);
+		contacts = move(contacts as any, event) as ContactEntry[];
 	}
 
 	function onDragEnd(event: any) {
-		contacts = move(contacts, event);
+		contacts = move(contacts as any, event) as ContactEntry[];
 	}
 </script>
 
-<BlockWrapper title="Contacts" bind:visible>
+<BlockWrapper title="Contacts" {blockId} bind:hiddenBlockIds>
 	<DragDropProvider {onDragEnd} {onDragOver}>
 		<div class="flex flex-col">
 			<div class="flex flex-col gap-2">
-				{#each contacts as contact, index (contact.id)}
-					{@const sortable = createSortable({ id: contact.id, index: (() => index) as any })}
+				{#each contacts as contact, index (contact.objectId)}
+					{@const sortable = createSortable({ id: contact.objectId, index: (() => index) as any })}
 					<div
 						class="flex items-center gap-2 {sortable.isDragging
 							? 'border-muted rounded border-2 border-dashed'
@@ -57,7 +59,7 @@
 								variant="ghost"
 								size="icon"
 								class="text-muted-foreground hover:text-destructive shrink-0"
-								onclick={() => removeContact(contact.id)}
+								onclick={() => removeContact(contact.objectId)}
 							>
 								<Trash2 class="h-4 w-4" />
 							</Button>
@@ -72,7 +74,7 @@
 		</div>
 		<DragOverlay>
 			{#snippet children(source: any)}
-				{@const contact = contacts.find((c) => c.id === source.id)}
+				{@const contact = contacts.find((c) => c.objectId === source.id)}
 				{#if contact}
 					<div class="bg-background flex items-center gap-2 rounded px-2 py-1 shadow-lg">
 						<GripVertical class="text-muted-foreground h-4 w-4 shrink-0" />

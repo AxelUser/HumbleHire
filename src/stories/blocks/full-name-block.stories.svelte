@@ -1,11 +1,11 @@
 <script module>
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import FullNameBlock from '$lib/components/blocks/full-name-block.svelte';
+	import TextBlock from '$lib/components/blocks/text-block.svelte';
 	import FullNameWrapper from './helpers/FullNameWrapper.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Blocks/FullName',
-		component: FullNameBlock,
+		component: TextBlock,
 		tags: ['autodocs']
 	});
 </script>
