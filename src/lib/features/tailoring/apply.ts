@@ -1,5 +1,5 @@
 import type { CV, ObjectId, JobEntry, ProjectEntry, SkillCategory, Achievement, Tag } from '$lib/types/cv';
-import { CollectingDiffBuilder, diffCVs } from './diff';
+import { diffCVs } from './diff';
 import type { DiffItem } from './types';
 
 function applyItem(tailored: CV, masterCv: CV, item: DiffItem): void {
@@ -41,10 +41,6 @@ function applyItem(tailored: CV, masterCv: CV, item: DiffItem): void {
 			break;
 		}
 
-		case 'childrenReordered': {
-			applyChildrenReordered(blocks, item);
-			break;
-		}
 	}
 }
 
@@ -197,52 +193,12 @@ function applyNestedEntryModified(
 	}
 }
 
-function applyChildrenReordered(
-	blocks: CV['blocks'],
-	item: Extract<DiffItem, { type: 'childrenReordered' }>
-): void {
-	const reorder = <T extends { objectId: ObjectId }>(arr: T[], newOrder: ObjectId[]): T[] => {
-		const map = new Map(arr.map((e) => [e.objectId, e]));
-		const reordered = newOrder.map((id) => map.get(id)).filter(Boolean) as T[];
-		const remaining = arr.filter((e) => !newOrder.includes(e.objectId));
-		return [...reordered, ...remaining];
-	};
-
-	if (item.parentObjectId) {
-		const parentId = item.parentObjectId;
-		if (item.blockKey === 'jobHistory') {
-			const job = blocks.jobHistory.find((j) => j.objectId === parentId);
-			if (job) {
-				job.achievements = reorder(job.achievements, item.afterIds);
-				job.skills = reorder(job.skills, item.afterIds);
-			}
-		} else if (item.blockKey === 'skills') {
-			const cat = blocks.skills.find((c) => c.objectId === parentId);
-			if (cat) cat.skills = reorder(cat.skills, item.afterIds);
-		} else if (item.blockKey === 'projects') {
-			const proj = blocks.projects.find((p) => p.objectId === parentId);
-			if (proj) proj.stack = reorder(proj.stack, item.afterIds);
-		}
-	} else {
-		switch (item.blockKey) {
-			case 'contacts': blocks.contacts = reorder(blocks.contacts, item.afterIds); break;
-			case 'highlights': blocks.highlights = reorder(blocks.highlights, item.afterIds); break;
-			case 'skills': blocks.skills = reorder(blocks.skills, item.afterIds); break;
-			case 'jobHistory': blocks.jobHistory = reorder(blocks.jobHistory, item.afterIds); break;
-			case 'projects': blocks.projects = reorder(blocks.projects, item.afterIds); break;
-			case 'education': blocks.education = reorder(blocks.education, item.afterIds); break;
-		}
-	}
-}
-
 export function applySyncDecisions(
 	tailoredCv: CV,
 	masterCv: CV,
 	decisions: Map<ObjectId, 'accepted' | 'discarded'>
 ): void {
-	const builder = new CollectingDiffBuilder();
-	diffCVs(masterCv, tailoredCv, builder);
-	const items = builder.items;
+	const items = diffCVs(masterCv, tailoredCv);
 
 	for (const item of items) {
 		if (decisions.get(item.objectId) === 'accepted') {
@@ -271,11 +227,10 @@ export function applySyncDecisions(
 		}
 	}
 
-	const allResolved = items.every(
-		(item) => decisions.has(item.objectId)
-	);
+	const allResolved = items.every((item) => decisions.has(item.objectId));
 	if (allResolved) {
 		syncDecisions.sourceSyncedVersion = masterCv.version;
+		tailoredCv.syncBaseline = structuredClone(masterCv.blocks);
 	}
 
 	tailoredCv.syncDecisions = syncDecisions;

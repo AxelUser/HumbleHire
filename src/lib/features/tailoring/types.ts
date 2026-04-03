@@ -21,36 +21,11 @@ export type AnyEntry =
 	| Highlight
 	| Tag;
 
-export interface IDiffBuilder {
-	textModified(blockKey: CVBlockKey, objectId: ObjectId, before: string, after: string): void;
-
-	entryAdded(blockKey: CVBlockKey, entry: AnyEntry, parentObjectId?: ObjectId): void;
-
-	entryRemoved(blockKey: CVBlockKey, entry: AnyEntry, parentObjectId?: ObjectId): void;
-
-	entryModified(
-		blockKey: CVBlockKey,
-		objectId: ObjectId,
-		before: Record<string, unknown>,
-		after: Record<string, unknown>,
-		parentObjectId?: ObjectId
-	): void;
-
-	childrenReordered(
-		blockKey: CVBlockKey,
-		objectId: ObjectId,
-		beforeIds: ObjectId[],
-		afterIds: ObjectId[],
-		parentObjectId?: ObjectId
-	): void;
-}
-
 export type DiffItemType =
 	| 'textModified'
 	| 'entryAdded'
 	| 'entryRemoved'
-	| 'entryModified'
-	| 'childrenReordered';
+	| 'entryModified';
 
 export type DiffItem =
 	| {
@@ -81,14 +56,6 @@ export type DiffItem =
 			parentObjectId?: ObjectId;
 			before: Record<string, unknown>;
 			after: Record<string, unknown>;
-	  }
-	| {
-			type: 'childrenReordered';
-			blockKey: CVBlockKey;
-			objectId: ObjectId;
-			parentObjectId?: ObjectId;
-			beforeIds: ObjectId[];
-			afterIds: ObjectId[];
 	  };
 
 export interface DiffViewItem {

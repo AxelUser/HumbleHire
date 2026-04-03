@@ -105,4 +105,5 @@ export interface CV {
 
 	sourceId?: string;
 	syncDecisions?: SyncDecisions;
+	syncBaseline?: CVBlocks;
 }

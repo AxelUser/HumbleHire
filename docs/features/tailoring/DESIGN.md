@@ -98,7 +98,7 @@ interface EducationEntry {
 }
 ```
 
-`CVBlocks` keeps its named fields so components can access `cv.blocks.jobHistory` directly. Each array block also gets an `ObjectId` for its container -- the diff uses it to identify the block itself (for reordering detection and hidden-block filtering):
+`CVBlocks` keeps its named fields so components can access `cv.blocks.jobHistory` directly. Each array block also gets an `ObjectId` for its container -- the diff uses it for hidden-block filtering:
 
 ```ts
 interface CVBlocks {
@@ -339,11 +339,6 @@ interface IDiffBuilder {
 		after: Record<string, unknown>
 	): void;
 
-	childrenReordered(
-		blockKey: CVBlockKey,
-		beforeIds: ObjectId[],
-		afterIds: ObjectId[]
-	): void;
 }
 ```
 
@@ -389,7 +384,6 @@ Each array diff function works the same way:
   - Found but fields differ: call `builder.entryModified(...)`.
   - For composite entries (JobEntry, SkillCategory, ProjectEntry): also diff nested children (achievements, skills, stack) the same way -- match by `objectId`, report additions/removals/modifications.
 3. Walk the tailored array. Entries not in the master are ignored -- the user added them after tailoring or the master removed them. Neither is a syncable change.
-4. Compare ordering: if both arrays contain the same set of `objectId`s but in a different order, call `builder.childrenReordered(...)`.
 
 Text block diffing is simpler: compare values, call `builder.textModified(...)` if they differ.
 
@@ -425,15 +419,14 @@ function diffCVs(master: CV, tailored: CV, builder: IDiffBuilder): void {
 
 ### Concrete example
 
-Master CV has a job entry for Stripe. The user tailored the CV, then later the master gets these edits: the company name changes from "Stripe" to "Stripe, Inc.", one achievement is added, and the achievements are reordered.
+Master CV has a job entry for Stripe. The user tailored the CV, then later the master gets these edits: the company name changes from "Stripe" to "Stripe, Inc." and one achievement is added.
 
 `diffJobHistory(master.blocks.jobHistory, tailored.blocks.jobHistory, builder)` does the following:
 
 1. The Stripe entry exists in both arrays (same `objectId`). Fields differ (`company: 'Stripe'` vs `company: 'Stripe, Inc.'`), so the function calls `builder.entryModified('jobHistory', stripeEntryId, { company: 'Stripe', ... }, { company: 'Stripe, Inc.', ... })`.
 2. Inside the entry, the function diffs the `achievements` arrays. The new achievement's `objectId` is missing from the tailored list, so it calls `builder.entryAdded('jobHistory', newAchievement)`.
-3. The remaining achievements exist in both but in a different order, so it calls `builder.childrenReordered('jobHistory', oldOrder, newOrder)`.
 
-Each change has its own `ObjectId`. The user can accept the name change but discard the reordering, or any combination.
+Each change has its own `ObjectId`. The user can accept or discard each independently.
 
 ### Location
 
@@ -529,7 +522,6 @@ Buttons: "Apply and close" and "Close" (without applying). Both commit the curre
 - `entryAdded` accepted: deep-copy the entry from the master and append it to the corresponding array.
 - `entryRemoved` accepted: filter the entry out of the array by `objectId`.
 - `entryModified` accepted: find the entry by `objectId` in the array and overwrite its fields with the master's version.
-- `childrenReordered` accepted: reorder the array to match the master's ordering.
 
 Write the `discarded` map to `syncDecisions.discarded` with the current `master.version` for each discarded item. Remove entries for accepted items from the map (if they were previously discarded).
 
@@ -755,8 +747,6 @@ src/lib/
 
 **Multiple tailored CVs from the same master.** Each tailored CV is independent. They share `sourceId` but have their own `syncDecisions`. No conflict.
 
-**Reordered entries.** If the master reorders entries in an array (e.g., moves a job entry up), the diff function detects the ordering change via ObjectId comparison. The user can accept or discard the new order independently of content changes.
-
 **Master hides a block after tailoring.** If the block's ObjectId is in `master.hiddenBlockIds`, `diffCVs` skips it. If the user later un-hides it, diffs resume.
 
 **Tailored CV removes an entry, master modifies it.** The entry's ObjectId is missing from the tailored CV's array, so the diff function skips it. The user chose to drop it.
@@ -771,8 +761,8 @@ src/lib/
 
 ### Unit tests
 
-- `diff.ts`: test each per-block diff function independently. For array blocks: test added, removed, modified, and reordered entries. For text blocks: test value changes. Test that `diffCVs` skips hidden blocks. Test that entries only in the tailored CV are ignored.
-- `apply.ts`: test that accepting a text change updates the correct `TextBlock.value`. Test that accepting an added entry appends it to the right array. Test that accepting a reorder produces the expected ordering. Test that discarded items are recorded with the correct version and stale discards are pruned.
+- `diff.ts`: test each per-block diff function independently. For array blocks: test added, removed, and modified entries. For text blocks: test value changes. Test that `diffCVs` skips hidden blocks. Test that entries only in the tailored CV are ignored.
+- `apply.ts`: test that accepting a text change updates the correct `TextBlock.value`. Test that accepting an added entry appends it to the right array. Test that discarded items are recorded with the correct version and stale discards are pruned.
 - `detection.ts`: test `hasUpdatesAvailable` with various version combinations. Badge shows when master version exceeds synced version, clears when they match.
 - `create-tailored.ts`: test that the created CV has a deep copy of blocks (not a reference), that `syncDecisions.sourceSyncedVersion` matches the master's version, and that modifying the copy does not affect the master.
 - `services/cv/create.ts`: test that `createCVFromTemplate` produces a valid CV with correct block structure, all ObjectIds present and unique, and `hiddenBlockIds` empty.

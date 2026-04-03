@@ -19,6 +19,7 @@ export async function createTailoredCV(
 		blocks: structuredClone(master.blocks),
 		hiddenBlockIds: [...master.hiddenBlockIds],
 		sourceId: master.id,
+		syncBaseline: structuredClone(master.blocks),
 		syncDecisions: {
 			sourceSyncedVersion: master.version,
 			discarded: {}

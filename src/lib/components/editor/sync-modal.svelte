@@ -9,7 +9,7 @@
 	} from '$lib/components/ui/dialog';
 	import { Button } from '$lib/components/ui/button';
 	import { DiffItemRow } from '$lib/components/ui/diff-item-row';
-	import { diffCVs, CollectingDiffBuilder } from '$lib/features/tailoring/diff';
+	import { diffCVs } from '$lib/features/tailoring/diff';
 	import { applySyncDecisions } from '$lib/features/tailoring/apply';
 	import { BLOCK_LABELS } from '$lib/features/tailoring/types';
 	import type { DiffItem, DiffViewItem } from '$lib/features/tailoring/types';
@@ -25,9 +25,7 @@
 	let { masterCv, tailoredCv, open = $bindable(), onClose }: Props = $props();
 
 	const diffItems = $derived.by((): DiffItem[] => {
-		const builder = new CollectingDiffBuilder();
-		diffCVs(masterCv, tailoredCv, builder);
-		return builder.items;
+		return diffCVs(masterCv, tailoredCv);
 	});
 
 	const viewItems = $derived.by((): DiffViewItem[] => {
@@ -97,16 +95,6 @@
 					previouslyDiscarded
 				};
 			}
-			case 'childrenReordered':
-				return {
-					objectId: item.objectId,
-					type: item.type,
-					blockKey: item.blockKey,
-					blockLabel,
-					description: `Reordered entries in ${blockLabel}${item.parentObjectId ? ' (nested)' : ''}`,
-					parentObjectId: item.parentObjectId,
-					previouslyDiscarded
-				};
 		}
 	}
 

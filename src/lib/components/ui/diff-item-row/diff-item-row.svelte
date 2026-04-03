@@ -20,7 +20,6 @@
 			case 'entryRemoved': return Minus;
 			case 'textModified':
 			case 'entryModified':
-			case 'childrenReordered': return ArrowLeftRight;
 		}
 	});
 
