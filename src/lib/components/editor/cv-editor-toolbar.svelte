@@ -4,7 +4,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { getCVStoreContext } from '$lib/stores/cv.svelte';
 	import { Scissors, RefreshCw, ExternalLink } from '@lucide/svelte';
-	import SyncModal from '$lib/components/editor/sync-modal.svelte';
+	import { SyncModal } from '$lib/components/sync';
 	import { TailorModal } from '$lib/components/dashboard';
 	import type { CV } from '$lib/types/cv';
 	import { hasUpdatesAvailable } from '$lib/features/tailoring/detection';

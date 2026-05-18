@@ -8,7 +8,7 @@
 		DialogTitle
 	} from '$lib/components/ui/dialog';
 	import { Button } from '$lib/components/ui/button';
-	import { DiffItemRow } from '$lib/components/ui/diff-item-row';
+	import DiffItemRow from './diff-item-row.svelte';
 	import { diffCVs } from '$lib/features/tailoring/diff';
 	import { applySyncDecisions } from '$lib/features/tailoring/apply';
 	import { BLOCK_LABELS } from '$lib/features/tailoring/types';

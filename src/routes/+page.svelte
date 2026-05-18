@@ -4,7 +4,7 @@
 	import { resolve } from '$app/paths';
 	import { db } from '$lib/db/index';
 	import { CvList, Hero, NewCvButton } from '$lib/components/dashboard';
-	import { SyncModal } from '$lib/components/editor';
+	import { SyncModal } from '$lib/components/sync';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import {
 		AlertDialog,
