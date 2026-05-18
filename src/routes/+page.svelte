@@ -17,7 +17,6 @@
 		AlertDialogAction
 	} from '$lib/components/ui/alert-dialog';
 	import { Button } from '$lib/components/ui/button';
-	import { toast } from 'svelte-sonner';
 
 	import type { CV } from '$lib/types/cv';
 
@@ -84,16 +83,14 @@
 		syncModalOpen = true;
 	}
 
-	function handleSyncClose() {
+	async function handleSyncClose() {
 		syncModalOpen = false;
-		if (syncTarget) {
-			db.cvs.get(syncTarget.id).then((updated) => {
-				if (updated) {
-					cvs = cvs.map((cv) => (cv.id === updated.id ? updated : cv));
-				}
-				syncTarget = null;
-			});
-		}
+		if (!syncTarget) return;
+		const snapshot = $state.snapshot(syncTarget);
+		const persisted = { ...snapshot, updatedAt: Date.now(), version: (snapshot.version ?? 0) + 1 };
+		await db.cvs.put(persisted);
+		cvs = cvs.map((cv) => (cv.id === persisted.id ? persisted : cv));
+		syncTarget = null;
 	}
 
 	const syncMasterCv = $derived(
@@ -158,7 +155,7 @@
 {#if syncTarget && syncMasterCv}
 	<SyncModal
 		masterCv={syncMasterCv}
-		tailoredCv={syncTarget}
+		bind:tailoredCv={syncTarget}
 		bind:open={syncModalOpen}
 		onClose={handleSyncClose}
 	/>

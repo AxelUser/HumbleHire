@@ -99,7 +99,7 @@
 {#if isTailored && masterCv && cvStore.cv}
 	<SyncModal
 		{masterCv}
-		tailoredCv={cvStore.cv}
+		bind:tailoredCv={cvStore.cv}
 		bind:open={syncModalOpen}
 		onClose={() => (syncModalOpen = false)}
 	/>

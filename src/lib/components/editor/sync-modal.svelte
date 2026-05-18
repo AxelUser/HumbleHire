@@ -22,7 +22,7 @@
 		onClose: () => void;
 	}
 
-	let { masterCv, tailoredCv, open = $bindable(), onClose }: Props = $props();
+	let { masterCv, tailoredCv = $bindable(), open = $bindable(), onClose }: Props = $props();
 
 	const diffItems = $derived.by((): DiffItem[] => {
 		return diffCVs(masterCv, tailoredCv);
@@ -128,7 +128,9 @@
 	}
 
 	function handleApply() {
-		applySyncDecisions(tailoredCv, masterCv, decisions);
+		const tailoredSnapshot = $state.snapshot(tailoredCv) as CV;
+		applySyncDecisions(tailoredSnapshot, $state.snapshot(masterCv) as CV, decisions);
+		tailoredCv = tailoredSnapshot;
 		decisions = new Map();
 		open = false;
 		onClose();
