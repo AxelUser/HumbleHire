@@ -4,7 +4,6 @@
 	import { resolve } from '$app/paths';
 	import { db } from '$lib/db/index';
 	import { CvList, Hero, NewCvButton } from '$lib/components/dashboard';
-	import { SyncModal } from '$lib/components/sync';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import {
 		AlertDialog,
@@ -26,9 +25,6 @@
 	let deleteTargetId = $state<string | null>(null);
 	let deleteTargetDependents = $state<CV[]>([]);
 	let deleteDialogOpen = $state(false);
-
-	let syncTarget = $state<CV | null>(null);
-	let syncModalOpen = $state(false);
 
 	onMount(async () => {
 		cvs = await db.cvs.orderBy('updatedAt').reverse().toArray();
@@ -78,24 +74,11 @@
 		goto(resolve(`/cv/${id}`));
 	}
 
-	function handleSync(cv: CV) {
-		syncTarget = cv;
-		syncModalOpen = true;
-	}
-
-	async function handleSyncClose() {
-		syncModalOpen = false;
-		if (!syncTarget) return;
-		const snapshot = $state.snapshot(syncTarget);
-		const persisted = { ...snapshot, updatedAt: Date.now(), version: (snapshot.version ?? 0) + 1 };
+	async function handleSync(updated: CV) {
+		const persisted = { ...updated, updatedAt: Date.now(), version: (updated.version ?? 0) + 1 };
 		await db.cvs.put(persisted);
 		cvs = cvs.map((cv) => (cv.id === persisted.id ? persisted : cv));
-		syncTarget = null;
 	}
-
-	const syncMasterCv = $derived(
-		syncTarget ? cvs.find((c) => c.id === syncTarget!.sourceId) : undefined
-	);
 </script>
 
 <svelte:head>
@@ -151,12 +134,3 @@
 	</AlertDialogContent>
 </AlertDialog>
 
-<!-- Sync modal -->
-{#if syncTarget && syncMasterCv}
-	<SyncModal
-		masterCv={syncMasterCv}
-		bind:tailoredCv={syncTarget}
-		bind:open={syncModalOpen}
-		onClose={handleSyncClose}
-	/>
-{/if}

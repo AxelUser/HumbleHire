@@ -1,5 +1,5 @@
 <script lang="ts">
-	import SyncModal from '$lib/components/sync/sync-modal.svelte';
+	import SyncDialog from '$lib/components/tailoring/sync-dialog.svelte';
 	import type { CV, ObjectId } from '$lib/types/cv';
 
 	const IDS = {
@@ -35,7 +35,7 @@
 	}
 
 	const masterCv: CV = {
-		id: 'master-1',
+		id: 'master-2',
 		name: 'Master CV',
 		notes: '',
 		version: 2,
@@ -45,19 +45,19 @@
 		hiddenBlockIds: []
 	};
 
-	let open = $state(true);
-	let tailoredCv = $state<CV>({
-		id: 'tailored-1',
-		name: 'Stripe — Engineer',
+	const tailoredCv: CV = {
+		id: 'tailored-2',
+		name: 'Google — Engineer',
 		notes: '',
 		version: 1,
 		createdAt: Date.now() - 86400000 * 3,
 		updatedAt: Date.now() - 86400000,
-		blocks: mkBlocks('Software Engineer'),
+		blocks: mkBlocks('Senior Software Engineer'),
 		hiddenBlockIds: [],
-		sourceId: 'master-1',
-		syncBaseline: mkBlocks('Software Engineer')
-	});
+		sourceId: 'master-2'
+	};
+
+	let open = $state(false);
 </script>
 
-<SyncModal {masterCv} bind:tailoredCv bind:open onClose={() => (open = false)} />
+<SyncDialog {masterCv} {tailoredCv} onSync={() => {}} bind:open />

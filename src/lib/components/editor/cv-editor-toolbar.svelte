@@ -3,11 +3,9 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
 	import { getCVStoreContext } from '$lib/stores/cv.svelte';
-	import { Scissors, RefreshCw, ExternalLink } from '@lucide/svelte';
-	import { SyncModal } from '$lib/components/sync';
-	import { TailorModal } from '$lib/components/dashboard';
+	import { ExternalLink } from '@lucide/svelte';
+	import { TailorDialog, SyncDialog } from '$lib/components/tailoring';
 	import type { CV } from '$lib/types/cv';
-	import { hasUpdatesAvailable } from '$lib/features/tailoring/detection';
 
 	interface Props {
 		cvName: string;
@@ -17,9 +15,6 @@
 	let { cvName = $bindable(), masterCv }: Props = $props();
 
 	const cvStore = getCVStoreContext();
-
-	let syncModalOpen = $state(false);
-	let tailorModalOpen = $state(false);
 
 	const badgeLabel = $derived.by(() => {
 		const status = cvStore.saveStatus;
@@ -35,11 +30,6 @@
 	});
 
 	const isTailored = $derived(!!cvStore.cv?.sourceId);
-	const canTailor = $derived(!isTailored);
-
-	const updatesAvailable = $derived(
-		masterCv && cvStore.cv ? hasUpdatesAvailable(masterCv, cvStore.cv) : false
-	);
 </script>
 
 <div class="bg-background sticky top-14 z-10 px-6 py-3">
@@ -60,25 +50,20 @@
 					{masterCv.name}
 				</a>
 
-				<Button
-					variant="ghost"
-					size="sm"
-					class={updatesAvailable ? 'text-primary relative' : ''}
-					onclick={() => (syncModalOpen = true)}
-				>
-					<RefreshCw class="mr-1.5 h-4 w-4" />
-					Sync
-					{#if updatesAvailable}
-						<span class="bg-primary absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full"></span>
-					{/if}
-				</Button>
+				{#if cvStore.cv}
+					<SyncDialog
+						{masterCv}
+						tailoredCv={cvStore.cv}
+						onSync={(updated) => (cvStore.cv = updated)}
+					/>
+				{/if}
 			{/if}
 
-			{#if canTailor && cvStore.cv}
-				<Button variant="ghost" size="sm" onclick={() => (tailorModalOpen = true)}>
-					<Scissors class="mr-1.5 h-4 w-4" />
-					Tailor
-				</Button>
+			{#if cvStore.cv}
+				<TailorDialog
+					sourceCv={cvStore.cv}
+					onCreate={(id) => (window.location.href = `/cv/${id}`)}
+				/>
 			{/if}
 
 			{#if cvStore.saveStatus === 'saving'}
@@ -95,20 +80,3 @@
 		</div>
 	</div>
 </div>
-
-{#if isTailored && masterCv && cvStore.cv}
-	<SyncModal
-		{masterCv}
-		bind:tailoredCv={cvStore.cv}
-		bind:open={syncModalOpen}
-		onClose={() => (syncModalOpen = false)}
-	/>
-{/if}
-
-{#if canTailor && cvStore.cv}
-	<TailorModal
-		sourceCv={cvStore.cv}
-		bind:open={tailorModalOpen}
-		onCreate={(id) => (window.location.href = `/cv/${id}`)}
-	/>
-{/if}

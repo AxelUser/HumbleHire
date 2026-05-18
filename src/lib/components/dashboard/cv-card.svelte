@@ -20,21 +20,19 @@
 	} from '$lib/components/ui/alert-dialog';
 	import { Button } from '$lib/components/ui/button';
 	import { Badge } from '$lib/components/ui/badge';
-	import { Eye, Trash2, Scissors, RefreshCw } from '@lucide/svelte';
+	import { Eye, Trash2 } from '@lucide/svelte';
 	import { hasUpdatesAvailable } from '$lib/features/tailoring/detection';
-	import { TailorModal } from '$lib/components/dashboard';
+	import { TailorDialog, SyncDialog } from '$lib/components/tailoring';
 
 	interface Props {
 		cv: CV;
 		allCvs: CV[];
 		onDelete: (id: string) => void;
 		onTailor: (id: string) => void;
-		onSync: (cv: CV) => void;
+		onSync: (updated: CV) => void;
 	}
 
 	let { cv, allCvs, onDelete, onTailor, onSync }: Props = $props();
-
-	let tailorModalOpen = $state(false);
 
 	const masterCv = $derived(cv.sourceId ? allCvs.find((c) => c.id === cv.sourceId) : undefined);
 
@@ -63,25 +61,10 @@
 			<Eye class="mr-2 h-4 w-4" /> View
 		</Button>
 
-		{#if !cv.sourceId}
-			<Button variant="ghost" size="sm" onclick={() => (tailorModalOpen = true)}>
-				<Scissors class="mr-2 h-4 w-4" /> Tailor
-			</Button>
-		{/if}
+		<TailorDialog sourceCv={cv} onCreate={onTailor} />
 
 		{#if cv.sourceId && masterCv}
-			<Button
-				variant="ghost"
-				size="sm"
-				class={updatesAvailable ? 'text-primary' : ''}
-				onclick={() => onSync(cv)}
-			>
-				<RefreshCw class="mr-2 h-4 w-4" />
-				Sync
-				{#if updatesAvailable}
-					<span class="bg-primary ml-1 h-2 w-2 rounded-full"></span>
-				{/if}
-			</Button>
+			<SyncDialog {masterCv} tailoredCv={cv} {onSync} />
 		{/if}
 
 		<AlertDialog>
@@ -109,4 +92,3 @@
 	</CardFooter>
 </Card>
 
-<TailorModal sourceCv={cv} bind:open={tailorModalOpen} onCreate={onTailor} />

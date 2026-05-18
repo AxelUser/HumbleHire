@@ -8,9 +8,11 @@
 		DialogTitle
 	} from '$lib/components/ui/dialog';
 	import { Button } from '$lib/components/ui/button';
+	import { RefreshCw } from '@lucide/svelte';
 	import DiffItemRow from './diff-item-row.svelte';
 	import { diffCVs } from '$lib/features/tailoring/diff';
 	import { applySyncDecisions } from '$lib/features/tailoring/apply';
+	import { hasUpdatesAvailable } from '$lib/features/tailoring/detection';
 	import { BLOCK_LABELS } from '$lib/features/tailoring/types';
 	import type { DiffItem, DiffViewItem } from '$lib/features/tailoring/types';
 	import type { CV, ObjectId } from '$lib/types/cv';
@@ -18,22 +20,22 @@
 	interface Props {
 		masterCv: CV;
 		tailoredCv: CV;
-		open: boolean;
-		onClose: () => void;
+		onSync: (updated: CV) => void;
+		open?: boolean;
 	}
 
-	let { masterCv, tailoredCv = $bindable(), open = $bindable(), onClose }: Props = $props();
+	let { masterCv, tailoredCv, onSync, open = $bindable(false) }: Props = $props();
 
-	const diffItems = $derived.by((): DiffItem[] => {
-		return diffCVs(masterCv, tailoredCv);
-	});
+	let decisions = $state(new Map<ObjectId, 'accepted' | 'discarded'>());
+
+	const updatesAvailable = $derived(hasUpdatesAvailable(masterCv, tailoredCv));
+
+	const diffItems = $derived.by((): DiffItem[] => diffCVs(masterCv, tailoredCv));
 
 	const viewItems = $derived.by((): DiffViewItem[] => {
 		const existing = tailoredCv.syncDecisions?.discarded ?? {};
 		return diffItems.map((item) => toDiffViewItem(item, existing));
 	});
-
-	let decisions = $state(new Map<ObjectId, 'accepted' | 'discarded'>());
 
 	function toDiffViewItem(item: DiffItem, existingDiscarded: Record<string, number>): DiffViewItem {
 		const blockLabel = BLOCK_LABELS[item.blockKey] ?? String(item.blockKey);
@@ -123,72 +125,90 @@
 		decisions = new Map(decisions);
 	}
 
+	function openDialog() {
+		decisions = new Map();
+		open = true;
+	}
+
 	function handleApply() {
-		const tailoredSnapshot = $state.snapshot(tailoredCv) as CV;
-		applySyncDecisions(tailoredSnapshot, $state.snapshot(masterCv) as CV, decisions);
-		tailoredCv = tailoredSnapshot;
+		const snapshot = $state.snapshot(tailoredCv) as CV;
+		applySyncDecisions(snapshot, $state.snapshot(masterCv) as CV, decisions);
+		onSync(snapshot);
 		decisions = new Map();
 		open = false;
-		onClose();
 	}
 
 	function handleClose() {
 		decisions = new Map();
 		open = false;
-		onClose();
 	}
 
 	const pendingCount = $derived(diffItems.filter((item) => !decisions.has(item.objectId)).length);
 </script>
 
-<Dialog bind:open>
-	<DialogContent class="flex max-h-[85vh] max-w-2xl flex-col">
-		<DialogHeader>
-			<DialogTitle>Sync from Master</DialogTitle>
-			<DialogDescription>
-				Review changes from <strong>{masterCv.name}</strong>. Accept or dismiss each change.
-			</DialogDescription>
-		</DialogHeader>
+{#if tailoredCv.sourceId}
+	<Button
+		variant="ghost"
+		size="sm"
+		class={updatesAvailable ? 'text-primary relative' : 'relative'}
+		onclick={openDialog}
+	>
+		<RefreshCw class="mr-2 h-4 w-4" />
+		Sync
+		{#if updatesAvailable}
+			<span class="bg-primary absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full"></span>
+		{/if}
+	</Button>
 
-		<div class="min-h-0 flex-1 overflow-y-auto py-2">
-			{#if diffItems.length === 0}
-				<div class="text-muted-foreground py-8 text-center text-sm">
-					<p>No relevant changes from the master CV.</p>
-					<p class="mt-1 text-xs">Closing will clear the sync indicator.</p>
-				</div>
-			{:else}
-				<div class="flex items-center justify-between gap-2 pb-3">
-					<span class="text-muted-foreground text-xs">
-						{diffItems.length} change{diffItems.length === 1 ? '' : 's'} ·
-						{pendingCount} pending
-					</span>
-					<div class="flex gap-2">
-						<Button variant="outline" size="sm" onclick={acceptAll}>Accept all</Button>
-						<Button variant="outline" size="sm" onclick={discardAll}>Dismiss all</Button>
+	<Dialog bind:open>
+		<DialogContent class="flex max-h-[85vh] max-w-2xl flex-col">
+			<DialogHeader>
+				<DialogTitle>Sync from Master</DialogTitle>
+				<DialogDescription>
+					Review changes from <strong>{masterCv.name}</strong>. Accept or dismiss each change.
+				</DialogDescription>
+			</DialogHeader>
+
+			<div class="min-h-0 flex-1 overflow-y-auto py-2">
+				{#if diffItems.length === 0}
+					<div class="text-muted-foreground py-8 text-center text-sm">
+						<p>No relevant changes from the master CV.</p>
+						<p class="mt-1 text-xs">Closing will clear the sync indicator.</p>
 					</div>
-				</div>
-				<div class="flex flex-col gap-2">
-					{#each viewItems as item (item.objectId)}
-						<DiffItemRow
-							{item}
-							decision={decisions.get(item.objectId)}
-							onAccept={() => accept(item.objectId)}
-							onDiscard={() => discard(item.objectId)}
-							onRevert={() => revert(item.objectId)}
-						/>
-					{/each}
-				</div>
-			{/if}
-		</div>
-
-		<DialogFooter>
-			<Button variant="outline" onclick={handleClose}>Close</Button>
-			<Button onclick={handleApply} disabled={diffItems.length > 0 && pendingCount > 0}>
-				Apply changes
-				{#if pendingCount > 0}
-					<span class="text-muted-foreground ml-1 text-xs">({pendingCount} pending)</span>
+				{:else}
+					<div class="flex items-center justify-between gap-2 pb-3">
+						<span class="text-muted-foreground text-xs">
+							{diffItems.length} change{diffItems.length === 1 ? '' : 's'} ·
+							{pendingCount} pending
+						</span>
+						<div class="flex gap-2">
+							<Button variant="outline" size="sm" onclick={acceptAll}>Accept all</Button>
+							<Button variant="outline" size="sm" onclick={discardAll}>Dismiss all</Button>
+						</div>
+					</div>
+					<div class="flex flex-col gap-2">
+						{#each viewItems as item (item.objectId)}
+							<DiffItemRow
+								{item}
+								decision={decisions.get(item.objectId)}
+								onAccept={() => accept(item.objectId)}
+								onDiscard={() => discard(item.objectId)}
+								onRevert={() => revert(item.objectId)}
+							/>
+						{/each}
+					</div>
 				{/if}
-			</Button>
-		</DialogFooter>
-	</DialogContent>
-</Dialog>
+			</div>
+
+			<DialogFooter>
+				<Button variant="outline" onclick={handleClose}>Close</Button>
+				<Button onclick={handleApply} disabled={diffItems.length > 0 && pendingCount > 0}>
+					Apply changes
+					{#if pendingCount > 0}
+						<span class="text-muted-foreground ml-1 text-xs">({pendingCount} pending)</span>
+					{/if}
+				</Button>
+			</DialogFooter>
+		</DialogContent>
+	</Dialog>
+{/if}
