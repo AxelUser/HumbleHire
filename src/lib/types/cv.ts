@@ -93,6 +93,14 @@ export interface CVBlocks {
 
 export type CVBlockKey = keyof CVBlocks;
 
+export type TextBlockKey = {
+	[K in keyof CVBlocks]: CVBlocks[K] extends TextBlock ? K : never;
+}[keyof CVBlocks];
+
+export type ListBlockKey = {
+	[K in keyof CVBlocks]: CVBlocks[K] extends Array<{ objectId: ObjectId }> ? K : never;
+}[keyof CVBlocks];
+
 export interface CV {
 	id: string;
 	name: string;

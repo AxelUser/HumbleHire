@@ -1,5 +1,7 @@
 import type {
 	CVBlockKey,
+	TextBlockKey,
+	ListBlockKey,
 	ObjectId,
 	Achievement,
 	Highlight,
@@ -21,39 +23,40 @@ export type AnyEntry =
 	| Highlight
 	| Tag;
 
-export type DiffItemType =
-	| 'textModified'
-	| 'entryAdded'
-	| 'entryRemoved'
-	| 'entryModified';
+export type NestedListKey = 'achievements' | 'skills' | 'stack';
+
+export type DiffItemType = 'textModified' | 'entryAdded' | 'entryRemoved' | 'entryModified';
 
 export type DiffItem =
 	| {
 			type: 'textModified';
-			blockKey: CVBlockKey;
+			blockKey: TextBlockKey;
 			objectId: ObjectId;
 			before: string;
 			after: string;
 	  }
 	| {
 			type: 'entryAdded';
-			blockKey: CVBlockKey;
+			blockKey: ListBlockKey;
 			objectId: ObjectId;
 			parentObjectId?: ObjectId;
+			nestedListKey?: NestedListKey;
 			entry: AnyEntry;
 	  }
 	| {
 			type: 'entryRemoved';
-			blockKey: CVBlockKey;
+			blockKey: ListBlockKey;
 			objectId: ObjectId;
 			parentObjectId?: ObjectId;
+			nestedListKey?: NestedListKey;
 			entry: AnyEntry;
 	  }
 	| {
 			type: 'entryModified';
-			blockKey: CVBlockKey;
+			blockKey: ListBlockKey;
 			objectId: ObjectId;
 			parentObjectId?: ObjectId;
+			nestedListKey?: NestedListKey;
 			before: Record<string, unknown>;
 			after: Record<string, unknown>;
 	  };

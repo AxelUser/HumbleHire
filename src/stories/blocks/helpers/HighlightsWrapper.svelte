@@ -16,9 +16,18 @@
 		startEmpty
 			? []
 			: [
-					{ objectId: createObjectId(), text: 'Led infrastructure migrations across 3 AWS regions with zero downtime.' },
-					{ objectId: createObjectId(), text: 'Owned the deploy pipeline from local dev to production for 2 years.' },
-					{ objectId: createObjectId(), text: 'Mentored 4 junior engineers through structured pairing sessions.' }
+					{
+						objectId: createObjectId(),
+						text: 'Led infrastructure migrations across 3 AWS regions with zero downtime.'
+					},
+					{
+						objectId: createObjectId(),
+						text: 'Owned the deploy pipeline from local dev to production for 2 years.'
+					},
+					{
+						objectId: createObjectId(),
+						text: 'Mentored 4 junior engineers through structured pairing sessions.'
+					}
 				]
 	);
 	let hiddenBlockIds = $state<ObjectId[]>(startVisible ? [] : [blockId]);

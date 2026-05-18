@@ -315,12 +315,7 @@ Each block type has its own diff function. The diff functions do not return resu
 
 ```ts
 interface IDiffBuilder {
-	textModified(
-		blockKey: CVBlockKey,
-		objectId: ObjectId,
-		before: string,
-		after: string
-	): void;
+	textModified(blockKey: CVBlockKey, objectId: ObjectId, before: string, after: string): void;
 
 	entryAdded(
 		blockKey: CVBlockKey,
@@ -338,7 +333,6 @@ interface IDiffBuilder {
 		before: Record<string, unknown>,
 		after: Record<string, unknown>
 	): void;
-
 }
 ```
 
@@ -348,31 +342,38 @@ Type safety: every `IDiffBuilder` implementation must handle all methods. Adding
 
 ```ts
 function diffTextBlock(
-	key: CVBlockKey, master: TextBlock, tailored: TextBlock, builder: IDiffBuilder
+	key: CVBlockKey,
+	master: TextBlock,
+	tailored: TextBlock,
+	builder: IDiffBuilder
 ): void;
 
-function diffHighlights(
-	master: Highlight[], tailored: Highlight[], builder: IDiffBuilder
-): void;
+function diffHighlights(master: Highlight[], tailored: Highlight[], builder: IDiffBuilder): void;
 
 function diffContacts(
-	master: ContactEntry[], tailored: ContactEntry[], builder: IDiffBuilder
+	master: ContactEntry[],
+	tailored: ContactEntry[],
+	builder: IDiffBuilder
 ): void;
 
 function diffSkills(
-	master: SkillCategory[], tailored: SkillCategory[], builder: IDiffBuilder
+	master: SkillCategory[],
+	tailored: SkillCategory[],
+	builder: IDiffBuilder
 ): void;
 
-function diffJobHistory(
-	master: JobEntry[], tailored: JobEntry[], builder: IDiffBuilder
-): void;
+function diffJobHistory(master: JobEntry[], tailored: JobEntry[], builder: IDiffBuilder): void;
 
 function diffProjects(
-	master: ProjectEntry[], tailored: ProjectEntry[], builder: IDiffBuilder
+	master: ProjectEntry[],
+	tailored: ProjectEntry[],
+	builder: IDiffBuilder
 ): void;
 
 function diffEducation(
-	master: EducationEntry[], tailored: EducationEntry[], builder: IDiffBuilder
+	master: EducationEntry[],
+	tailored: EducationEntry[],
+	builder: IDiffBuilder
 ): void;
 ```
 
@@ -380,9 +381,11 @@ Each array diff function works the same way:
 
 1. Build a map of tailored entries by `objectId`.
 2. Walk the master array. For each entry:
-  - Not found in tailored map: call `builder.entryAdded(...)`.
-  - Found but fields differ: call `builder.entryModified(...)`.
-  - For composite entries (JobEntry, SkillCategory, ProjectEntry): also diff nested children (achievements, skills, stack) the same way -- match by `objectId`, report additions/removals/modifications.
+
+- Not found in tailored map: call `builder.entryAdded(...)`.
+- Found but fields differ: call `builder.entryModified(...)`.
+- For composite entries (JobEntry, SkillCategory, ProjectEntry): also diff nested children (achievements, skills, stack) the same way -- match by `objectId`, report additions/removals/modifications.
+
 3. Walk the tailored array. Entries not in the master are ignored -- the user added them after tailoring or the master removed them. Neither is a syncable change.
 
 Text block diffing is simpler: compare values, call `builder.textModified(...)` if they differ.
@@ -779,4 +782,3 @@ src/lib/
 8. Resolve all remaining items. Verify the badge disappears.
 9. Edit the master on a field that was previously discarded. Verify the badge reappears and the item is pending again (discard reset).
 10. Delete the master. Verify the prompt appears and both options work.
-

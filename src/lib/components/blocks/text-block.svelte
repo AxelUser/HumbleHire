@@ -12,8 +12,13 @@
 		class?: string;
 	}
 
-	let { block = $bindable(), hiddenBlockIds = $bindable(), title, placeholder, class: className }: Props =
-		$props();
+	let {
+		block = $bindable(),
+		hiddenBlockIds = $bindable(),
+		title,
+		placeholder,
+		class: className
+	}: Props = $props();
 </script>
 
 <BlockWrapper {title} blockId={block.objectId} bind:hiddenBlockIds>

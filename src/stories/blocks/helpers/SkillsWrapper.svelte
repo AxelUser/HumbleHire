@@ -21,13 +21,29 @@
 		if (startEmpty) return [];
 		if (startWithCategories) {
 			return [
-				{ objectId: createObjectId(), name: 'Frontend', skills: mkTags(['React', 'TypeScript', 'Svelte', 'CSS']) },
-				{ objectId: createObjectId(), name: 'Backend', skills: mkTags(['Node.js', 'PostgreSQL', 'Redis']) },
-				{ objectId: createObjectId(), name: 'DevOps', skills: mkTags(['Docker', 'Kubernetes', 'Terraform']) }
+				{
+					objectId: createObjectId(),
+					name: 'Frontend',
+					skills: mkTags(['React', 'TypeScript', 'Svelte', 'CSS'])
+				},
+				{
+					objectId: createObjectId(),
+					name: 'Backend',
+					skills: mkTags(['Node.js', 'PostgreSQL', 'Redis'])
+				},
+				{
+					objectId: createObjectId(),
+					name: 'DevOps',
+					skills: mkTags(['Docker', 'Kubernetes', 'Terraform'])
+				}
 			];
 		}
 		return [
-			{ objectId: createObjectId(), name: '', skills: mkTags(['React', 'TypeScript', 'Node.js', 'PostgreSQL', 'Docker']) }
+			{
+				objectId: createObjectId(),
+				name: '',
+				skills: mkTags(['React', 'TypeScript', 'Node.js', 'PostgreSQL', 'Docker'])
+			}
 		];
 	}
 

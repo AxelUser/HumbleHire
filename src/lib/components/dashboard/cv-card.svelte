@@ -36,13 +36,9 @@
 
 	let tailorModalOpen = $state(false);
 
-	const masterCv = $derived(
-		cv.sourceId ? allCvs.find((c) => c.id === cv.sourceId) : undefined
-	);
+	const masterCv = $derived(cv.sourceId ? allCvs.find((c) => c.id === cv.sourceId) : undefined);
 
-	const updatesAvailable = $derived(
-		masterCv ? hasUpdatesAvailable(masterCv, cv) : false
-	);
+	const updatesAvailable = $derived(masterCv ? hasUpdatesAvailable(masterCv, cv) : false);
 </script>
 
 <Card>

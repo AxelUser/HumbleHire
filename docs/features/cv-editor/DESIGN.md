@@ -269,7 +269,7 @@ Plain HTML handles inline inputs and block text. Everything below needs a shadcn
 | Input        | `InlineField` (edit mode)                                               | Single-line text                            |
 | Textarea     | `InlineTextarea` (edit mode)                                            | Multiline text                              |
 | Switch       | Block visibility toggle in `BlockWrapper`                               | On/off maps to show/hide                    |
-| Badge        | Save status in `CvEditorToolbar`; tag badges in `TagInput`               | Status indicator; skill/tech tag rendering  |
+| Badge        | Save status in `CvEditorToolbar`; tag badges in `TagInput`              | Status indicator; skill/tech tag rendering  |
 | Skeleton     | Dashboard while CVs load from IndexedDB                                 | Loading placeholder for CV cards            |
 | Separator    | Between CV sections in `CvPreview`                                      | Visual section divider                      |
 | Sonner       | Auto-save error notifications                                           | Toasts that don't interrupt editing         |

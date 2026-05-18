@@ -9,7 +9,9 @@
 
 	import type { CV, ObjectId } from '$lib/types/cv';
 
-	function oid(s: string): ObjectId { return s as unknown as ObjectId; }
+	function oid(s: string): ObjectId {
+		return s as unknown as ObjectId;
+	}
 
 	function mkBlocks(name: string, position: string, location: string) {
 		return {

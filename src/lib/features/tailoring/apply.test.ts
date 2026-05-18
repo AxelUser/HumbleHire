@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createObjectId } from '$lib/types/cv';
-import type { CV, CVBlocks, JobEntry, ObjectId } from '$lib/types/cv';
+import type { CV, CVBlocks, JobEntry, Achievement, Tag, ObjectId } from '$lib/types/cv';
 import { diffCVs } from './diff';
 import { applySyncDecisions } from './apply';
 
@@ -9,6 +9,14 @@ function id(): ObjectId {
 }
 
 function textBlock(value: string) {
+	return { objectId: id(), value };
+}
+
+function makeAchievement(text: string): Achievement {
+	return { objectId: id(), text };
+}
+
+function makeTag(value: string): Tag {
 	return { objectId: id(), value };
 }
 
@@ -184,5 +192,93 @@ describe('applySyncDecisions', () => {
 		);
 
 		expect(Object.keys(tailored.syncDecisions?.discarded ?? {})).toHaveLength(0);
+	});
+});
+
+describe('applySyncDecisions — nested lists', () => {
+	it('accepting nested entryAdded: achievement lands in achievements, not job.skills', () => {
+		const job = makeJob('Acme', 'Engineer');
+		const master = makeMaster({ jobHistory: [job] });
+		const tailored = makeTailored(master);
+
+		const newAch = makeAchievement('Built the thing');
+		master.blocks.jobHistory[0].achievements.push(newAch);
+		master.version = 6;
+
+		const items = diffCVs(master, tailored);
+		const addedItem = items.find((i) => i.objectId === newAch.objectId);
+		expect(addedItem).toBeDefined();
+
+		applySyncDecisions(tailored, master, new Map([[addedItem!.objectId, 'accepted']]));
+
+		const tailoredJob = tailored.blocks.jobHistory[0];
+		expect(tailoredJob.achievements).toHaveLength(1);
+		expect(tailoredJob.achievements[0].text).toBe('Built the thing');
+		expect(tailoredJob.skills).toHaveLength(0);
+	});
+
+	it('accepting nested entryAdded: job skill lands in job.skills, not achievements', () => {
+		const job = makeJob('Acme', 'Engineer');
+		const master = makeMaster({ jobHistory: [job] });
+		const tailored = makeTailored(master);
+
+		const newSkill = makeTag('TypeScript');
+		master.blocks.jobHistory[0].skills.push(newSkill);
+		master.version = 6;
+
+		const items = diffCVs(master, tailored);
+		const addedItem = items.find((i) => i.objectId === newSkill.objectId);
+		expect(addedItem).toBeDefined();
+
+		applySyncDecisions(tailored, master, new Map([[addedItem!.objectId, 'accepted']]));
+
+		const tailoredJob = tailored.blocks.jobHistory[0];
+		expect(tailoredJob.skills).toHaveLength(1);
+		expect(tailoredJob.skills[0].value).toBe('TypeScript');
+		expect(tailoredJob.achievements).toHaveLength(0);
+	});
+
+	it('accepting nested entryRemoved: removes only from achievements, leaves job.skills intact', () => {
+		const ach = makeAchievement('Old achievement');
+		const skill = makeTag('Go');
+		const job = makeJob('Acme', 'Engineer');
+		job.achievements.push(ach);
+		job.skills.push(skill);
+
+		const master = makeMaster({ jobHistory: [job] });
+		const tailored = makeTailored(master);
+
+		master.blocks.jobHistory[0].achievements = [];
+		master.version = 6;
+
+		const items = diffCVs(master, tailored);
+		const removedItem = items.find((i) => i.objectId === ach.objectId);
+		expect(removedItem).toBeDefined();
+
+		applySyncDecisions(tailored, master, new Map([[removedItem!.objectId, 'accepted']]));
+
+		const tailoredJob = tailored.blocks.jobHistory[0];
+		expect(tailoredJob.achievements).toHaveLength(0);
+		expect(tailoredJob.skills).toHaveLength(1);
+	});
+
+	it('accepting nested entryModified: updates the correct achievement', () => {
+		const ach = makeAchievement('Old text');
+		const job = makeJob('Acme', 'Engineer');
+		job.achievements.push(ach);
+
+		const master = makeMaster({ jobHistory: [job] });
+		const tailored = makeTailored(master);
+
+		master.blocks.jobHistory[0].achievements[0].text = 'New text';
+		master.version = 6;
+
+		const items = diffCVs(master, tailored);
+		const modifiedItem = items.find((i) => i.objectId === ach.objectId);
+		expect(modifiedItem).toBeDefined();
+
+		applySyncDecisions(tailored, master, new Map([[modifiedItem!.objectId, 'accepted']]));
+
+		expect(tailored.blocks.jobHistory[0].achievements[0].text).toBe('New text');
 	});
 });

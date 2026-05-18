@@ -11,7 +11,13 @@
 </script>
 
 <Story name="Default" asChild>
-	<EditableListWrapper startItems={['Strong communication skills', 'Led cross-functional teams', 'Shipped 3 major features']} />
+	<EditableListWrapper
+		startItems={[
+			'Strong communication skills',
+			'Led cross-functional teams',
+			'Shipped 3 major features'
+		]}
+	/>
 </Story>
 
 <Story name="Empty" asChild>

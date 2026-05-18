@@ -18,7 +18,11 @@
 			: [
 					{ objectId: createObjectId(), label: 'Email', value: 'aleksey@maltsev.space' },
 					{ objectId: createObjectId(), label: 'GitHub', value: 'github.com/axeluser' },
-					{ objectId: createObjectId(), label: 'LinkedIn', value: 'linkedin.com/in/aleksey-maltsev' }
+					{
+						objectId: createObjectId(),
+						label: 'LinkedIn',
+						value: 'linkedin.com/in/aleksey-maltsev'
+					}
 				]
 	);
 	let hiddenBlockIds = $state<ObjectId[]>(startVisible ? [] : [blockId]);

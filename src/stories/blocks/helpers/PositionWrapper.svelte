@@ -9,8 +9,17 @@
 
 	let { startVisible = true }: Props = $props();
 
-	let block = $state<TextBlockData>({ objectId: createObjectId(), value: 'Senior Software Engineer' });
+	let block = $state<TextBlockData>({
+		objectId: createObjectId(),
+		value: 'Senior Software Engineer'
+	});
 	let hiddenBlockIds = $state<ObjectId[]>(startVisible ? [] : [block.objectId]);
 </script>
 
-<TextBlock bind:block bind:hiddenBlockIds title="Position" placeholder="Your position / job title" class="text-muted-foreground text-xl" />
+<TextBlock
+	bind:block
+	bind:hiddenBlockIds
+	title="Position"
+	placeholder="Your position / job title"
+	class="text-muted-foreground text-xl"
+/>

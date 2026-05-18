@@ -1,13 +1,5 @@
-import type { CVBlocks, ObjectId, TextBlock } from '$lib/types/cv';
-import type { AnyEntry, DiffItem } from './types';
-
-export type TextBlockKey = {
-	[K in keyof CVBlocks]: CVBlocks[K] extends TextBlock ? K : never;
-}[keyof CVBlocks];
-
-export type ListBlockKey = {
-	[K in keyof CVBlocks]: CVBlocks[K] extends Array<{ objectId: ObjectId }> ? K : never;
-}[keyof CVBlocks];
+import type { CVBlocks, ObjectId, TextBlock, TextBlockKey, ListBlockKey } from '$lib/types/cv';
+import type { AnyEntry, DiffItem, NestedListKey } from './types';
 
 type ListBlockEntry<K extends ListBlockKey> = CVBlocks[K] extends Array<infer E> ? E : never;
 
@@ -62,7 +54,8 @@ export class ListBuilder<K extends ListBlockKey, E extends { objectId: ObjectId 
 	constructor(
 		private readonly root: DiffRoot,
 		private readonly blockKey: K,
-		private readonly parentObjectId?: ObjectId
+		private readonly parentObjectId?: ObjectId,
+		private readonly nestedListKey?: NestedListKey
 	) {}
 
 	entryAdded(entry: E): void {
@@ -71,6 +64,7 @@ export class ListBuilder<K extends ListBlockKey, E extends { objectId: ObjectId 
 			blockKey: this.blockKey,
 			objectId: entry.objectId,
 			parentObjectId: this.parentObjectId,
+			nestedListKey: this.nestedListKey,
 			entry: entry as unknown as AnyEntry
 		});
 	}
@@ -81,12 +75,19 @@ export class ListBuilder<K extends ListBlockKey, E extends { objectId: ObjectId 
 			blockKey: this.blockKey,
 			objectId: entry.objectId,
 			parentObjectId: this.parentObjectId,
+			nestedListKey: this.nestedListKey,
 			entry: entry as unknown as AnyEntry
 		});
 	}
 
 	atEntry(entry: E): EntryBuilder<K, E> {
-		return new EntryBuilder(this.root, this.blockKey, entry, this.parentObjectId);
+		return new EntryBuilder(
+			this.root,
+			this.blockKey,
+			entry,
+			this.parentObjectId,
+			this.nestedListKey
+		);
 	}
 }
 
@@ -95,7 +96,8 @@ export class EntryBuilder<K extends ListBlockKey, E extends { objectId: ObjectId
 		private readonly root: DiffRoot,
 		private readonly blockKey: K,
 		private readonly entry: E,
-		private readonly parentObjectId?: ObjectId
+		private readonly parentObjectId?: ObjectId,
+		private readonly nestedListKey?: NestedListKey
 	) {}
 
 	modified(before: Partial<E>, after: Partial<E>): void {
@@ -104,14 +106,20 @@ export class EntryBuilder<K extends ListBlockKey, E extends { objectId: ObjectId
 			blockKey: this.blockKey,
 			objectId: this.entry.objectId,
 			parentObjectId: this.parentObjectId,
+			nestedListKey: this.nestedListKey,
 			before: before as Record<string, unknown>,
 			after: after as Record<string, unknown>
 		});
 	}
 
 	atList<L extends NestedListFieldKey<E>>(
-		_listKey: L
+		listKey: L
 	): ListBuilder<K, NestedListItem<E, L> & { objectId: ObjectId }> {
-		return new ListBuilder(this.root, this.blockKey, this.entry.objectId);
+		return new ListBuilder(
+			this.root,
+			this.blockKey,
+			this.entry.objectId,
+			String(listKey) as NestedListKey
+		);
 	}
 }

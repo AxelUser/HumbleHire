@@ -70,7 +70,9 @@
 			</div>
 
 			<div class="flex flex-col gap-1.5">
-				<Label for="tailored-notes">Notes <span class="text-muted-foreground">(optional)</span></Label>
+				<Label for="tailored-notes"
+					>Notes <span class="text-muted-foreground">(optional)</span></Label
+				>
 				<Textarea
 					id="tailored-notes"
 					bind:value={notes}

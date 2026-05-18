@@ -1,12 +1,7 @@
 import type { CV, ObjectId, TextBlock } from '$lib/types/cv';
 import type { DiffItem } from './types';
-import {
-	DiffRoot,
-	EntryBuilder,
-	ListBuilder,
-	TextBlockBuilder,
-	type ListBlockKey
-} from './diff-builder';
+import { DiffRoot, EntryBuilder, ListBuilder, TextBlockBuilder } from './diff-builder';
+import type { ListBlockKey } from '$lib/types/cv';
 
 export function diffCVs(master: CV, tailored: CV): DiffItem[] {
 	const root = new DiffRoot();

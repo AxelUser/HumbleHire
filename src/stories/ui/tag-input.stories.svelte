@@ -24,6 +24,19 @@
 
 <Story name="ManyTags" asChild>
 	<TagInputWrapper
-		startTags={['React', 'TypeScript', 'Node.js', 'PostgreSQL', 'Docker', 'Kubernetes', 'AWS', 'GraphQL', 'Redis', 'Terraform', 'Go', 'Python']}
+		startTags={[
+			'React',
+			'TypeScript',
+			'Node.js',
+			'PostgreSQL',
+			'Docker',
+			'Kubernetes',
+			'AWS',
+			'GraphQL',
+			'Redis',
+			'Terraform',
+			'Go',
+			'Python'
+		]}
 	/>
 </Story>

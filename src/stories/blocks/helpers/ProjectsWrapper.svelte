@@ -19,7 +19,8 @@
 					{
 						objectId: createObjectId(),
 						name: 'OpenMetrics',
-						description: 'An open-source observability toolkit for distributed systems. Built with Go and Prometheus.',
+						description:
+							'An open-source observability toolkit for distributed systems. Built with Go and Prometheus.',
 						stack: [
 							{ objectId: createObjectId(), value: 'Go' },
 							{ objectId: createObjectId(), value: 'Prometheus' },

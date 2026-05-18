@@ -35,12 +35,8 @@
 
 	let decisions = $state(new Map<ObjectId, 'accepted' | 'discarded'>());
 
-	function toDiffViewItem(
-		item: DiffItem,
-		existingDiscarded: Record<string, number>
-	): DiffViewItem {
-		const blockLabel =
-			BLOCK_LABELS[item.blockKey as keyof typeof BLOCK_LABELS] ?? String(item.blockKey);
+	function toDiffViewItem(item: DiffItem, existingDiscarded: Record<string, number>): DiffViewItem {
+		const blockLabel = BLOCK_LABELS[item.blockKey] ?? String(item.blockKey);
 		const previouslyDiscarded = existingDiscarded[item.objectId] !== undefined;
 
 		switch (item.type) {
@@ -142,9 +138,7 @@
 		onClose();
 	}
 
-	const pendingCount = $derived(
-		diffItems.filter((item) => !decisions.has(item.objectId)).length
-	);
+	const pendingCount = $derived(diffItems.filter((item) => !decisions.has(item.objectId)).length);
 </script>
 
 <Dialog bind:open>

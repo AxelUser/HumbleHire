@@ -9,7 +9,10 @@
 
 	let { startVisible = true }: Props = $props();
 
-	let block = $state<TextBlockData>({ objectId: createObjectId(), value: 'San Francisco, CA (open to remote)' });
+	let block = $state<TextBlockData>({
+		objectId: createObjectId(),
+		value: 'San Francisco, CA (open to remote)'
+	});
 	let hiddenBlockIds = $state<ObjectId[]>(startVisible ? [] : [block.objectId]);
 </script>
 

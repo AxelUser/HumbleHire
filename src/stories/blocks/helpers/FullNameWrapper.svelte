@@ -13,4 +13,10 @@
 	let hiddenBlockIds = $state<ObjectId[]>(startVisible ? [] : [block.objectId]);
 </script>
 
-<TextBlock bind:block bind:hiddenBlockIds title="Full Name" placeholder="Your full name" class="text-3xl font-bold" />
+<TextBlock
+	bind:block
+	bind:hiddenBlockIds
+	title="Full Name"
+	placeholder="Your full name"
+	class="text-3xl font-bold"
+/>

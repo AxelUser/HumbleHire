@@ -16,8 +16,10 @@
 
 	const typeIcon = $derived.by(() => {
 		switch (item.type) {
-			case 'entryAdded': return Plus;
-			case 'entryRemoved': return Minus;
+			case 'entryAdded':
+				return Plus;
+			case 'entryRemoved':
+				return Minus;
 			case 'textModified':
 			case 'entryModified':
 		}
@@ -25,9 +27,12 @@
 
 	const typeColor = $derived.by(() => {
 		switch (item.type) {
-			case 'entryAdded': return 'text-green-600 dark:text-green-400';
-			case 'entryRemoved': return 'text-red-600 dark:text-red-400';
-			default: return 'text-blue-600 dark:text-blue-400';
+			case 'entryAdded':
+				return 'text-green-600 dark:text-green-400';
+			case 'entryRemoved':
+				return 'text-red-600 dark:text-red-400';
+			default:
+				return 'text-blue-600 dark:text-blue-400';
 		}
 	});
 </script>
@@ -52,14 +57,16 @@
 
 		<div class="min-w-0 flex-1">
 			<div class="flex flex-wrap items-center gap-2">
-				<span class="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+				<span class="text-muted-foreground text-xs font-medium tracking-wide uppercase">
 					{item.blockLabel}
 				</span>
 				{#if item.previouslyDiscarded}
 					<Badge variant="outline" class="text-xs">Previously dismissed</Badge>
 				{/if}
 				{#if decision === 'accepted'}
-					<Badge variant="secondary" class="text-xs text-green-700 dark:text-green-400">Accepted</Badge>
+					<Badge variant="secondary" class="text-xs text-green-700 dark:text-green-400"
+						>Accepted</Badge
+					>
 				{:else if decision === 'discarded'}
 					<Badge variant="secondary" class="text-xs">Dismissed</Badge>
 				{/if}
@@ -89,7 +96,7 @@
 				<Button
 					variant="ghost"
 					size="icon"
-					class="h-7 w-7 text-muted-foreground hover:text-foreground"
+					class="text-muted-foreground hover:text-foreground h-7 w-7"
 					onclick={onRevert}
 					title="Revert decision"
 				>
@@ -108,7 +115,7 @@
 				<Button
 					variant="ghost"
 					size="icon"
-					class="h-7 w-7 text-muted-foreground hover:text-foreground"
+					class="text-muted-foreground hover:text-foreground h-7 w-7"
 					onclick={onDiscard}
 					title="Dismiss change"
 				>
