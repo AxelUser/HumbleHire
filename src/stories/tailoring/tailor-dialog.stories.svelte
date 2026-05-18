@@ -1,7 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import TailorDialog from '$lib/components/tailoring/tailor-dialog.svelte';
-	import TailorDialogWrapper from './helpers/TailorDialogWrapper.svelte';
 	import { fn } from 'storybook/test';
 	import type { CV, ObjectId } from '$lib/types/cv';
 
