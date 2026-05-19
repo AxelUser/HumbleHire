@@ -105,6 +105,7 @@ export interface CV {
 	id: string;
 	name: string;
 	notes: string;
+	company?: string;
 	createdAt: number;
 	updatedAt: number;
 	version: number;

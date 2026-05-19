@@ -23,11 +23,13 @@
 
 	let { sourceCv, onCreate, open = $bindable(false) }: Props = $props();
 
+	let company = $state('');
 	let name = $state('');
 	let notes = $state('');
 	let loading = $state(false);
 
 	function reset() {
+		company = '';
 		name = '';
 		notes = '';
 		loading = false;
@@ -37,7 +39,12 @@
 		if (!name.trim()) return;
 		loading = true;
 		try {
-			const id = await createTailoredCV($state.snapshot(sourceCv), name.trim(), notes.trim());
+			const id = await createTailoredCV(
+				$state.snapshot(sourceCv),
+				name.trim(),
+				notes.trim(),
+				company.trim() || undefined
+			);
 			open = false;
 			reset();
 			onCreate(id);
@@ -53,8 +60,8 @@
 </script>
 
 {#if !sourceCv.sourceId}
-	<Button variant="ghost" size="sm" onclick={() => (open = true)}>
-		<Scissors class="mr-2 h-4 w-4" /> Tailor
+	<Button variant="accent" size="sm" onclick={() => (open = true)}>
+		<Scissors class="h-3.5 w-3.5" /> Tailor a copy
 	</Button>
 
 	<Dialog bind:open>
@@ -66,19 +73,31 @@
 
 			<div class="flex flex-col gap-4 py-2">
 				<div class="flex flex-col gap-1.5">
-					<Label for="tailored-name">Name</Label>
+					<Label for="tailored-company">
+						Company <span class="text-muted-foreground">(optional)</span>
+					</Label>
 					<Input
-						id="tailored-name"
-						bind:value={name}
-						placeholder="e.g. Stripe — Senior Frontend"
+						id="tailored-company"
+						bind:value={company}
+						placeholder="e.g. Stripe"
 						disabled={loading}
 					/>
 				</div>
 
 				<div class="flex flex-col gap-1.5">
-					<Label for="tailored-notes"
-						>Notes <span class="text-muted-foreground">(optional)</span></Label
-					>
+					<Label for="tailored-name">Name</Label>
+					<Input
+						id="tailored-name"
+						bind:value={name}
+						placeholder="e.g. Senior Frontend Engineer"
+						disabled={loading}
+					/>
+				</div>
+
+				<div class="flex flex-col gap-1.5">
+					<Label for="tailored-notes">
+						Notes <span class="text-muted-foreground">(optional)</span>
+					</Label>
 					<Textarea
 						id="tailored-notes"
 						bind:value={notes}

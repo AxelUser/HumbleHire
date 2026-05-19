@@ -147,17 +147,8 @@
 </script>
 
 {#if tailoredCv.sourceId}
-	<Button
-		variant="ghost"
-		size="sm"
-		class={updatesAvailable ? 'text-primary relative' : 'relative'}
-		onclick={openDialog}
-	>
-		<RefreshCw class="mr-2 h-4 w-4" />
-		Sync
-		{#if updatesAvailable}
-			<span class="bg-primary absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full"></span>
-		{/if}
+	<Button variant="accent" size="sm" onclick={openDialog}>
+		<RefreshCw class="h-3.5 w-3.5" /> Review · Sync
 	</Button>
 
 	<Dialog bind:open>
