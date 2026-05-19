@@ -96,7 +96,8 @@
 			<p class="text-accent text-[11px] font-extrabold tracking-widest uppercase">↳ Your CVs</p>
 			<h2 class="text-[34px] leading-none font-extrabold tracking-tight">Dashboard</h2>
 			<p class="text-muted-foreground max-w-[560px] text-sm font-medium">
-				Every tailored CV sits under its master so lineage is never in doubt.
+				Your master CV has everything. Tailored copies are job-specific cuts of it — edit freely,
+				and check back when the master changes.
 			</p>
 		</div>
 		<NewCvButton onCreate={handleCreate} />

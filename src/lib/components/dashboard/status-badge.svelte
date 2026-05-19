@@ -6,7 +6,12 @@
 	let { updatesAvailable }: Props = $props();
 </script>
 
-<span class="inline-flex items-center gap-1.5">
+<span
+	class="inline-flex cursor-help items-center gap-1.5"
+	title={updatesAvailable
+		? 'Master has changed since tailoring'
+		: 'Tailored copy is in sync with master'}
+>
 	<span
 		class="border-foreground h-2 w-2 shrink-0 border-2 {updatesAvailable
 			? 'bg-accent'

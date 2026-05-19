@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
 	import type { CV } from '$lib/types/cv';
 	import { formatRelativeTime } from '$lib/utils';
 	import { Button } from '$lib/components/ui/button';
@@ -17,31 +16,9 @@
 
 	let { master, tailored, onDelete, onTailor, onSync }: Props = $props();
 
-	const collapseKey = $derived(`dashboard:collapsed:${master.id}`);
-	let collapsed = $state(browser ? localStorage.getItem(collapseKey) === 'true' : false);
+	let collapsed = $state(false);
 	let tailorOpen = $state(false);
 
-	$effect(() => {
-		if (browser) localStorage.setItem(collapseKey, String(collapsed));
-	});
-
-	function countBlocks(cv: CV): number {
-		const { blocks, hiddenBlockIds } = cv;
-		const hiddenSet = new Set(hiddenBlockIds);
-		let count = 0;
-		if (blocks.fullName.value && !hiddenSet.has(blocks.fullName.objectId)) count++;
-		if (blocks.position.value && !hiddenSet.has(blocks.position.objectId)) count++;
-		if (blocks.location.value && !hiddenSet.has(blocks.location.objectId)) count++;
-		if (!hiddenSet.has(blocks.contactsBlockId)) count += blocks.contacts.length;
-		if (!hiddenSet.has(blocks.highlightsBlockId)) count += blocks.highlights.length;
-		if (!hiddenSet.has(blocks.skillsBlockId)) count += blocks.skills.length;
-		if (!hiddenSet.has(blocks.jobHistoryBlockId)) count += blocks.jobHistory.length;
-		if (!hiddenSet.has(blocks.projectsBlockId)) count += blocks.projects.length;
-		if (!hiddenSet.has(blocks.educationBlockId)) count += blocks.education.length;
-		return count;
-	}
-
-	const blockCount = $derived(countBlocks(master));
 	const editedRelative = $derived(formatRelativeTime(master.updatedAt));
 	const hasTailored = $derived(tailored.length > 0);
 	const childrenLabel = $derived(
@@ -67,8 +44,7 @@
 		<div class="flex min-w-0 flex-1 flex-col gap-1">
 			<span class="text-lg font-extrabold tracking-tight">{master.name}</span>
 			<span class="text-muted-foreground text-xs font-medium">
-				{blockCount}
-				{blockCount === 1 ? 'block' : 'blocks'} · edited {editedRelative}
+				Edited {editedRelative}
 			</span>
 		</div>
 
