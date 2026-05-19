@@ -13,9 +13,10 @@
 	import { diffCVs } from '$lib/features/tailoring/diff';
 	import { applySyncDecisions } from '$lib/features/tailoring/apply';
 	import { hasUpdatesAvailable } from '$lib/features/tailoring/detection';
-	import { BLOCK_LABELS } from '$lib/features/tailoring/types';
+	import { toViewItem } from '$lib/features/tailoring/present';
 	import type { DiffItem, DiffViewItem } from '$lib/features/tailoring/types';
 	import type { CV, ObjectId } from '$lib/types/cv';
+	import { dev } from '$app/environment';
 
 	interface Props {
 		masterCv: CV;
@@ -34,67 +35,8 @@
 
 	const viewItems = $derived.by((): DiffViewItem[] => {
 		const existing = tailoredCv.syncDecisions?.discarded ?? {};
-		return diffItems.map((item) => toDiffViewItem(item, existing));
+		return diffItems.map((item) => toViewItem(item, existing));
 	});
-
-	function toDiffViewItem(item: DiffItem, existingDiscarded: Record<string, number>): DiffViewItem {
-		const blockLabel = BLOCK_LABELS[item.blockKey] ?? String(item.blockKey);
-		const previouslyDiscarded = existingDiscarded[item.objectId] !== undefined;
-
-		switch (item.type) {
-			case 'textModified':
-				return {
-					objectId: item.objectId,
-					type: item.type,
-					blockKey: item.blockKey,
-					blockLabel,
-					description: `Changed ${blockLabel}`,
-					before: item.before || '(empty)',
-					after: item.after || '(empty)',
-					previouslyDiscarded
-				};
-			case 'entryAdded':
-				return {
-					objectId: item.objectId,
-					type: item.type,
-					blockKey: item.blockKey,
-					blockLabel,
-					description: `Added entry to ${blockLabel}${item.parentObjectId ? ' (nested)' : ''}`,
-					parentObjectId: item.parentObjectId,
-					previouslyDiscarded
-				};
-			case 'entryRemoved':
-				return {
-					objectId: item.objectId,
-					type: item.type,
-					blockKey: item.blockKey,
-					blockLabel,
-					description: `Removed entry from ${blockLabel}${item.parentObjectId ? ' (nested)' : ''}`,
-					parentObjectId: item.parentObjectId,
-					previouslyDiscarded
-				};
-			case 'entryModified': {
-				const changedKeys = Object.keys(item.after).join(', ');
-				const before = Object.entries(item.before)
-					.map(([k, v]) => `${k}: ${v}`)
-					.join(', ');
-				const after = Object.entries(item.after)
-					.map(([k, v]) => `${k}: ${v}`)
-					.join(', ');
-				return {
-					objectId: item.objectId,
-					type: item.type,
-					blockKey: item.blockKey,
-					blockLabel,
-					description: `Modified ${changedKeys} in ${blockLabel}`,
-					before,
-					after,
-					parentObjectId: item.parentObjectId,
-					previouslyDiscarded
-				};
-			}
-		}
-	}
 
 	function accept(objectId: ObjectId) {
 		decisions.set(objectId, 'accepted');
@@ -128,6 +70,9 @@
 	function openDialog() {
 		decisions = new Map();
 		open = true;
+		if (dev) {
+			console.log('Diff items:', diffItems);
+		}
 	}
 
 	function handleApply() {

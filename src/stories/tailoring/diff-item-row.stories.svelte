@@ -16,8 +16,7 @@
 		blockKey: 'position',
 		blockLabel: 'Position',
 		description: 'Changed Position',
-		before: 'Software Engineer',
-		after: 'Senior Software Engineer'
+		fields: [{ label: 'Position', before: 'Software Engineer', after: 'Senior Software Engineer' }]
 	};
 
 	const entryAddedItem: DiffViewItem = {
@@ -25,15 +24,25 @@
 		type: 'entryAdded',
 		blockKey: 'jobHistory',
 		blockLabel: 'Job History',
-		description: 'Added entry to Job History'
+		description: 'Added job entry — Stripe, Inc.',
+		preview: {
+			title: 'Stripe, Inc.',
+			subtitle: 'Senior Engineer · Jan 2021 – Present',
+			bullets: ['Led the payments platform rewrite', 'Cut checkout latency by 40%'],
+			tags: ['Go', 'Kubernetes', 'Terraform']
+		}
 	};
 
 	const entryRemovedItem: DiffViewItem = {
 		objectId: id('obj-removed'),
 		type: 'entryRemoved',
-		blockKey: 'jobHistory',
-		blockLabel: 'Job History',
-		description: 'Removed entry from Job History'
+		blockKey: 'skills',
+		blockLabel: 'Skills',
+		description: 'Removed skill category — Languages',
+		preview: {
+			title: 'Languages',
+			tags: ['Rust', 'Elixir']
+		}
 	};
 
 	const entryModifiedItem: DiffViewItem = {
@@ -41,9 +50,11 @@
 		type: 'entryModified',
 		blockKey: 'jobHistory',
 		blockLabel: 'Job History',
-		description: 'Modified title, period in Job History',
-		before: 'title: Engineer, period: 2020–2022',
-		after: 'title: Senior Engineer, period: 2020–2023'
+		description: 'Changed Acme Corp',
+		fields: [
+			{ label: 'Role', before: 'Engineer', after: 'Senior Engineer' },
+			{ label: 'End date', before: 'Jan 2022', after: 'Jan 2023' }
+		]
 	};
 
 	const nestedAddedItem: DiffViewItem = {
@@ -51,8 +62,11 @@
 		type: 'entryAdded',
 		blockKey: 'jobHistory',
 		blockLabel: 'Job History',
-		description: 'Added entry to Job History (nested)',
-		parentObjectId: id('parent-job')
+		description: 'Added achievement — Shipped the onboarding redesign',
+		parentObjectId: id('parent-job'),
+		preview: {
+			title: 'Shipped the onboarding redesign'
+		}
 	};
 
 	const { Story } = defineMeta({

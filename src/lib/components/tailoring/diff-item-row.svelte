@@ -14,27 +14,16 @@
 
 	let { item, decision, onAccept, onDiscard, onRevert }: Props = $props();
 
-	const typeIcon = $derived.by(() => {
-		switch (item.type) {
-			case 'entryAdded':
-				return Plus;
-			case 'entryRemoved':
-				return Minus;
-			case 'textModified':
-			case 'entryModified':
-		}
-	});
+	const isAdded = $derived(item.type === 'entryAdded');
+	const isRemoved = $derived(item.type === 'entryRemoved');
 
-	const typeColor = $derived.by(() => {
-		switch (item.type) {
-			case 'entryAdded':
-				return 'text-green-600 dark:text-green-400';
-			case 'entryRemoved':
-				return 'text-red-600 dark:text-red-400';
-			default:
-				return 'text-blue-600 dark:text-blue-400';
-		}
-	});
+	const typeColor = $derived(
+		isAdded
+			? 'text-green-600 dark:text-green-400'
+			: isRemoved
+				? 'text-red-600 dark:text-red-400'
+				: 'text-blue-600 dark:text-blue-400'
+	);
 </script>
 
 <div
@@ -46,9 +35,9 @@
 >
 	<div class="flex items-start gap-3">
 		<div class="mt-0.5 shrink-0 {typeColor}">
-			{#if item.type === 'entryAdded'}
+			{#if isAdded}
 				<Plus class="h-4 w-4" />
-			{:else if item.type === 'entryRemoved'}
+			{:else if isRemoved}
 				<Minus class="h-4 w-4" />
 			{:else}
 				<ArrowLeftRight class="h-4 w-4" />
@@ -73,20 +62,51 @@
 			</div>
 			<p class="mt-0.5 text-sm font-medium">{item.description}</p>
 
-			{#if item.type === 'textModified' || item.type === 'entryModified'}
-				<div class="mt-2 grid grid-cols-2 gap-2 text-xs">
-					{#if item.before !== undefined}
-						<div class="rounded bg-red-50 p-2 dark:bg-red-950/30">
-							<span class="text-muted-foreground mb-1 block font-medium">Before</span>
-							<span class="text-foreground">{item.before || '(empty)'}</span>
+			{#if item.preview}
+				{@const p = item.preview}
+				<div
+					class="mt-2 rounded border p-3 text-sm {isAdded
+						? 'border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950/30'
+						: 'border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/30'}"
+				>
+					<p class="text-foreground font-medium">{p.title}</p>
+					{#if p.subtitle}
+						<p class="text-muted-foreground mt-0.5 text-xs">{p.subtitle}</p>
+					{/if}
+					{#if p.bullets && p.bullets.length > 0}
+						<ul class="text-foreground mt-2 list-disc space-y-0.5 pl-4 text-xs">
+							{#each p.bullets as bullet, i (i)}
+								<li>{bullet}</li>
+							{/each}
+						</ul>
+					{/if}
+					{#if p.tags && p.tags.length > 0}
+						<div class="mt-2 flex flex-wrap gap-1">
+							{#each p.tags as tag, i (i)}
+								<Badge variant="secondary" class="text-xs">{tag}</Badge>
+							{/each}
 						</div>
 					{/if}
-					{#if item.after !== undefined}
-						<div class="rounded bg-green-50 p-2 dark:bg-green-950/30">
-							<span class="text-muted-foreground mb-1 block font-medium">After</span>
-							<span class="text-foreground">{item.after || '(empty)'}</span>
+				</div>
+			{/if}
+
+			{#if item.fields && item.fields.length > 0}
+				<div class="mt-2 flex flex-col gap-2">
+					{#each item.fields as field (field.label)}
+						<div>
+							<span class="text-muted-foreground text-xs font-medium">{field.label}</span>
+							<div class="mt-1 grid grid-cols-2 gap-2 text-xs">
+								<div class="rounded bg-red-50 p-2 dark:bg-red-950/30">
+									<span class="text-muted-foreground mb-1 block font-medium">Before</span>
+									<span class="text-foreground">{field.before}</span>
+								</div>
+								<div class="rounded bg-green-50 p-2 dark:bg-green-950/30">
+									<span class="text-muted-foreground mb-1 block font-medium">After</span>
+									<span class="text-foreground">{field.after}</span>
+								</div>
+							</div>
 						</div>
-					{/if}
+					{/each}
 				</div>
 			{/if}
 		</div>

@@ -107,6 +107,7 @@ export class EntryBuilder<K extends ListBlockKey, E extends { objectId: ObjectId
 			objectId: this.entry.objectId,
 			parentObjectId: this.parentObjectId,
 			nestedListKey: this.nestedListKey,
+			entry: this.entry as unknown as AnyEntry,
 			before: before as Record<string, unknown>,
 			after: after as Record<string, unknown>
 		});

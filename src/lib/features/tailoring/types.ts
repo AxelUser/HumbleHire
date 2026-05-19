@@ -57,9 +57,23 @@ export type DiffItem =
 			objectId: ObjectId;
 			parentObjectId?: ObjectId;
 			nestedListKey?: NestedListKey;
+			entry: AnyEntry;
 			before: Record<string, unknown>;
 			after: Record<string, unknown>;
 	  };
+
+export interface FieldChange {
+	label: string;
+	before: string;
+	after: string;
+}
+
+export interface EntryPreview {
+	title: string;
+	subtitle?: string;
+	bullets?: string[];
+	tags?: string[];
+}
 
 export interface DiffViewItem {
 	objectId: ObjectId;
@@ -67,10 +81,10 @@ export interface DiffViewItem {
 	blockKey: CVBlockKey;
 	blockLabel: string;
 	description: string;
-	before?: string;
-	after?: string;
 	parentObjectId?: ObjectId;
 	previouslyDiscarded?: boolean;
+	preview?: EntryPreview;
+	fields?: FieldChange[];
 }
 
 export const BLOCK_LABELS: Partial<Record<CVBlockKey, string>> = {
@@ -83,4 +97,19 @@ export const BLOCK_LABELS: Partial<Record<CVBlockKey, string>> = {
 	jobHistory: 'Job History',
 	projects: 'Projects',
 	education: 'Education'
+};
+
+export const FIELD_LABELS: Record<string, string> = {
+	company: 'Company',
+	role: 'Role',
+	startDate: 'Start date',
+	endDate: 'End date',
+	name: 'Name',
+	description: 'Description',
+	link: 'Link',
+	label: 'Label',
+	value: 'Value',
+	institution: 'Institution',
+	degree: 'Degree',
+	text: 'Text'
 };
