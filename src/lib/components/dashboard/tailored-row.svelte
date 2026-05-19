@@ -3,7 +3,7 @@
 	import { hasUpdatesAvailable } from '$lib/features/tailoring/detection';
 	import { formatRelativeTime } from '$lib/utils';
 	import { Button } from '$lib/components/ui/button';
-	import { SyncDialog } from '$lib/components/tailoring';
+	import { SyncDrawer } from '$lib/components/tailoring';
 	import StatusBadge from './status-badge.svelte';
 	import { Eye, Trash2 } from '@lucide/svelte';
 
@@ -75,7 +75,7 @@
 		<!-- Actions -->
 		<div class="flex shrink-0 items-center gap-1.5">
 			{#if updatesAvailable}
-				<SyncDialog masterCv={master} tailoredCv={cv} {onSync} />
+				<SyncDrawer masterCv={master} tailoredCv={cv} {onSync} />
 			{/if}
 			<Button variant="outline" size="sm" href="/cv/{cv.id}">
 				<Eye class="h-3.5 w-3.5" /> Open

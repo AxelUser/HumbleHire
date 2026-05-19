@@ -90,7 +90,7 @@
 
 <div
 	class="rounded-lg border p-4 {decision === 'accepted'
-		? 'border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950/30'
+		? 'border-accent bg-accent/10'
 		: decision === 'discarded'
 			? 'border-muted bg-muted/30 opacity-60'
 			: 'border-border bg-card'}"
@@ -98,10 +98,10 @@
 	<div class="flex items-start gap-3">
 		<div
 			class="mt-0.5 shrink-0 {meta.change === 'added'
-				? 'text-green-600 dark:text-green-400'
+				? 'text-accent'
 				: meta.change === 'removed'
-					? 'text-red-600 dark:text-red-400'
-					: 'text-blue-600 dark:text-blue-400'}"
+					? 'text-destructive'
+					: 'text-muted-foreground'}"
 		>
 			{#if meta.change === 'added'}
 				<Plus class="h-4 w-4" />
@@ -113,21 +113,18 @@
 		</div>
 
 		<div class="min-w-0 flex-1">
-			<div class="flex flex-wrap items-center gap-2">
-				<span class="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-					{meta.blockLabel}
-				</span>
-				{#if previouslyDiscarded}
-					<Badge variant="outline" class="text-xs">Previously dismissed</Badge>
-				{/if}
-				{#if decision === 'accepted'}
-					<Badge variant="secondary" class="text-xs text-green-700 dark:text-green-400"
-						>Accepted</Badge
-					>
-				{:else if decision === 'discarded'}
-					<Badge variant="secondary" class="text-xs">Dismissed</Badge>
-				{/if}
-			</div>
+			{#if previouslyDiscarded || decision !== undefined}
+				<div class="mb-1 flex flex-wrap items-center gap-2">
+					{#if previouslyDiscarded}
+						<Badge variant="outline" class="text-xs">Previously dismissed</Badge>
+					{/if}
+					{#if decision === 'accepted'}
+						<Badge variant="secondary" class="text-accent text-xs">Accepted</Badge>
+					{:else if decision === 'discarded'}
+						<Badge variant="secondary" class="text-xs">Dismissed</Badge>
+					{/if}
+				</div>
+			{/if}
 
 			{#if item.kind !== 'text'}
 				<p class="mt-0.5 text-sm font-medium">{meta.title}</p>
@@ -138,9 +135,9 @@
 
 			{#if showPreview && resolvedEntry}
 				<div
-					class="mt-2 rounded border p-3 text-sm {meta.change === 'added'
-						? 'border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950/30'
-						: 'border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/30'}"
+					class="mt-2 rounded-lg border p-3 text-sm {meta.change === 'added'
+						? 'border-accent bg-accent/10'
+						: 'border-destructive bg-destructive/10'}"
 				>
 					{#if kind === 'job'}
 						<JobPreview entry={resolvedEntry as JobEntry} />
@@ -182,7 +179,7 @@
 				<Button
 					variant="ghost"
 					size="icon"
-					class="h-7 w-7 text-green-600 hover:bg-green-50 hover:text-green-700 dark:text-green-400 dark:hover:bg-green-950/30"
+					class="text-accent hover:bg-muted hover:text-accent h-7 w-7"
 					onclick={onAccept}
 					title="Accept change"
 				>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import SyncDialog from '$lib/components/tailoring/sync-dialog.svelte';
+	import SyncDrawer from '$lib/components/tailoring/sync-drawer.svelte';
 	import type { CV, ObjectId } from '$lib/types/cv';
 
 	const IDS = {
@@ -54,4 +54,4 @@
 	let open = $state(false);
 </script>
 
-<SyncDialog {masterCv} {tailoredCv} onSync={() => {}} bind:open />
+<SyncDrawer {masterCv} {tailoredCv} onSync={() => {}} bind:open />

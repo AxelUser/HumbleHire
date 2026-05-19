@@ -4,7 +4,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { getCVStoreContext } from '$lib/stores/cv.svelte';
 	import { ExternalLink } from '@lucide/svelte';
-	import { TailorDialog, SyncDialog } from '$lib/components/tailoring';
+	import { TailorDialog, SyncDrawer } from '$lib/components/tailoring';
 	import type { CV } from '$lib/types/cv';
 
 	interface Props {
@@ -51,7 +51,7 @@
 				</a>
 
 				{#if cvStore.cv}
-					<SyncDialog
+					<SyncDrawer
 						{masterCv}
 						tailoredCv={cvStore.cv}
 						onSync={(updated) => (cvStore.cv = updated)}
