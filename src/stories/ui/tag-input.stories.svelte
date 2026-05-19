@@ -11,11 +11,11 @@
 </script>
 
 <Story name="Default" asChild>
-	<TagInput tags={['React', 'TypeScript', 'Node.js']} placeholder="Add a tag..." />
+	<TagInputWrapper startTags={['React', 'TypeScript', 'Node.js']} />
 </Story>
 
 <Story name="Empty" asChild>
-	<TagInput tags={[]} placeholder="Add a tag..." />
+	<TagInputWrapper startTags={[]} />
 </Story>
 
 <Story name="Interactive" asChild>
@@ -23,8 +23,8 @@
 </Story>
 
 <Story name="ManyTags" asChild>
-	<TagInput
-		tags={[
+	<TagInputWrapper
+		startTags={[
 			'React',
 			'TypeScript',
 			'Node.js',
@@ -38,6 +38,5 @@
 			'Go',
 			'Python'
 		]}
-		placeholder="Add a tag..."
 	/>
 </Story>

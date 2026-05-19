@@ -1,25 +1,36 @@
 <script lang="ts">
 	import type { CV } from '$lib/types/cv';
-	import { CvCard } from '$lib/components/dashboard';
-	import { FileText } from '@lucide/svelte';
+	import MasterGroup from './master-group.svelte';
+	import SearchBar from './search-bar.svelte';
 
 	interface Props {
 		cvs: CV[];
 		onDelete: (id: string) => void;
+		onTailor: (id: string) => void;
+		onSync: (updated: CV) => void;
 	}
 
-	let { cvs, onDelete }: Props = $props();
+	let { cvs, onDelete, onTailor, onSync }: Props = $props();
+
+	const groups = $derived.by(() => {
+		const allIds = new Set(cvs.map((c) => c.id));
+		const groupHeads = cvs.filter((c) => !c.sourceId || !allIds.has(c.sourceId));
+		return groupHeads.map((master) => ({
+			master,
+			tailored: cvs
+				.filter((c) => c.sourceId === master.id)
+				.sort((a, b) => b.createdAt - a.createdAt)
+		}));
+	});
+
+	const tailoredCount = $derived(cvs.filter((c) => !!c.sourceId).length);
 </script>
 
-{#if cvs.length === 0}
-	<div class="text-muted-foreground py-16 text-center">
-		<FileText class="mx-auto mb-4 h-12 w-12 opacity-40" />
-		<p>No CVs yet. Create one to get started.</p>
-	</div>
-{:else}
-	<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-		{#each cvs as cv (cv.id)}
-			<CvCard {cv} {onDelete} />
+<div class="flex flex-col gap-4">
+	<SearchBar masterCount={groups.length} {tailoredCount} />
+	<div class="flex flex-col gap-[18px]">
+		{#each groups as { master, tailored } (master.id)}
+			<MasterGroup {master} {tailored} {onDelete} {onTailor} {onSync} />
 		{/each}
 	</div>
-{/if}
+</div>

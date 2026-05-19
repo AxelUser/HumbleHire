@@ -1,13 +1,25 @@
 <script lang="ts">
-	import PositionBlock from '$lib/components/blocks/position-block.svelte';
+	import TextBlock from '$lib/components/blocks/text-block.svelte';
+	import { createObjectId } from '$lib/types/cv';
+	import type { ObjectId, Block } from '$lib/types/cv';
 
 	interface Props {
 		startVisible?: boolean;
 	}
 
 	let { startVisible = true }: Props = $props();
-	let value = $state('Senior Software Engineer');
-	let visible = $state(startVisible);
+
+	let block = $state<Block<string>>({
+		objectId: createObjectId(),
+		value: 'Senior Software Engineer'
+	});
+	let hiddenBlockIds = $state<ObjectId[]>(startVisible ? [] : [block.objectId]);
 </script>
 
-<PositionBlock bind:value bind:visible />
+<TextBlock
+	bind:block
+	bind:hiddenBlockIds
+	title="Position"
+	placeholder="Your position / job title"
+	class="text-muted-foreground text-xl"
+/>

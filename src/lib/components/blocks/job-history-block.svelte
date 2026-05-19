@@ -9,20 +9,22 @@
 	import { DragDropProvider, DragOverlay } from '@dnd-kit/svelte';
 	import { createSortable } from '@dnd-kit/svelte/sortable';
 	import { move } from '@dnd-kit/helpers';
-	import type { JobEntry } from '$lib/types/cv';
+	import type { JobEntry, ObjectId } from '$lib/types/cv';
+	import { createObjectId } from '$lib/types/cv';
 
 	interface Props {
 		jobs: JobEntry[];
-		visible: boolean;
+		blockId: ObjectId;
+		hiddenBlockIds: ObjectId[];
 	}
 
-	let { jobs = $bindable(), visible = $bindable() }: Props = $props();
+	let { jobs = $bindable(), blockId, hiddenBlockIds = $bindable() }: Props = $props();
 
 	function addJob() {
 		jobs = [
 			...jobs,
 			{
-				id: crypto.randomUUID(),
+				objectId: createObjectId(),
 				company: '',
 				role: '',
 				startDate: undefined,
@@ -33,24 +35,24 @@
 		];
 	}
 
-	function removeJob(id: string) {
-		jobs = jobs.filter((j) => j.id !== id);
+	function removeJob(objectId: ObjectId) {
+		jobs = jobs.filter((j) => j.objectId !== objectId);
 	}
 
 	function onDragOver(event: any) {
-		jobs = move(jobs, event);
+		jobs = move(jobs as any, event) as JobEntry[];
 	}
 
 	function onDragEnd(event: any) {
-		jobs = move(jobs, event);
+		jobs = move(jobs as any, event) as JobEntry[];
 	}
 </script>
 
-<BlockWrapper title="Job History" bind:visible>
+<BlockWrapper title="Job History" {blockId} bind:hiddenBlockIds>
 	<DragDropProvider {onDragEnd} {onDragOver}>
 		<div class="flex flex-col gap-4">
-			{#each jobs as job, index (job.id)}
-				{@const sortable = createSortable({ id: job.id, index: (() => index) as any })}
+			{#each jobs as job, index (job.objectId)}
+				{@const sortable = createSortable({ id: job.objectId, index: (() => index) as any })}
 				<div
 					class="rounded-lg p-4 {sortable.isDragging
 						? 'border-muted border-2 border-dashed'
@@ -74,7 +76,7 @@
 								variant="ghost"
 								size="icon"
 								class="text-muted-foreground hover:text-destructive shrink-0"
-								onclick={() => removeJob(job.id)}
+								onclick={() => removeJob(job.objectId)}
 							>
 								<Trash2 class="h-4 w-4" />
 							</Button>
@@ -100,7 +102,7 @@
 		</div>
 		<DragOverlay>
 			{#snippet children(source: any)}
-				{@const job = jobs.find((j) => j.id === source.id)}
+				{@const job = jobs.find((j) => j.objectId === source.id)}
 				{#if job}
 					<div class="bg-background rounded-lg border p-4 shadow-lg">
 						<div class="flex items-start gap-2">

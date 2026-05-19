@@ -7,20 +7,22 @@
 	import { createSortable } from '@dnd-kit/svelte/sortable';
 	import { move } from '@dnd-kit/helpers';
 	import { Trash2, Plus, GripVertical } from '@lucide/svelte';
-	import type { EducationEntry } from '$lib/types/cv';
+	import type { EducationEntry, ObjectId } from '$lib/types/cv';
+	import { createObjectId } from '$lib/types/cv';
 
 	interface Props {
 		education: EducationEntry[];
-		visible: boolean;
+		blockId: ObjectId;
+		hiddenBlockIds: ObjectId[];
 	}
 
-	let { education = $bindable(), visible = $bindable() }: Props = $props();
+	let { education = $bindable(), blockId, hiddenBlockIds = $bindable() }: Props = $props();
 
 	function addEducation() {
 		education = [
 			...education,
 			{
-				id: crypto.randomUUID(),
+				objectId: createObjectId(),
 				institution: '',
 				degree: '',
 				startDate: undefined,
@@ -29,24 +31,24 @@
 		];
 	}
 
-	function removeEducation(id: string) {
-		education = education.filter((e) => e.id !== id);
+	function removeEducation(objectId: ObjectId) {
+		education = education.filter((e) => e.objectId !== objectId);
 	}
 
 	function onDragOver(event: any) {
-		education = move(education, event);
+		education = move(education as any, event) as EducationEntry[];
 	}
 
 	function onDragEnd(event: any) {
-		education = move(education, event);
+		education = move(education as any, event) as EducationEntry[];
 	}
 </script>
 
-<BlockWrapper title="Education" bind:visible>
+<BlockWrapper title="Education" {blockId} bind:hiddenBlockIds>
 	<DragDropProvider {onDragEnd} {onDragOver}>
 		<div class="flex flex-col gap-4">
-			{#each education as entry, index (entry.id)}
-				{@const sortable = createSortable({ id: entry.id, index: (() => index) as any })}
+			{#each education as entry, index (entry.objectId)}
+				{@const sortable = createSortable({ id: entry.objectId, index: (() => index) as any })}
 				<div
 					{@attach sortable.attach}
 					class="rounded-lg p-4 {sortable.isDragging
@@ -69,7 +71,7 @@
 								variant="ghost"
 								size="icon"
 								class="text-muted-foreground hover:text-destructive shrink-0"
-								onclick={() => removeEducation(entry.id)}
+								onclick={() => removeEducation(entry.objectId)}
 							>
 								<Trash2 class="h-4 w-4" />
 							</Button>
@@ -94,7 +96,7 @@
 		</div>
 		<DragOverlay>
 			{#snippet children(source: any)}
-				{@const entry = education.find((e) => e.id === source.id)}
+				{@const entry = education.find((e) => e.objectId === source.id)}
 				{#if entry}
 					<div class="bg-background rounded-lg border p-4 shadow-lg">
 						<div class="flex flex-col gap-2">

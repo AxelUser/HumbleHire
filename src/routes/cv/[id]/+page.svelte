@@ -7,9 +7,12 @@
 	import { CVStore, setCVStoreContext } from '$lib/stores/cv.svelte';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { CvEditorToolbar, CvPreview } from '$lib/components/editor';
+	import type { CV } from '$lib/types/cv';
 
 	const cvStore = new CVStore();
 	setCVStoreContext(cvStore);
+
+	let masterCv = $state<CV | undefined>(undefined);
 
 	onMount(async () => {
 		const id = page.params.id;
@@ -19,6 +22,14 @@
 			return;
 		}
 		cvStore.cv = loaded;
+
+		if (loaded.sourceId) {
+			masterCv = await db.cvs.get(loaded.sourceId);
+			if (!masterCv) {
+				await db.cvs.update(id, { sourceId: undefined, syncDecisions: undefined });
+				cvStore.cv = { ...loaded, sourceId: undefined, syncDecisions: undefined };
+			}
+		}
 	});
 </script>
 
@@ -33,6 +44,6 @@
 		<Skeleton class="h-32 w-full" />
 	</div>
 {:else}
-	<CvEditorToolbar bind:cvName={cvStore.cv.name} />
+	<CvEditorToolbar bind:cvName={cvStore.cv.name} {masterCv} />
 	<CvPreview bind:cv={cvStore.cv} />
 {/if}

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import SkillsBlock from '$lib/components/blocks/skills-block.svelte';
-	import type { SkillCategory } from '$lib/types/cv';
+	import { createObjectId } from '$lib/types/cv';
+	import type { ObjectId, SkillCategory } from '$lib/types/cv';
 
 	interface Props {
 		startVisible?: boolean;
@@ -10,38 +11,44 @@
 
 	let { startVisible = true, startEmpty = false, startWithCategories = false }: Props = $props();
 
+	const blockId = createObjectId();
+
+	function mkTags(values: string[]) {
+		return values.map((value) => ({ objectId: createObjectId(), value }));
+	}
+
 	function getInitialSkills(): SkillCategory[] {
 		if (startEmpty) return [];
 		if (startWithCategories) {
 			return [
 				{
-					id: '1',
+					objectId: createObjectId(),
 					name: 'Frontend',
-					skills: ['React', 'TypeScript', 'Svelte', 'CSS']
+					skills: mkTags(['React', 'TypeScript', 'Svelte', 'CSS'])
 				},
 				{
-					id: '2',
+					objectId: createObjectId(),
 					name: 'Backend',
-					skills: ['Node.js', 'PostgreSQL', 'Redis']
+					skills: mkTags(['Node.js', 'PostgreSQL', 'Redis'])
 				},
 				{
-					id: '3',
+					objectId: createObjectId(),
 					name: 'DevOps',
-					skills: ['Docker', 'Kubernetes', 'Terraform']
+					skills: mkTags(['Docker', 'Kubernetes', 'Terraform'])
 				}
 			];
 		}
 		return [
 			{
-				id: '1',
+				objectId: createObjectId(),
 				name: '',
-				skills: ['React', 'TypeScript', 'Node.js', 'PostgreSQL', 'Docker']
+				skills: mkTags(['React', 'TypeScript', 'Node.js', 'PostgreSQL', 'Docker'])
 			}
 		];
 	}
 
 	let skills = $state<SkillCategory[]>(getInitialSkills());
-	let visible = $state(startVisible);
+	let hiddenBlockIds = $state<ObjectId[]>(startVisible ? [] : [blockId]);
 </script>
 
-<SkillsBlock bind:skills bind:visible />
+<SkillsBlock bind:skills {blockId} bind:hiddenBlockIds />

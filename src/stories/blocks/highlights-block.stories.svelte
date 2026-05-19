@@ -1,11 +1,11 @@
 <script module>
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import HighlightsBlock from '$lib/components/blocks/highlights-block.svelte';
+	import BulletListBlock from '$lib/components/blocks/bullet-list-block.svelte';
 	import HighlightsWrapper from './helpers/HighlightsWrapper.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Blocks/Highlights',
-		component: HighlightsBlock,
+		component: BulletListBlock,
 		tags: ['autodocs']
 	});
 </script>

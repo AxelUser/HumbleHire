@@ -1,9 +1,11 @@
 <script lang="ts">
 	import '../app.css';
+	import { dev } from '$app/environment';
 	import { ModeWatcher, toggleMode, mode } from 'mode-watcher';
 	import { Sun, Moon } from '@lucide/svelte';
 	import Header from '$lib/components/layout/header.svelte';
 	import Footer from '$lib/components/layout/footer.svelte';
+	import DevToolbox from '$lib/components/dev/dev-toolbox.svelte';
 
 	let { children } = $props();
 </script>
@@ -31,3 +33,7 @@
 		Dark
 	{/if}
 </button>
+
+{#if dev}
+	<DevToolbox />
+{/if}

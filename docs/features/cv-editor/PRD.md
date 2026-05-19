@@ -2,9 +2,9 @@
 
 ## Overview
 
-The CV Editor is the core feature of HumbleHire. Users create and manage CVs through an inline block editor: click any field to edit it, see changes immediately, and have edits auto-saved. All data lives in IndexedDB.
+The CV Editor is the core feature of HumbleHire. Users create and manage CVs through a click-to-edit block interface — edits appear in the preview immediately and save automatically. All data lives in IndexedDB.
 
-The CV Editor handles a single CV at a time. Branching, version snapshots, and cross-CV sync are covered by the separate [Branching & Versioning](../branching/PRD.md) feature.
+The CV Editor handles a single CV at a time. Tailoring, version snapshots, and cross-CV sync are covered by the separate [Tailoring & Versioning](../tailoring/PRD.md) feature.
 
 ---
 
@@ -17,7 +17,7 @@ The CV Editor handles a single CV at a time. Branching, version snapshots, and c
 
 ## Non-goals
 
-- Branching, version snapshots, diffing, and merging (see [Branching & Versioning](../branching/PRD.md)).
+- Tailoring, version snapshots, diffing, and merging (see [Tailoring & Versioning](../tailoring/PRD.md)).
 - Export to PDF/HTML/Markdown (separate feature).
 - Cloud sync or multi-device support.
 - Custom block types beyond the fixed set.
@@ -72,17 +72,17 @@ The CV Editor handles a single CV at a time. Branching, version snapshots, and c
 
 ## CV blocks (fixed set, fixed order)
 
-| #   | Block       | Repeatable | Notes                                        |
-| --- | ----------- | ---------- | -------------------------------------------- |
-| 1   | Full Name   | No         | Single text field                            |
-| 2   | Position    | No         | Single text field (target job title)         |
-| 3   | Location    | No         | Single text field                            |
-| 4   | Contacts    | Yes        | List of label + value pairs                  |
-| 5   | Highlights  | Yes        | Ordered list of bullet-point strings                                                    |
-| 6   | Skills      | Yes        | Tag badges; optional grouping into named categories (e.g. Frontend, Backend)            |
-| 7   | Job History | Yes        | Company, dates, role, achievements list, skill tags                                     |
-| 8   | Projects    | Yes        | Name, description, tech stack (tag badges), optional link                               |
-| 9   | Education   | Yes        | Institution, degree, dates                                                              |
+| #   | Block       | Repeatable | Notes                                                                        |
+| --- | ----------- | ---------- | ---------------------------------------------------------------------------- |
+| 1   | Full Name   | No         | Single text field                                                            |
+| 2   | Position    | No         | Single text field (target job title)                                         |
+| 3   | Location    | No         | Single text field                                                            |
+| 4   | Contacts    | Yes        | List of label + value pairs                                                  |
+| 5   | Highlights  | Yes        | Ordered list of bullet-point strings                                         |
+| 6   | Skills      | Yes        | Tag badges; optional grouping into named categories (e.g. Frontend, Backend) |
+| 7   | Job History | Yes        | Company, dates, role, achievements list, skill tags                          |
+| 8   | Projects    | Yes        | Name, description, tech stack (tag badges), optional link                    |
+| 9   | Education   | Yes        | Institution, degree, dates                                                   |
 
 Block order is fixed. Users cannot reorder blocks.
 

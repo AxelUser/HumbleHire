@@ -1,6 +1,7 @@
 <script lang="ts">
 	import ContactsBlock from '$lib/components/blocks/contacts-block.svelte';
-	import type { ContactEntry } from '$lib/types/cv';
+	import { createObjectId } from '$lib/types/cv';
+	import type { ObjectId, ContactEntry } from '$lib/types/cv';
 
 	interface Props {
 		startVisible?: boolean;
@@ -9,16 +10,22 @@
 
 	let { startVisible = true, startEmpty = false }: Props = $props();
 
+	const blockId = createObjectId();
+
 	let contacts = $state<ContactEntry[]>(
 		startEmpty
 			? []
 			: [
-					{ id: '1', label: 'Email', value: 'aleksey@maltsev.space' },
-					{ id: '2', label: 'GitHub', value: 'github.com/axeluser' },
-					{ id: '3', label: 'LinkedIn', value: 'linkedin.com/in/aleksey-maltsev' }
+					{ objectId: createObjectId(), label: 'Email', value: 'aleksey@maltsev.space' },
+					{ objectId: createObjectId(), label: 'GitHub', value: 'github.com/axeluser' },
+					{
+						objectId: createObjectId(),
+						label: 'LinkedIn',
+						value: 'linkedin.com/in/aleksey-maltsev'
+					}
 				]
 	);
-	let visible = $state(startVisible);
+	let hiddenBlockIds = $state<ObjectId[]>(startVisible ? [] : [blockId]);
 </script>
 
-<ContactsBlock bind:contacts bind:visible />
+<ContactsBlock bind:contacts {blockId} bind:hiddenBlockIds />

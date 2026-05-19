@@ -2,7 +2,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Plus } from '@lucide/svelte';
 	import { db } from '$lib/db/index';
-	import { createEmptyCV } from '$lib/types/cv';
+	import { createCVFromTemplate } from '$lib/services/cv/create';
 
 	interface Props {
 		onCreate: (id: string) => void;
@@ -12,7 +12,7 @@
 
 	async function handleClick() {
 		const id = crypto.randomUUID();
-		const cv = createEmptyCV(id, 'Untitled CV');
+		const cv = createCVFromTemplate(id, 'Untitled CV');
 		await db.cvs.add(cv);
 		onCreate(id);
 	}

@@ -11,19 +11,17 @@
 </script>
 
 <Story name="Default" asChild>
-	<EditableList
-		items={[
+	<EditableListWrapper
+		startItems={[
 			'Strong communication skills',
 			'Led cross-functional teams',
 			'Shipped 3 major features'
 		]}
-		placeholder="Add an item..."
-		addLabel="Add Item"
 	/>
 </Story>
 
 <Story name="Empty" asChild>
-	<EditableList items={[]} placeholder="Add an item..." addLabel="Add Item" />
+	<EditableListWrapper startItems={[]} />
 </Story>
 
 <Story name="Interactive" asChild>

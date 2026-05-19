@@ -3,12 +3,16 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
 	import { getCVStoreContext } from '$lib/stores/cv.svelte';
+	import { ExternalLink } from '@lucide/svelte';
+	import { TailorDialog, SyncDrawer } from '$lib/components/tailoring';
+	import type { CV } from '$lib/types/cv';
 
 	interface Props {
 		cvName: string;
+		masterCv?: CV;
 	}
 
-	let { cvName = $bindable() }: Props = $props();
+	let { cvName = $bindable(), masterCv }: Props = $props();
 
 	const cvStore = getCVStoreContext();
 
@@ -24,6 +28,8 @@
 		}
 		return null;
 	});
+
+	const isTailored = $derived(!!cvStore.cv?.sourceId);
 </script>
 
 <div class="bg-background sticky top-14 z-10 px-6 py-3">
@@ -34,7 +40,32 @@
 			<InlineField bind:value={cvName} class="text-lg font-bold" />
 		</div>
 
-		<div class="flex items-center gap-3">
+		<div class="flex items-center gap-2">
+			{#if isTailored && masterCv}
+				<a
+					href="/cv/{masterCv.id}"
+					class="text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs transition-colors"
+				>
+					<ExternalLink class="h-3 w-3" />
+					{masterCv.name}
+				</a>
+
+				{#if cvStore.cv}
+					<SyncDrawer
+						{masterCv}
+						tailoredCv={cvStore.cv}
+						onSync={(updated) => (cvStore.cv = updated)}
+					/>
+				{/if}
+			{/if}
+
+			{#if cvStore.cv}
+				<TailorDialog
+					sourceCv={cvStore.cv}
+					onCreate={(id) => (window.location.href = `/cv/${id}`)}
+				/>
+			{/if}
+
 			{#if cvStore.saveStatus === 'saving'}
 				<Badge variant="secondary">Saving…</Badge>
 			{:else if cvStore.saveStatus === 'saved' && badgeLabel !== null}

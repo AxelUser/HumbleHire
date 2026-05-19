@@ -8,20 +8,22 @@
 	import { DragDropProvider, DragOverlay } from '@dnd-kit/svelte';
 	import { createSortable } from '@dnd-kit/svelte/sortable';
 	import { move } from '@dnd-kit/helpers';
-	import type { ProjectEntry } from '$lib/types/cv';
+	import type { ProjectEntry, ObjectId } from '$lib/types/cv';
+	import { createObjectId } from '$lib/types/cv';
 
 	interface Props {
 		projects: ProjectEntry[];
-		visible: boolean;
+		blockId: ObjectId;
+		hiddenBlockIds: ObjectId[];
 	}
 
-	let { projects = $bindable(), visible = $bindable() }: Props = $props();
+	let { projects = $bindable(), blockId, hiddenBlockIds = $bindable() }: Props = $props();
 
 	function addProject() {
 		projects = [
 			...projects,
 			{
-				id: crypto.randomUUID(),
+				objectId: createObjectId(),
 				name: '',
 				description: '',
 				stack: [],
@@ -30,24 +32,24 @@
 		];
 	}
 
-	function removeProject(id: string) {
-		projects = projects.filter((p) => p.id !== id);
+	function removeProject(objectId: ObjectId) {
+		projects = projects.filter((p) => p.objectId !== objectId);
 	}
 
 	function onDragOver(event: any) {
-		projects = move(projects, event);
+		projects = move(projects as any, event) as ProjectEntry[];
 	}
 
 	function onDragEnd(event: any) {
-		projects = move(projects, event);
+		projects = move(projects as any, event) as ProjectEntry[];
 	}
 </script>
 
-<BlockWrapper title="Projects" bind:visible>
+<BlockWrapper title="Projects" {blockId} bind:hiddenBlockIds>
 	<DragDropProvider {onDragEnd} {onDragOver}>
 		<div class="flex flex-col gap-4">
-			{#each projects as project, index (project.id)}
-				{@const sortable = createSortable({ id: project.id, index: (() => index) as any })}
+			{#each projects as project, index (project.objectId)}
+				{@const sortable = createSortable({ id: project.objectId, index: (() => index) as any })}
 				<div
 					class="rounded-lg p-4 {sortable.isDragging
 						? 'border-muted border-2 border-dashed'
@@ -70,7 +72,7 @@
 								variant="ghost"
 								size="icon"
 								class="text-muted-foreground hover:text-destructive shrink-0"
-								onclick={() => removeProject(project.id)}
+								onclick={() => removeProject(project.objectId)}
 							>
 								<Trash2 class="h-4 w-4" />
 							</Button>
@@ -97,7 +99,7 @@
 		</div>
 		<DragOverlay>
 			{#snippet children(source: any)}
-				{@const project = projects.find((p) => p.id === source.id)}
+				{@const project = projects.find((p) => p.objectId === source.id)}
 				{#if project}
 					<div class="bg-background rounded-lg border p-4 shadow-lg">
 						<div class="flex items-start gap-2">

@@ -19,36 +19,36 @@
 					One CV. <em class="text-accent not-italic">Many targets.</em>
 				</h1>
 				<p class="text-muted-foreground text-base font-medium">
-					Fork your master, tweak it per job, and always know which version went where.
+					Tailor your master CV for each job, and always know which version went where.
 				</p>
 			</div>
 
 			<!-- Right: feature panel grid -->
 			<div class="w-full shrink-0 md:w-[420px]">
 				<div class="grid grid-cols-2 gap-3" style="grid-template-rows: auto auto;">
-					<!-- Panel A: Branch (full width) -->
+					<!-- Panel A: Tailor (full width) -->
 					<div
 						class="border-foreground bg-background shadow-brutal col-span-2 overflow-hidden border-2 p-4"
 					>
-						<p class="text-accent mb-1 text-xs font-bold tracking-widest uppercase">↳ Branch</p>
+						<p class="text-accent mb-1 text-xs font-bold tracking-widest uppercase">↳ Tailor</p>
 						<p class="mb-3 text-sm font-extrabold">One master. Many variants.</p>
-						<div class="branch-diagram relative flex flex-col gap-2 font-mono text-xs">
-							<div class="branch-node node-master flex items-center gap-2">
+						<div class="tailor-diagram relative flex flex-col gap-2 font-mono text-xs">
+							<div class="tailor-node node-master flex items-center gap-2">
 								<span
 									class="node-dot border-foreground bg-accent h-3 w-3 shrink-0 rounded-full border-2"
 								></span>
 								<span class="font-bold">Master CV</span>
 							</div>
 							<div
-								class="branch-children border-foreground ml-1.5 flex flex-col gap-2 border-l-2 pl-3"
+								class="tailor-children border-foreground ml-1.5 flex flex-col gap-2 border-l-2 pl-3"
 							>
-								<div class="branch-node node-child1 flex items-center gap-2">
+								<div class="tailor-node node-child1 flex items-center gap-2">
 									<span
 										class="node-dot border-foreground bg-card h-2.5 w-2.5 shrink-0 rounded-full border-2"
 									></span>
 									<span>Google SWE ↗</span>
 								</div>
-								<div class="branch-node node-child2 flex items-center gap-2">
+								<div class="tailor-node node-child2 flex items-center gap-2">
 									<span
 										class="node-dot border-foreground bg-card h-2.5 w-2.5 shrink-0 rounded-full border-2"
 									></span>
@@ -119,8 +119,8 @@
 </div>
 
 <style>
-	/* Branch diagram staggered fade-in */
-	.branch-node {
+	/* Tailor diagram staggered fade-in */
+	.tailor-node {
 		opacity: 0;
 		animation: fadeSlideUp 0.4s ease forwards;
 	}
