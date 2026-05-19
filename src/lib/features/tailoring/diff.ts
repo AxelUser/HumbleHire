@@ -1,99 +1,148 @@
-import type { CV, ObjectId, TextBlock } from '$lib/types/cv';
-import type { DiffItem } from './types';
-import { DiffRoot, EntryBuilder, ListBuilder, TextBlockBuilder } from './diff-builder';
-import type { ListBlockKey } from '$lib/types/cv';
+import type { CV, Block, ObjectId, TextBlockKey, ListBlockKey, WithId } from '$lib/types/cv';
+import type { AnyEntry, DiffItem, NestedListKey } from './types';
 
+/**
+ * Diff a master CV and a tailored CV. It checks what has changed in master but not in tailored.
+ * Internally it performs a 3 way diff between the master, tailored and tailored's baseline (the last one is the version of the master that was used to create the tailored CV).
+ * Baseline is needed to distinguish between changes that were made in the tailored CV and changes that were made in the master CV.
+ *
+ * Diff tracks the following changes:
+ * - Changes in plain text blocks, where value is already in the root of the block.
+ * - Additions and removals of entries in list blocks.
+ * - Changes in individual entries in list blocks, both in scalar fields and nested lists.
+ *
+ * So it can go max 2 levels deep: block own fields (text or list) -> entry's list or scalar fields.
+ *
+ * @param master - The master CV.
+ * @param tailored - The tailored CV.
+ * @returns A list of diff items.
+ */
 export function diffCVs(master: CV, tailored: CV): DiffItem[] {
-	const root = new DiffRoot();
+	console.log('diffCVs', master, tailored);
+	const items: DiffItem[] = [];
 	const hidden = new Set(master.hiddenBlockIds);
 	const visible = (id: ObjectId) => !hidden.has(id);
-	const baseline = tailored.syncBaseline ?? master.blocks; // baseline is the master CV version at the time of tailoring
+	const baseline = tailored.syncBaseline ?? master.blocks;
 
 	for (const key of ['fullName', 'position', 'location'] as const) {
 		if (visible(master.blocks[key].objectId)) {
-			diffText(root.atBlock(key), baseline[key], master.blocks[key], tailored.blocks[key]);
+			diffText(items, key, baseline[key], master.blocks[key], tailored.blocks[key]);
 		}
 	}
 
-	if (visible(master.blocks.contactsBlockId)) {
+	if (visible(master.blocks.contacts.objectId)) {
 		diffList(
-			root.atBlock('contacts'),
-			baseline.contacts,
-			master.blocks.contacts,
-			tailored.blocks.contacts
+			items,
+			'contacts',
+			baseline.contacts.value,
+			master.blocks.contacts.value,
+			tailored.blocks.contacts.value
 		);
 	}
-	if (visible(master.blocks.highlightsBlockId)) {
+	if (visible(master.blocks.highlights.objectId)) {
 		diffList(
-			root.atBlock('highlights'),
-			baseline.highlights,
-			master.blocks.highlights,
-			tailored.blocks.highlights
+			items,
+			'highlights',
+			baseline.highlights.value,
+			master.blocks.highlights.value,
+			tailored.blocks.highlights.value
 		);
 	}
-	if (visible(master.blocks.educationBlockId)) {
+	if (visible(master.blocks.education.objectId)) {
 		diffList(
-			root.atBlock('education'),
-			baseline.education,
-			master.blocks.education,
-			tailored.blocks.education
+			items,
+			'education',
+			baseline.education.value,
+			master.blocks.education.value,
+			tailored.blocks.education.value
+		);
+	}
+	if (visible(master.blocks.skills.objectId)) {
+		diffList(
+			items,
+			'skills',
+			baseline.skills.value,
+			master.blocks.skills.value,
+			tailored.blocks.skills.value,
+			undefined,
+			(b, m, t) => {
+				diffList(items, 'skills', b.skills, m.skills, t.skills, {
+					objectId: m.objectId,
+					nestedListKey: 'skills'
+				});
+			}
+		);
+	}
+	if (visible(master.blocks.jobHistory.objectId)) {
+		diffList(
+			items,
+			'jobHistory',
+			baseline.jobHistory.value,
+			master.blocks.jobHistory.value,
+			tailored.blocks.jobHistory.value,
+			undefined,
+			(b, m, t) => {
+				diffList(items, 'jobHistory', b.achievements, m.achievements, t.achievements, {
+					objectId: m.objectId,
+					nestedListKey: 'achievements'
+				});
+				diffList(items, 'jobHistory', b.skills, m.skills, t.skills, {
+					objectId: m.objectId,
+					nestedListKey: 'skills'
+				});
+			}
+		);
+	}
+	if (visible(master.blocks.projects.objectId)) {
+		diffList(
+			items,
+			'projects',
+			baseline.projects.value,
+			master.blocks.projects.value,
+			tailored.blocks.projects.value,
+			undefined,
+			(b, m, t) => {
+				diffList(items, 'projects', b.stack, m.stack, t.stack, {
+					objectId: m.objectId,
+					nestedListKey: 'stack'
+				});
+			}
 		);
 	}
 
-	if (visible(master.blocks.skillsBlockId)) {
-		diffList(
-			root.atBlock('skills'),
-			baseline.skills,
-			master.blocks.skills,
-			tailored.blocks.skills,
-			(b, m, t, eb) => {
-				diffList(eb.atList('skills'), b.skills, m.skills, t.skills);
-			}
-		);
-	}
-	if (visible(master.blocks.jobHistoryBlockId)) {
-		diffList(
-			root.atBlock('jobHistory'),
-			baseline.jobHistory,
-			master.blocks.jobHistory,
-			tailored.blocks.jobHistory,
-			(b, m, t, eb) => {
-				diffList(eb.atList('achievements'), b.achievements, m.achievements, t.achievements);
-				diffList(eb.atList('skills'), b.skills, m.skills, t.skills);
-			}
-		);
-	}
-	if (visible(master.blocks.projectsBlockId)) {
-		diffList(
-			root.atBlock('projects'),
-			baseline.projects,
-			master.blocks.projects,
-			tailored.blocks.projects,
-			(b, m, t, eb) => {
-				diffList(eb.atList('stack'), b.stack, m.stack, t.stack);
-			}
-		);
-	}
-
-	return root.items;
+	return items;
 }
 
 function diffText(
-	builder: TextBlockBuilder,
-	baseline: TextBlock,
-	master: TextBlock,
-	tailored: TextBlock
+	items: DiffItem[],
+	blockKey: TextBlockKey,
+	baseline: Block<string>,
+	master: Block<string>,
+	tailored: Block<string>
 ): void {
 	if (baseline.value === master.value || tailored.value === master.value) return;
-	builder.modified(master.objectId, tailored.value, master.value);
+	items.push({
+		type: 'textModified',
+		blockKey,
+		objectId: master.objectId,
+		before: tailored.value,
+		after: master.value
+	});
 }
 
-function diffList<K extends ListBlockKey, E extends { objectId: ObjectId }>(
-	builder: ListBuilder<K, E>,
+interface NestedParent {
+	objectId: ObjectId;
+	nestedListKey: NestedListKey;
+}
+
+function diffList<E extends WithId>(
+	items: DiffItem[],
+	blockKey: ListBlockKey,
 	baseline: E[],
 	master: E[],
 	tailored: E[],
-	onMatched?: (b: E, m: E, t: E, eb: EntryBuilder<K, E>) => void
+	parent?: NestedParent,
+	onMatched?: (baseline: E, master: E, tailored: E) => void
 ): void {
 	const baselineMap = new Map(baseline.map((e) => [e.objectId, e]));
 	const masterMap = new Map(master.map((e) => [e.objectId, e]));
@@ -102,7 +151,14 @@ function diffList<K extends ListBlockKey, E extends { objectId: ObjectId }>(
 	// In baseline but not in master: master deleted it, surface if tailored still has it.
 	for (const baselineEntry of baseline) {
 		if (!masterMap.has(baselineEntry.objectId) && tailoredMap.has(baselineEntry.objectId)) {
-			builder.entryRemoved(baselineEntry);
+			items.push({
+				type: 'entryRemoved',
+				blockKey,
+				objectId: baselineEntry.objectId,
+				parentObjectId: parent?.objectId,
+				nestedListKey: parent?.nestedListKey,
+				entry: baselineEntry as unknown as AnyEntry
+			});
 		}
 	}
 
@@ -112,15 +168,23 @@ function diffList<K extends ListBlockKey, E extends { objectId: ObjectId }>(
 
 		if (!baselineEntry) {
 			// Not in baseline: master added it after tailoring.
-			if (!tailoredEntry) builder.entryAdded(masterEntry);
+			if (!tailoredEntry) {
+				items.push({
+					type: 'entryAdded',
+					blockKey,
+					objectId: masterEntry.objectId,
+					parentObjectId: parent?.objectId,
+					nestedListKey: parent?.nestedListKey,
+					entry: masterEntry as unknown as AnyEntry
+				});
+			}
 			continue;
 		}
 
 		// Entry exists in both master and tailored, so diff items.
 		if (tailoredEntry) {
-			const eb = builder.atEntry(masterEntry);
-			diffScalars(eb, baselineEntry, masterEntry, tailoredEntry);
-			onMatched?.(baselineEntry, masterEntry, tailoredEntry, eb);
+			diffScalars(items, blockKey, parent, baselineEntry, masterEntry, tailoredEntry);
+			onMatched?.(baselineEntry, masterEntry, tailoredEntry);
 		}
 		// tailoredEntry absent: user removed it from tailored, don't do anything about it.
 	}
@@ -130,28 +194,39 @@ function sameValue(a: unknown, b: unknown): boolean {
 	return a instanceof Date || b instanceof Date ? String(a) === String(b) : a === b;
 }
 
-function diffScalars<K extends ListBlockKey, E extends { objectId: ObjectId }>(
-	builder: EntryBuilder<K, E>,
+function diffScalars<E extends WithId>(
+	items: DiffItem[],
+	blockKey: ListBlockKey,
+	parent: NestedParent | undefined,
 	baseline: E,
 	master: E,
 	tailored: E
 ): void {
-	const scalarBefore: Partial<E> = {};
-	const scalarAfter: Partial<E> = {};
+	const before: Record<string, unknown> = {};
+	const after: Record<string, unknown> = {};
 	let changed = false;
 
 	for (const key of Object.keys(master) as Array<keyof E & string>) {
 		if (key === 'objectId') continue;
-		if (Array.isArray(master[key])) continue;
+		if (Array.isArray(master[key])) continue; // nested lists are handled at diffList
 		if (sameValue(baseline[key], master[key])) continue;
 		if (sameValue(tailored[key], master[key])) continue;
 
-		scalarBefore[key] = tailored[key];
-		scalarAfter[key] = master[key];
+		before[key] = tailored[key];
+		after[key] = master[key];
 		changed = true;
 	}
 
 	if (changed) {
-		builder.modified(scalarBefore, scalarAfter);
+		items.push({
+			type: 'entryModified',
+			blockKey,
+			objectId: master.objectId,
+			parentObjectId: parent?.objectId,
+			nestedListKey: parent?.nestedListKey,
+			entry: master as unknown as AnyEntry,
+			before,
+			after
+		});
 	}
 }

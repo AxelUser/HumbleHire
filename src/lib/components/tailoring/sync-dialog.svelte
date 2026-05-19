@@ -31,7 +31,9 @@
 
 	const updatesAvailable = $derived(hasUpdatesAvailable(masterCv, tailoredCv));
 
-	const diffItems = $derived.by((): DiffItem[] => diffCVs(masterCv, tailoredCv));
+	const diffItems = $derived.by((): DiffItem[] =>
+		diffCVs($state.snapshot(masterCv), $state.snapshot(tailoredCv))
+	);
 
 	const viewItems = $derived.by((): DiffViewItem[] => {
 		const existing = tailoredCv.syncDecisions?.discarded ?? {};

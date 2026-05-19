@@ -18,18 +18,12 @@
 				value: 'Senior Software Engineer'
 			},
 			location: { objectId: 'loc-1' as unknown as ObjectId, value: 'San Francisco, CA' },
-			contactsBlockId: 'cb-1' as unknown as ObjectId,
-			contacts: [],
-			highlightsBlockId: 'hb-1' as unknown as ObjectId,
-			highlights: [],
-			skillsBlockId: 'sb-1' as unknown as ObjectId,
-			skills: [],
-			jobHistoryBlockId: 'jb-1' as unknown as ObjectId,
-			jobHistory: [],
-			projectsBlockId: 'pb-1' as unknown as ObjectId,
-			projects: [],
-			educationBlockId: 'eb-1' as unknown as ObjectId,
-			education: []
+			contacts: { objectId: 'cb-1' as unknown as ObjectId, value: [] },
+			highlights: { objectId: 'hb-1' as unknown as ObjectId, value: [] },
+			skills: { objectId: 'sb-1' as unknown as ObjectId, value: [] },
+			jobHistory: { objectId: 'jb-1' as unknown as ObjectId, value: [] },
+			projects: { objectId: 'pb-1' as unknown as ObjectId, value: [] },
+			education: { objectId: 'eb-1' as unknown as ObjectId, value: [] }
 		},
 		hiddenBlockIds: []
 	};

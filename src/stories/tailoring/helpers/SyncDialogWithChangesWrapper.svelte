@@ -19,18 +19,12 @@
 			fullName: { objectId: IDS.fn, value: 'Alex Smith' },
 			position: { objectId: IDS.pos, value: position },
 			location: { objectId: IDS.loc, value: 'San Francisco, CA' },
-			contactsBlockId: IDS.cb,
-			contacts: [],
-			highlightsBlockId: IDS.hb,
-			highlights: [],
-			skillsBlockId: IDS.sb,
-			skills: [],
-			jobHistoryBlockId: IDS.jb,
-			jobHistory: [],
-			projectsBlockId: IDS.pb,
-			projects: [],
-			educationBlockId: IDS.eb,
-			education: []
+			contacts: { objectId: IDS.cb, value: [] },
+			highlights: { objectId: IDS.hb, value: [] },
+			skills: { objectId: IDS.sb, value: [] },
+			jobHistory: { objectId: IDS.jb, value: [] },
+			projects: { objectId: IDS.pb, value: [] },
+			education: { objectId: IDS.eb, value: [] }
 		};
 	}
 

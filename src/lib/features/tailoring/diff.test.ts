@@ -11,6 +11,10 @@ function textBlock(value: string) {
 	return { objectId: id(), value };
 }
 
+function listBlock<T>(value: T) {
+	return { objectId: id(), value };
+}
+
 function makeJob(company: string, role: string): JobEntry {
 	return {
 		objectId: id(),
@@ -32,18 +36,12 @@ function emptyBlocks(): CVBlocks {
 		fullName: textBlock('John Doe'),
 		position: textBlock('Engineer'),
 		location: textBlock('NYC'),
-		contactsBlockId: id(),
-		contacts: [],
-		highlightsBlockId: id(),
-		highlights: [],
-		skillsBlockId: id(),
-		skills: [],
-		jobHistoryBlockId: id(),
-		jobHistory: [],
-		projectsBlockId: id(),
-		projects: [],
-		educationBlockId: id(),
-		education: []
+		contacts: listBlock([]),
+		highlights: listBlock([]),
+		skills: listBlock([]),
+		jobHistory: listBlock([]),
+		projects: listBlock([]),
+		education: listBlock([])
 	};
 }
 
@@ -126,14 +124,14 @@ describe('diffCVs - jobHistory entries', () => {
 	it('tailored-only job addition is ignored', () => {
 		const master = makeMaster();
 		const tailored = makeTailored(master);
-		tailored.blocks.jobHistory.push(makeJob('Tailored-Only Corp', 'Dev'));
+		tailored.blocks.jobHistory.value.push(makeJob('Tailored-Only Corp', 'Dev'));
 		expect(diffCVs(master, tailored)).toEqual([]);
 	});
 
 	it('new master job shows up as entryAdded', () => {
 		const master = makeMaster();
 		const tailored = makeTailored(master);
-		master.blocks.jobHistory.push(makeJob('Acme', 'Engineer'));
+		master.blocks.jobHistory.value.push(makeJob('Acme', 'Engineer'));
 		const items = diffCVs(master, tailored);
 		expect(items).toHaveLength(1);
 		expect(items[0].type).toBe('entryAdded');
@@ -142,17 +140,17 @@ describe('diffCVs - jobHistory entries', () => {
 
 	it('tailored-only field edit is ignored', () => {
 		const job = makeJob('Acme', 'Engineer');
-		const master = makeMaster({ jobHistory: [job] });
+		const master = makeMaster({ jobHistory: listBlock([job]) });
 		const tailored = makeTailored(master);
-		tailored.blocks.jobHistory[0].role = 'Senior Engineer';
+		tailored.blocks.jobHistory.value[0].role = 'Senior Engineer';
 		expect(diffCVs(master, tailored)).toEqual([]);
 	});
 
 	it('master field change becomes entryModified', () => {
 		const job = makeJob('Acme', 'Engineer');
-		const master = makeMaster({ jobHistory: [job] });
+		const master = makeMaster({ jobHistory: listBlock([job]) });
 		const tailored = makeTailored(master);
-		master.blocks.jobHistory[0].role = 'Staff Engineer';
+		master.blocks.jobHistory.value[0].role = 'Staff Engineer';
 		const items = diffCVs(master, tailored);
 		expect(items).toHaveLength(1);
 		expect(items[0].type).toBe('entryModified');
@@ -160,10 +158,10 @@ describe('diffCVs - jobHistory entries', () => {
 
 	it('conflicting edits on same field become entryModified', () => {
 		const job = makeJob('Acme', 'Engineer');
-		const master = makeMaster({ jobHistory: [job] });
+		const master = makeMaster({ jobHistory: listBlock([job]) });
 		const tailored = makeTailored(master);
-		master.blocks.jobHistory[0].role = 'Staff Engineer';
-		tailored.blocks.jobHistory[0].role = 'Senior Engineer';
+		master.blocks.jobHistory.value[0].role = 'Staff Engineer';
+		tailored.blocks.jobHistory.value[0].role = 'Senior Engineer';
 		const items = diffCVs(master, tailored);
 		expect(items).toHaveLength(1);
 		expect(items[0].type).toBe('entryModified');
@@ -171,18 +169,18 @@ describe('diffCVs - jobHistory entries', () => {
 
 	it('converging edits on same field produce no diff', () => {
 		const job = makeJob('Acme', 'Engineer');
-		const master = makeMaster({ jobHistory: [job] });
+		const master = makeMaster({ jobHistory: listBlock([job]) });
 		const tailored = makeTailored(master);
-		master.blocks.jobHistory[0].role = 'Staff Engineer';
-		tailored.blocks.jobHistory[0].role = 'Staff Engineer';
+		master.blocks.jobHistory.value[0].role = 'Staff Engineer';
+		tailored.blocks.jobHistory.value[0].role = 'Staff Engineer';
 		expect(diffCVs(master, tailored)).toEqual([]);
 	});
 
 	it('master-deleted job that tailored kept becomes entryRemoved', () => {
 		const job = makeJob('Acme', 'Engineer');
-		const master = makeMaster({ jobHistory: [job] });
+		const master = makeMaster({ jobHistory: listBlock([job]) });
 		const tailored = makeTailored(master);
-		master.blocks.jobHistory = [];
+		master.blocks.jobHistory.value = [];
 		const items = diffCVs(master, tailored);
 		expect(items).toHaveLength(1);
 		expect(items[0].type).toBe('entryRemoved');
@@ -191,18 +189,18 @@ describe('diffCVs - jobHistory entries', () => {
 
 	it('tailored-only removal is ignored', () => {
 		const job = makeJob('Acme', 'Engineer');
-		const master = makeMaster({ jobHistory: [job] });
+		const master = makeMaster({ jobHistory: listBlock([job]) });
 		const tailored = makeTailored(master);
-		tailored.blocks.jobHistory = [];
+		tailored.blocks.jobHistory.value = [];
 		expect(diffCVs(master, tailored)).toEqual([]);
 	});
 
 	it('both sides removing same job produces no diff', () => {
 		const job = makeJob('Acme', 'Engineer');
-		const master = makeMaster({ jobHistory: [job] });
+		const master = makeMaster({ jobHistory: listBlock([job]) });
 		const tailored = makeTailored(master);
-		master.blocks.jobHistory = [];
-		tailored.blocks.jobHistory = [];
+		master.blocks.jobHistory.value = [];
+		tailored.blocks.jobHistory.value = [];
 		expect(diffCVs(master, tailored)).toEqual([]);
 	});
 });
@@ -210,17 +208,17 @@ describe('diffCVs - jobHistory entries', () => {
 describe('diffCVs - nested entries', () => {
 	it('tailored-only achievement addition is ignored', () => {
 		const job = makeJob('Acme', 'Engineer');
-		const master = makeMaster({ jobHistory: [job] });
+		const master = makeMaster({ jobHistory: listBlock([job]) });
 		const tailored = makeTailored(master);
-		tailored.blocks.jobHistory[0].achievements.push(makeAchievement('New tailored achievement'));
+		tailored.blocks.jobHistory.value[0].achievements.push(makeAchievement('New tailored achievement'));
 		expect(diffCVs(master, tailored)).toEqual([]);
 	});
 
 	it('master-added nested entry carries parentObjectId', () => {
 		const job = makeJob('Acme', 'Engineer');
-		const master = makeMaster({ jobHistory: [job] });
+		const master = makeMaster({ jobHistory: listBlock([job]) });
 		const tailored = makeTailored(master);
-		master.blocks.jobHistory[0].achievements.push(makeAchievement('Master achievement'));
+		master.blocks.jobHistory.value[0].achievements.push(makeAchievement('Master achievement'));
 		const items = diffCVs(master, tailored);
 		expect(items).toHaveLength(1);
 		expect(items[0].type).toBe('entryAdded');
@@ -233,9 +231,9 @@ describe('diffCVs - nested entries', () => {
 		const ach = makeAchievement('Old text');
 		const job = makeJob('Acme', 'Engineer');
 		job.achievements.push(ach);
-		const master = makeMaster({ jobHistory: [job] });
+		const master = makeMaster({ jobHistory: listBlock([job]) });
 		const tailored = makeTailored(master);
-		master.blocks.jobHistory[0].achievements[0].text = 'New text';
+		master.blocks.jobHistory.value[0].achievements[0].text = 'New text';
 		const items = diffCVs(master, tailored);
 		expect(items).toHaveLength(1);
 		expect(items[0].type).toBe('entryModified');
@@ -248,9 +246,9 @@ describe('diffCVs - nested entries', () => {
 		const ach = makeAchievement('Remove me');
 		const job = makeJob('Acme', 'Engineer');
 		job.achievements.push(ach);
-		const master = makeMaster({ jobHistory: [job] });
+		const master = makeMaster({ jobHistory: listBlock([job]) });
 		const tailored = makeTailored(master);
-		master.blocks.jobHistory[0].achievements = [];
+		master.blocks.jobHistory.value[0].achievements = [];
 		const items = diffCVs(master, tailored);
 		expect(items).toHaveLength(1);
 		expect(items[0].type).toBe('entryRemoved');
@@ -263,10 +261,10 @@ describe('diffCVs - nested entries', () => {
 describe('diffCVs - hidden blocks', () => {
 	it('hidden blocks are skipped even if master changed them', () => {
 		const job = makeJob('Acme', 'Engineer');
-		const master = makeMaster({ jobHistory: [job] });
-		master.hiddenBlockIds = [master.blocks.jobHistoryBlockId];
+		const master = makeMaster({ jobHistory: listBlock([job]) });
+		master.hiddenBlockIds = [master.blocks.jobHistory.objectId];
 		const tailored = makeTailored(master);
-		master.blocks.jobHistory[0].role = 'Changed Role';
+		master.blocks.jobHistory.value[0].role = 'Changed Role';
 		expect(diffCVs(master, tailored)).toEqual([]);
 	});
 });

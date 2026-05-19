@@ -18,18 +18,12 @@
 			fullName: { objectId: oid(`${name}-fn`), value: name },
 			position: { objectId: oid(`${name}-pos`), value: position },
 			location: { objectId: oid(`${name}-loc`), value: location },
-			contactsBlockId: oid(`${name}-cb`),
-			contacts: [],
-			highlightsBlockId: oid(`${name}-hb`),
-			highlights: [],
-			skillsBlockId: oid(`${name}-sb`),
-			skills: [],
-			jobHistoryBlockId: oid(`${name}-jb`),
-			jobHistory: [],
-			projectsBlockId: oid(`${name}-pb`),
-			projects: [],
-			educationBlockId: oid(`${name}-eb`),
-			education: []
+			contacts: { objectId: oid(`${name}-cb`), value: [] },
+			highlights: { objectId: oid(`${name}-hb`), value: [] },
+			skills: { objectId: oid(`${name}-sb`), value: [] },
+			jobHistory: { objectId: oid(`${name}-jb`), value: [] },
+			projects: { objectId: oid(`${name}-pb`), value: [] },
+			education: { objectId: oid(`${name}-eb`), value: [] }
 		};
 	}
 

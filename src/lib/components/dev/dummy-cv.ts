@@ -15,7 +15,7 @@ export function createDummyCV(): CV {
 	cv.blocks.position.value = 'Senior Software Engineer';
 	cv.blocks.location.value = 'Berlin, Germany';
 
-	cv.blocks.contacts = [
+	cv.blocks.contacts.value = [
 		{ objectId: createObjectId(), label: 'Email', value: 'jordan.rivera@example.com' },
 		{ objectId: createObjectId(), label: 'Phone', value: '+49 30 1234567' },
 		{ objectId: createObjectId(), label: 'LinkedIn', value: 'linkedin.com/in/jordanrivera' },
@@ -23,7 +23,7 @@ export function createDummyCV(): CV {
 		{ objectId: createObjectId(), label: 'Website', value: 'jordanrivera.dev' }
 	];
 
-	cv.blocks.highlights = [
+	cv.blocks.highlights.value = [
 		{
 			objectId: createObjectId(),
 			text: 'Eight years building and scaling web applications across fintech and developer tooling.'
@@ -42,8 +42,12 @@ export function createDummyCV(): CV {
 		}
 	];
 
-	cv.blocks.skills = [
-		{ objectId: createObjectId(), name: 'Languages', skills: tags('TypeScript', 'JavaScript', 'Python', 'Go', 'SQL') },
+	cv.blocks.skills.value = [
+		{
+			objectId: createObjectId(),
+			name: 'Languages',
+			skills: tags('TypeScript', 'JavaScript', 'Python', 'Go', 'SQL')
+		},
 		{
 			objectId: createObjectId(),
 			name: 'Frameworks',
@@ -56,7 +60,7 @@ export function createDummyCV(): CV {
 		}
 	];
 
-	cv.blocks.jobHistory = [
+	cv.blocks.jobHistory.value = [
 		{
 			objectId: createObjectId(),
 			company: 'Nimbus Labs',
@@ -64,10 +68,22 @@ export function createDummyCV(): CV {
 			startDate: new Date('2021-03-01'),
 			endDate: undefined,
 			achievements: [
-				{ objectId: createObjectId(), text: 'Designed the event-sourcing pipeline powering the billing system.' },
-				{ objectId: createObjectId(), text: 'Mentored three junior engineers to mid-level promotions.' },
-				{ objectId: createObjectId(), text: 'Introduced end-to-end tests, dropping production regressions by half.' },
-				{ objectId: createObjectId(), text: 'Owned the design system adopted across four product teams.' }
+				{
+					objectId: createObjectId(),
+					text: 'Designed the event-sourcing pipeline powering the billing system.'
+				},
+				{
+					objectId: createObjectId(),
+					text: 'Mentored three junior engineers to mid-level promotions.'
+				},
+				{
+					objectId: createObjectId(),
+					text: 'Introduced end-to-end tests, dropping production regressions by half.'
+				},
+				{
+					objectId: createObjectId(),
+					text: 'Owned the design system adopted across four product teams.'
+				}
 			],
 			skills: tags('TypeScript', 'SvelteKit', 'PostgreSQL', 'AWS')
 		},
@@ -78,7 +94,10 @@ export function createDummyCV(): CV {
 			startDate: new Date('2018-06-01'),
 			endDate: new Date('2021-02-01'),
 			achievements: [
-				{ objectId: createObjectId(), text: 'Built the customer dashboard used by 200k monthly active users.' },
+				{
+					objectId: createObjectId(),
+					text: 'Built the customer dashboard used by 200k monthly active users.'
+				},
 				{ objectId: createObjectId(), text: 'Reduced page load time from 4.2s to 1.1s.' },
 				{ objectId: createObjectId(), text: 'Integrated three third-party payment providers.' }
 			],
@@ -91,14 +110,17 @@ export function createDummyCV(): CV {
 			startDate: new Date('2016-09-01'),
 			endDate: new Date('2018-05-01'),
 			achievements: [
-				{ objectId: createObjectId(), text: 'Delivered marketing sites for a dozen agency clients.' },
+				{
+					objectId: createObjectId(),
+					text: 'Delivered marketing sites for a dozen agency clients.'
+				},
 				{ objectId: createObjectId(), text: 'Automated the deploy process with a CI pipeline.' }
 			],
 			skills: tags('JavaScript', 'CSS', 'Docker')
 		}
 	];
 
-	cv.blocks.projects = [
+	cv.blocks.projects.value = [
 		{
 			objectId: createObjectId(),
 			name: 'OpenLedger',
@@ -115,7 +137,7 @@ export function createDummyCV(): CV {
 		}
 	];
 
-	cv.blocks.education = [
+	cv.blocks.education.value = [
 		{
 			objectId: createObjectId(),
 			institution: 'Technical University of Munich',

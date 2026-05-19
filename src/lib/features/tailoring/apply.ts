@@ -59,22 +59,22 @@ function applyTopLevelEntryAdded(
 	const entry = structuredClone(item.entry);
 	switch (item.blockKey) {
 		case 'contacts':
-			blocks.contacts.push(entry as ContactEntry);
+			blocks.contacts.value.push(entry as ContactEntry);
 			break;
 		case 'highlights':
-			blocks.highlights.push(entry as Highlight);
+			blocks.highlights.value.push(entry as Highlight);
 			break;
 		case 'skills':
-			blocks.skills.push(entry as SkillCategory);
+			blocks.skills.value.push(entry as SkillCategory);
 			break;
 		case 'jobHistory':
-			blocks.jobHistory.push(entry as JobEntry);
+			blocks.jobHistory.value.push(entry as JobEntry);
 			break;
 		case 'projects':
-			blocks.projects.push(entry as ProjectEntry);
+			blocks.projects.value.push(entry as ProjectEntry);
 			break;
 		case 'education':
-			blocks.education.push(entry as EducationEntry);
+			blocks.education.value.push(entry as EducationEntry);
 			break;
 	}
 }
@@ -88,22 +88,22 @@ function applyTopLevelEntryRemoved(
 
 	switch (item.blockKey) {
 		case 'contacts':
-			blocks.contacts = removeById(blocks.contacts);
+			blocks.contacts.value = removeById(blocks.contacts.value);
 			break;
 		case 'highlights':
-			blocks.highlights = removeById(blocks.highlights);
+			blocks.highlights.value = removeById(blocks.highlights.value);
 			break;
 		case 'skills':
-			blocks.skills = removeById(blocks.skills);
+			blocks.skills.value = removeById(blocks.skills.value);
 			break;
 		case 'jobHistory':
-			blocks.jobHistory = removeById(blocks.jobHistory);
+			blocks.jobHistory.value = removeById(blocks.jobHistory.value);
 			break;
 		case 'projects':
-			blocks.projects = removeById(blocks.projects);
+			blocks.projects.value = removeById(blocks.projects.value);
 			break;
 		case 'education':
-			blocks.education = removeById(blocks.education);
+			blocks.education.value = removeById(blocks.education.value);
 			break;
 	}
 }
@@ -119,22 +119,22 @@ function applyTopLevelEntryModified(
 
 	switch (item.blockKey) {
 		case 'contacts':
-			applyFields(blocks.contacts);
+			applyFields(blocks.contacts.value);
 			break;
 		case 'highlights':
-			applyFields(blocks.highlights);
+			applyFields(blocks.highlights.value);
 			break;
 		case 'skills':
-			applyFields(blocks.skills);
+			applyFields(blocks.skills.value);
 			break;
 		case 'jobHistory':
-			applyFields(blocks.jobHistory);
+			applyFields(blocks.jobHistory.value);
 			break;
 		case 'projects':
-			applyFields(blocks.projects);
+			applyFields(blocks.projects.value);
 			break;
 		case 'education':
-			applyFields(blocks.education);
+			applyFields(blocks.education.value);
 			break;
 	}
 }
@@ -147,17 +147,17 @@ function applyNestedEntryAdded(
 	const entry = structuredClone(item.entry);
 
 	if (item.nestedListKey === 'achievements') {
-		const job = blocks.jobHistory.find((j) => j.objectId === parentId);
+		const job = blocks.jobHistory.value.find((j) => j.objectId === parentId);
 		if (job) job.achievements.push(entry as Achievement);
 	} else if (item.nestedListKey === 'stack') {
-		const proj = blocks.projects.find((p) => p.objectId === parentId);
+		const proj = blocks.projects.value.find((p) => p.objectId === parentId);
 		if (proj) proj.stack.push(entry as Tag);
 	} else if (item.nestedListKey === 'skills') {
 		if (item.blockKey === 'jobHistory') {
-			const job = blocks.jobHistory.find((j) => j.objectId === parentId);
+			const job = blocks.jobHistory.value.find((j) => j.objectId === parentId);
 			if (job) job.skills.push(entry as Tag);
 		} else {
-			const cat = blocks.skills.find((c) => c.objectId === parentId);
+			const cat = blocks.skills.value.find((c) => c.objectId === parentId);
 			if (cat) cat.skills.push(entry as Tag);
 		}
 	}
@@ -172,17 +172,17 @@ function applyNestedEntryRemoved(
 		arr.filter((e) => e.objectId !== item.objectId);
 
 	if (item.nestedListKey === 'achievements') {
-		const job = blocks.jobHistory.find((j) => j.objectId === parentId);
+		const job = blocks.jobHistory.value.find((j) => j.objectId === parentId);
 		if (job) job.achievements = removeById(job.achievements);
 	} else if (item.nestedListKey === 'stack') {
-		const proj = blocks.projects.find((p) => p.objectId === parentId);
+		const proj = blocks.projects.value.find((p) => p.objectId === parentId);
 		if (proj) proj.stack = removeById(proj.stack);
 	} else if (item.nestedListKey === 'skills') {
 		if (item.blockKey === 'jobHistory') {
-			const job = blocks.jobHistory.find((j) => j.objectId === parentId);
+			const job = blocks.jobHistory.value.find((j) => j.objectId === parentId);
 			if (job) job.skills = removeById(job.skills);
 		} else {
-			const cat = blocks.skills.find((c) => c.objectId === parentId);
+			const cat = blocks.skills.value.find((c) => c.objectId === parentId);
 			if (cat) cat.skills = removeById(cat.skills);
 		}
 	}
@@ -199,17 +199,17 @@ function applyNestedEntryModified(
 	};
 
 	if (item.nestedListKey === 'achievements') {
-		const job = blocks.jobHistory.find((j) => j.objectId === parentId);
+		const job = blocks.jobHistory.value.find((j) => j.objectId === parentId);
 		if (job) applyTo(job.achievements);
 	} else if (item.nestedListKey === 'stack') {
-		const proj = blocks.projects.find((p) => p.objectId === parentId);
+		const proj = blocks.projects.value.find((p) => p.objectId === parentId);
 		if (proj) applyTo(proj.stack);
 	} else if (item.nestedListKey === 'skills') {
 		if (item.blockKey === 'jobHistory') {
-			const job = blocks.jobHistory.find((j) => j.objectId === parentId);
+			const job = blocks.jobHistory.value.find((j) => j.objectId === parentId);
 			if (job) applyTo(job.skills);
 		} else {
-			const cat = blocks.skills.find((c) => c.objectId === parentId);
+			const cat = blocks.skills.value.find((c) => c.objectId === parentId);
 			if (cat) applyTo(cat.skills);
 		}
 	}

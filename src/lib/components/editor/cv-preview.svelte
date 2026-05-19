@@ -39,33 +39,33 @@
 		placeholder="City, Country"
 	/>
 	<ContactsBlock
-		bind:contacts={cv.blocks.contacts}
-		blockId={cv.blocks.contactsBlockId}
+		bind:contacts={cv.blocks.contacts.value}
+		blockId={cv.blocks.contacts.objectId}
 		bind:hiddenBlockIds={cv.hiddenBlockIds}
 	/>
 	<BulletListBlock
-		bind:highlights={cv.blocks.highlights}
-		blockId={cv.blocks.highlightsBlockId}
+		bind:highlights={cv.blocks.highlights.value}
+		blockId={cv.blocks.highlights.objectId}
 		bind:hiddenBlockIds={cv.hiddenBlockIds}
 	/>
 	<SkillsBlock
-		bind:skills={cv.blocks.skills}
-		blockId={cv.blocks.skillsBlockId}
+		bind:skills={cv.blocks.skills.value}
+		blockId={cv.blocks.skills.objectId}
 		bind:hiddenBlockIds={cv.hiddenBlockIds}
 	/>
 	<JobHistoryBlock
-		bind:jobs={cv.blocks.jobHistory}
-		blockId={cv.blocks.jobHistoryBlockId}
+		bind:jobs={cv.blocks.jobHistory.value}
+		blockId={cv.blocks.jobHistory.objectId}
 		bind:hiddenBlockIds={cv.hiddenBlockIds}
 	/>
 	<ProjectsBlock
-		bind:projects={cv.blocks.projects}
-		blockId={cv.blocks.projectsBlockId}
+		bind:projects={cv.blocks.projects.value}
+		blockId={cv.blocks.projects.objectId}
 		bind:hiddenBlockIds={cv.hiddenBlockIds}
 	/>
 	<EducationBlock
-		bind:education={cv.blocks.education}
-		blockId={cv.blocks.educationBlockId}
+		bind:education={cv.blocks.education.value}
+		blockId={cv.blocks.education.objectId}
 		bind:hiddenBlockIds={cv.hiddenBlockIds}
 	/>
 </div>

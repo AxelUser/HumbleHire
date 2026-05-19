@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { InlineField } from '$lib/components/ui/inline-field';
 	import { BlockWrapper } from '$lib/components/ui/block-wrapper';
-	import type { TextBlock, ObjectId } from '$lib/types/cv';
+	import type { Block, ObjectId } from '$lib/types/cv';
 	import { cn } from '$lib/utils';
 
 	interface Props {
-		block: TextBlock;
+		block: Block<string>;
 		hiddenBlockIds: ObjectId[];
 		title: string;
 		placeholder: string;

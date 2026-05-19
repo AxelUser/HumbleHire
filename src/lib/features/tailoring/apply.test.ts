@@ -12,6 +12,10 @@ function textBlock(value: string) {
 	return { objectId: id(), value };
 }
 
+function listBlock<T>(value: T) {
+	return { objectId: id(), value };
+}
+
 function makeAchievement(text: string): Achievement {
 	return { objectId: id(), text };
 }
@@ -37,18 +41,12 @@ function emptyBlocks(): CVBlocks {
 		fullName: textBlock('John Doe'),
 		position: textBlock('Engineer'),
 		location: textBlock('NYC'),
-		contactsBlockId: id(),
-		contacts: [],
-		highlightsBlockId: id(),
-		highlights: [],
-		skillsBlockId: id(),
-		skills: [],
-		jobHistoryBlockId: id(),
-		jobHistory: [],
-		projectsBlockId: id(),
-		projects: [],
-		educationBlockId: id(),
-		education: []
+		contacts: listBlock([]),
+		highlights: listBlock([]),
+		skills: listBlock([]),
+		jobHistory: listBlock([]),
+		projects: listBlock([]),
+		education: listBlock([])
 	};
 }
 
@@ -133,10 +131,10 @@ describe('applySyncDecisions', () => {
 	it('baseline stays frozen while any item is unresolved', () => {
 		const job1 = makeJob('Acme', 'Engineer');
 		const job2 = makeJob('Beta', 'Dev');
-		const master = makeMaster({ jobHistory: [job1, job2] });
+		const master = makeMaster({ jobHistory: listBlock([job1, job2]) });
 		const tailored = makeTailored(master);
-		master.blocks.jobHistory[0].role = 'Staff Engineer';
-		master.blocks.jobHistory[1].role = 'Senior Dev';
+		master.blocks.jobHistory.value[0].role = 'Staff Engineer';
+		master.blocks.jobHistory.value[1].role = 'Senior Dev';
 		master.version = 6;
 
 		const items = diffCVs(master, tailored);
@@ -148,7 +146,7 @@ describe('applySyncDecisions', () => {
 		applySyncDecisions(tailored, master, decisions);
 
 		expect(tailored.syncDecisions?.sourceSyncedVersion).toBe(5);
-		expect(tailored.syncBaseline?.jobHistory[0].role).toBe('Engineer');
+		expect(tailored.syncBaseline?.jobHistory.value[0].role).toBe('Engineer');
 	});
 
 	it('each discard records the master version', () => {
@@ -198,11 +196,11 @@ describe('applySyncDecisions', () => {
 describe('applySyncDecisions — nested lists', () => {
 	it('accepting nested entryAdded: achievement lands in achievements, not job.skills', () => {
 		const job = makeJob('Acme', 'Engineer');
-		const master = makeMaster({ jobHistory: [job] });
+		const master = makeMaster({ jobHistory: listBlock([job]) });
 		const tailored = makeTailored(master);
 
 		const newAch = makeAchievement('Built the thing');
-		master.blocks.jobHistory[0].achievements.push(newAch);
+		master.blocks.jobHistory.value[0].achievements.push(newAch);
 		master.version = 6;
 
 		const items = diffCVs(master, tailored);
@@ -211,7 +209,7 @@ describe('applySyncDecisions — nested lists', () => {
 
 		applySyncDecisions(tailored, master, new Map([[addedItem!.objectId, 'accepted']]));
 
-		const tailoredJob = tailored.blocks.jobHistory[0];
+		const tailoredJob = tailored.blocks.jobHistory.value[0];
 		expect(tailoredJob.achievements).toHaveLength(1);
 		expect(tailoredJob.achievements[0].text).toBe('Built the thing');
 		expect(tailoredJob.skills).toHaveLength(0);
@@ -219,11 +217,11 @@ describe('applySyncDecisions — nested lists', () => {
 
 	it('accepting nested entryAdded: job skill lands in job.skills, not achievements', () => {
 		const job = makeJob('Acme', 'Engineer');
-		const master = makeMaster({ jobHistory: [job] });
+		const master = makeMaster({ jobHistory: listBlock([job]) });
 		const tailored = makeTailored(master);
 
 		const newSkill = makeTag('TypeScript');
-		master.blocks.jobHistory[0].skills.push(newSkill);
+		master.blocks.jobHistory.value[0].skills.push(newSkill);
 		master.version = 6;
 
 		const items = diffCVs(master, tailored);
@@ -232,7 +230,7 @@ describe('applySyncDecisions — nested lists', () => {
 
 		applySyncDecisions(tailored, master, new Map([[addedItem!.objectId, 'accepted']]));
 
-		const tailoredJob = tailored.blocks.jobHistory[0];
+		const tailoredJob = tailored.blocks.jobHistory.value[0];
 		expect(tailoredJob.skills).toHaveLength(1);
 		expect(tailoredJob.skills[0].value).toBe('TypeScript');
 		expect(tailoredJob.achievements).toHaveLength(0);
@@ -245,10 +243,10 @@ describe('applySyncDecisions — nested lists', () => {
 		job.achievements.push(ach);
 		job.skills.push(skill);
 
-		const master = makeMaster({ jobHistory: [job] });
+		const master = makeMaster({ jobHistory: listBlock([job]) });
 		const tailored = makeTailored(master);
 
-		master.blocks.jobHistory[0].achievements = [];
+		master.blocks.jobHistory.value[0].achievements = [];
 		master.version = 6;
 
 		const items = diffCVs(master, tailored);
@@ -257,7 +255,7 @@ describe('applySyncDecisions — nested lists', () => {
 
 		applySyncDecisions(tailored, master, new Map([[removedItem!.objectId, 'accepted']]));
 
-		const tailoredJob = tailored.blocks.jobHistory[0];
+		const tailoredJob = tailored.blocks.jobHistory.value[0];
 		expect(tailoredJob.achievements).toHaveLength(0);
 		expect(tailoredJob.skills).toHaveLength(1);
 	});
@@ -267,10 +265,10 @@ describe('applySyncDecisions — nested lists', () => {
 		const job = makeJob('Acme', 'Engineer');
 		job.achievements.push(ach);
 
-		const master = makeMaster({ jobHistory: [job] });
+		const master = makeMaster({ jobHistory: listBlock([job]) });
 		const tailored = makeTailored(master);
 
-		master.blocks.jobHistory[0].achievements[0].text = 'New text';
+		master.blocks.jobHistory.value[0].achievements[0].text = 'New text';
 		master.version = 6;
 
 		const items = diffCVs(master, tailored);
@@ -279,6 +277,6 @@ describe('applySyncDecisions — nested lists', () => {
 
 		applySyncDecisions(tailored, master, new Map([[modifiedItem!.objectId, 'accepted']]));
 
-		expect(tailored.blocks.jobHistory[0].achievements[0].text).toBe('New text');
+		expect(tailored.blocks.jobHistory.value[0].achievements[0].text).toBe('New text');
 	});
 });

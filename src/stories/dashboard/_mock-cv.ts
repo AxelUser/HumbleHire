@@ -9,18 +9,12 @@ export function mkBlocks(name = '', position = '', location = ''): CVBlocks {
 		fullName: { objectId: id(`${name}-fn`), value: name },
 		position: { objectId: id(`${name}-pos`), value: position },
 		location: { objectId: id(`${name}-loc`), value: location },
-		contactsBlockId: id(`${name}-cb`),
-		contacts: [],
-		highlightsBlockId: id(`${name}-hb`),
-		highlights: [],
-		skillsBlockId: id(`${name}-sb`),
-		skills: [],
-		jobHistoryBlockId: id(`${name}-jb`),
-		jobHistory: [],
-		projectsBlockId: id(`${name}-pb`),
-		projects: [],
-		educationBlockId: id(`${name}-eb`),
-		education: []
+		contacts: { objectId: id(`${name}-cb`), value: [] },
+		highlights: { objectId: id(`${name}-hb`), value: [] },
+		skills: { objectId: id(`${name}-sb`), value: [] },
+		jobHistory: { objectId: id(`${name}-jb`), value: [] },
+		projects: { objectId: id(`${name}-pb`), value: [] },
+		education: { objectId: id(`${name}-eb`), value: [] }
 	};
 }
 

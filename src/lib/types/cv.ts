@@ -4,34 +4,24 @@ export function createObjectId(): ObjectId {
 	return crypto.randomUUID() as ObjectId;
 }
 
-export interface TextBlock {
+export interface WithId {
 	objectId: ObjectId;
+}
+
+export interface Block<T> extends WithId {
+	value: T;
+}
+
+export interface Tag extends WithId {
 	value: string;
 }
 
-export interface Achievement {
-	objectId: ObjectId;
-	text: string;
-}
-
-export interface Highlight {
-	objectId: ObjectId;
-	text: string;
-}
-
-export interface Tag {
-	objectId: ObjectId;
-	value: string;
-}
-
-export interface ContactEntry {
-	objectId: ObjectId;
+export interface ContactEntry extends WithId {
 	label: string;
 	value: string;
 }
 
-export interface JobEntry {
-	objectId: ObjectId;
+export interface JobEntry extends WithId {
 	company: string;
 	role: string;
 	startDate: Date | undefined;
@@ -40,22 +30,27 @@ export interface JobEntry {
 	skills: Tag[];
 }
 
-export interface ProjectEntry {
-	objectId: ObjectId;
+export interface Achievement extends WithId {
+	text: string;
+}
+
+export interface Highlight extends WithId {
+	text: string;
+}
+
+export interface ProjectEntry extends WithId {
 	name: string;
 	description: string;
 	stack: Tag[];
 	link: string;
 }
 
-export interface SkillCategory {
-	objectId: ObjectId;
+export interface SkillCategory extends WithId {
 	name: string;
 	skills: Tag[];
 }
 
-export interface EducationEntry {
-	objectId: ObjectId;
+export interface EducationEntry extends WithId {
 	institution: string;
 	degree: string;
 	startDate: Date | undefined;
@@ -68,37 +63,31 @@ export interface SyncDecisions {
 }
 
 export interface CVBlocks {
-	fullName: TextBlock;
-	position: TextBlock;
-	location: TextBlock;
+	fullName: Block<string>;
+	position: Block<string>;
+	location: Block<string>;
 
-	contactsBlockId: ObjectId;
-	contacts: ContactEntry[];
+	contacts: Block<ContactEntry[]>;
 
-	highlightsBlockId: ObjectId;
-	highlights: Highlight[];
+	highlights: Block<Highlight[]>;
 
-	skillsBlockId: ObjectId;
-	skills: SkillCategory[];
+	skills: Block<SkillCategory[]>;
 
-	jobHistoryBlockId: ObjectId;
-	jobHistory: JobEntry[];
+	jobHistory: Block<JobEntry[]>;
 
-	projectsBlockId: ObjectId;
-	projects: ProjectEntry[];
+	projects: Block<ProjectEntry[]>;
 
-	educationBlockId: ObjectId;
-	education: EducationEntry[];
+	education: Block<EducationEntry[]>;
 }
 
 export type CVBlockKey = keyof CVBlocks;
 
 export type TextBlockKey = {
-	[K in keyof CVBlocks]: CVBlocks[K] extends TextBlock ? K : never;
+	[K in keyof CVBlocks]: CVBlocks[K] extends Block<string> ? K : never;
 }[keyof CVBlocks];
 
 export type ListBlockKey = {
-	[K in keyof CVBlocks]: CVBlocks[K] extends Array<{ objectId: ObjectId }> ? K : never;
+	[K in keyof CVBlocks]: CVBlocks[K] extends Block<Array<WithId>> ? K : never;
 }[keyof CVBlocks];
 
 export interface CV {

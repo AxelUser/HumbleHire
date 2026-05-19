@@ -22,18 +22,12 @@ export function createCVFromTemplate(
 			fullName: { objectId: createObjectId(), value: '' },
 			position: { objectId: createObjectId(), value: '' },
 			location: { objectId: createObjectId(), value: '' },
-			contactsBlockId: createObjectId(),
-			contacts: [],
-			highlightsBlockId: createObjectId(),
-			highlights: [],
-			skillsBlockId: createObjectId(),
-			skills: [],
-			jobHistoryBlockId: createObjectId(),
-			jobHistory: [],
-			projectsBlockId: createObjectId(),
-			projects: [],
-			educationBlockId: createObjectId(),
-			education: []
+			contacts: { objectId: createObjectId(), value: [] },
+			highlights: { objectId: createObjectId(), value: [] },
+			skills: { objectId: createObjectId(), value: [] },
+			jobHistory: { objectId: createObjectId(), value: [] },
+			projects: { objectId: createObjectId(), value: [] },
+			education: { objectId: createObjectId(), value: [] }
 		},
 		hiddenBlockIds: []
 	};
