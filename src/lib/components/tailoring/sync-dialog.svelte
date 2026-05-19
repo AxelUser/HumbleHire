@@ -13,8 +13,7 @@
 	import { diffCVs } from '$lib/features/tailoring/diff';
 	import { applySyncDecisions } from '$lib/features/tailoring/apply';
 	import { hasUpdatesAvailable } from '$lib/features/tailoring/detection';
-	import { toViewItem } from '$lib/features/tailoring/present';
-	import type { DiffItem, DiffViewItem } from '$lib/features/tailoring/types';
+	import type { DiffItem } from '$lib/features/tailoring/types';
 	import type { CV, ObjectId } from '$lib/types/cv';
 	import { dev } from '$app/environment';
 
@@ -35,10 +34,9 @@
 		diffCVs($state.snapshot(masterCv), $state.snapshot(tailoredCv))
 	);
 
-	const viewItems = $derived.by((): DiffViewItem[] => {
-		const existing = tailoredCv.syncDecisions?.discarded ?? {};
-		return diffItems.map((item) => toViewItem(item, existing));
-	});
+	function isPreviouslyDiscarded(objectId: ObjectId): boolean {
+		return (tailoredCv.syncDecisions?.discarded ?? {})[objectId] !== undefined;
+	}
 
 	function accept(objectId: ObjectId) {
 		decisions.set(objectId, 'accepted');
@@ -125,9 +123,12 @@
 						</div>
 					</div>
 					<div class="flex flex-col gap-2">
-						{#each viewItems as item (item.objectId)}
+						{#each diffItems as item (item.objectId)}
 							<DiffItemRow
 								{item}
+								{masterCv}
+								{tailoredCv}
+								previouslyDiscarded={isPreviouslyDiscarded(item.objectId)}
 								decision={decisions.get(item.objectId)}
 								onAccept={() => accept(item.objectId)}
 								onDiscard={() => discard(item.objectId)}

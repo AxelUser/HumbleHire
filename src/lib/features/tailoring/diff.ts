@@ -1,5 +1,5 @@
 import type { CV, Block, ObjectId, TextBlockKey, ListBlockKey, WithId } from '$lib/types/cv';
-import type { AnyEntry, DiffItem, NestedListKey } from './types';
+import type { DiffItem, NestedListKey } from './types';
 
 /**
  * Diff a master CV and a tailored CV. It checks what has changed in master but not in tailored.
@@ -18,7 +18,6 @@ import type { AnyEntry, DiffItem, NestedListKey } from './types';
  * @returns A list of diff items.
  */
 export function diffCVs(master: CV, tailored: CV): DiffItem[] {
-	console.log('diffCVs', master, tailored);
 	const items: DiffItem[] = [];
 	const hidden = new Set(master.hiddenBlockIds);
 	const visible = (id: ObjectId) => !hidden.has(id);
@@ -122,7 +121,7 @@ function diffText(
 ): void {
 	if (baseline.value === master.value || tailored.value === master.value) return;
 	items.push({
-		type: 'textModified',
+		kind: 'text',
 		blockKey,
 		objectId: master.objectId,
 		before: tailored.value,
@@ -151,14 +150,23 @@ function diffList<E extends WithId>(
 	// In baseline but not in master: master deleted it, surface if tailored still has it.
 	for (const baselineEntry of baseline) {
 		if (!masterMap.has(baselineEntry.objectId) && tailoredMap.has(baselineEntry.objectId)) {
-			items.push({
-				type: 'entryRemoved',
-				blockKey,
-				objectId: baselineEntry.objectId,
-				parentObjectId: parent?.objectId,
-				nestedListKey: parent?.nestedListKey,
-				entry: baselineEntry as unknown as AnyEntry
-			});
+			if (parent) {
+				items.push({
+					kind: 'nested',
+					change: 'removed',
+					blockKey,
+					nestedListKey: parent.nestedListKey,
+					parentObjectId: parent.objectId,
+					objectId: baselineEntry.objectId
+				});
+			} else {
+				items.push({
+					kind: 'entry',
+					change: 'removed',
+					blockKey,
+					objectId: baselineEntry.objectId
+				});
+			}
 		}
 	}
 
@@ -169,14 +177,23 @@ function diffList<E extends WithId>(
 		if (!baselineEntry) {
 			// Not in baseline: master added it after tailoring.
 			if (!tailoredEntry) {
-				items.push({
-					type: 'entryAdded',
-					blockKey,
-					objectId: masterEntry.objectId,
-					parentObjectId: parent?.objectId,
-					nestedListKey: parent?.nestedListKey,
-					entry: masterEntry as unknown as AnyEntry
-				});
+				if (parent) {
+					items.push({
+						kind: 'nested',
+						change: 'added',
+						blockKey,
+						nestedListKey: parent.nestedListKey,
+						parentObjectId: parent.objectId,
+						objectId: masterEntry.objectId
+					});
+				} else {
+					items.push({
+						kind: 'entry',
+						change: 'added',
+						blockKey,
+						objectId: masterEntry.objectId
+					});
+				}
 			}
 			continue;
 		}
@@ -218,15 +235,26 @@ function diffScalars<E extends WithId>(
 	}
 
 	if (changed) {
-		items.push({
-			type: 'entryModified',
-			blockKey,
-			objectId: master.objectId,
-			parentObjectId: parent?.objectId,
-			nestedListKey: parent?.nestedListKey,
-			entry: master as unknown as AnyEntry,
-			before,
-			after
-		});
+		if (parent) {
+			items.push({
+				kind: 'nested',
+				change: 'modified',
+				blockKey,
+				nestedListKey: parent.nestedListKey,
+				parentObjectId: parent.objectId,
+				objectId: master.objectId,
+				before,
+				after
+			});
+		} else {
+			items.push({
+				kind: 'entry',
+				change: 'modified',
+				blockKey,
+				objectId: master.objectId,
+				before,
+				after
+			});
+		}
 	}
 }

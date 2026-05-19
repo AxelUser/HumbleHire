@@ -88,13 +88,13 @@ describe('diffCVs - text blocks', () => {
 		expect(diffCVs(master, tailored)).toEqual([]);
 	});
 
-	it('master text change becomes textModified', () => {
+	it('master text change becomes kind:text item', () => {
 		const master = makeMaster();
 		const tailored = makeTailored(master);
 		master.blocks.fullName.value = 'Jane Smith';
 		const items = diffCVs(master, tailored);
 		expect(items).toHaveLength(1);
-		expect(items[0].type).toBe('textModified');
+		expect(items[0].kind).toBe('text');
 		expect(items[0].blockKey).toBe('fullName');
 	});
 
@@ -106,14 +106,14 @@ describe('diffCVs - text blocks', () => {
 		expect(diffCVs(master, tailored)).toEqual([]);
 	});
 
-	it('textModified.before is tailored value, .after is master value', () => {
+	it('text item.before is tailored value, .after is master value', () => {
 		const master = makeMaster();
 		const tailored = makeTailored(master);
 		master.blocks.position.value = 'Senior Engineer';
 		tailored.blocks.position.value = 'Current Tailored Position';
 		const items = diffCVs(master, tailored);
-		expect(items[0].type).toBe('textModified');
-		if (items[0].type === 'textModified') {
+		expect(items[0].kind).toBe('text');
+		if (items[0].kind === 'text') {
 			expect(items[0].before).toBe('Current Tailored Position');
 			expect(items[0].after).toBe('Senior Engineer');
 		}
@@ -128,13 +128,14 @@ describe('diffCVs - jobHistory entries', () => {
 		expect(diffCVs(master, tailored)).toEqual([]);
 	});
 
-	it('new master job shows up as entryAdded', () => {
+	it('new master job shows up as kind:entry change:added', () => {
 		const master = makeMaster();
 		const tailored = makeTailored(master);
 		master.blocks.jobHistory.value.push(makeJob('Acme', 'Engineer'));
 		const items = diffCVs(master, tailored);
 		expect(items).toHaveLength(1);
-		expect(items[0].type).toBe('entryAdded');
+		expect(items[0].kind).toBe('entry');
+		expect(items[0].kind === 'entry' && items[0].change).toBe('added');
 		expect(items[0].blockKey).toBe('jobHistory');
 	});
 
@@ -146,17 +147,18 @@ describe('diffCVs - jobHistory entries', () => {
 		expect(diffCVs(master, tailored)).toEqual([]);
 	});
 
-	it('master field change becomes entryModified', () => {
+	it('master field change becomes kind:entry change:modified', () => {
 		const job = makeJob('Acme', 'Engineer');
 		const master = makeMaster({ jobHistory: listBlock([job]) });
 		const tailored = makeTailored(master);
 		master.blocks.jobHistory.value[0].role = 'Staff Engineer';
 		const items = diffCVs(master, tailored);
 		expect(items).toHaveLength(1);
-		expect(items[0].type).toBe('entryModified');
+		expect(items[0].kind).toBe('entry');
+		expect(items[0].kind === 'entry' && items[0].change).toBe('modified');
 	});
 
-	it('conflicting edits on same field become entryModified', () => {
+	it('conflicting edits on same field become kind:entry change:modified', () => {
 		const job = makeJob('Acme', 'Engineer');
 		const master = makeMaster({ jobHistory: listBlock([job]) });
 		const tailored = makeTailored(master);
@@ -164,7 +166,8 @@ describe('diffCVs - jobHistory entries', () => {
 		tailored.blocks.jobHistory.value[0].role = 'Senior Engineer';
 		const items = diffCVs(master, tailored);
 		expect(items).toHaveLength(1);
-		expect(items[0].type).toBe('entryModified');
+		expect(items[0].kind).toBe('entry');
+		expect(items[0].kind === 'entry' && items[0].change).toBe('modified');
 	});
 
 	it('converging edits on same field produce no diff', () => {
@@ -176,14 +179,15 @@ describe('diffCVs - jobHistory entries', () => {
 		expect(diffCVs(master, tailored)).toEqual([]);
 	});
 
-	it('master-deleted job that tailored kept becomes entryRemoved', () => {
+	it('master-deleted job that tailored kept becomes kind:entry change:removed', () => {
 		const job = makeJob('Acme', 'Engineer');
 		const master = makeMaster({ jobHistory: listBlock([job]) });
 		const tailored = makeTailored(master);
 		master.blocks.jobHistory.value = [];
 		const items = diffCVs(master, tailored);
 		expect(items).toHaveLength(1);
-		expect(items[0].type).toBe('entryRemoved');
+		expect(items[0].kind).toBe('entry');
+		expect(items[0].kind === 'entry' && items[0].change).toBe('removed');
 		expect(items[0].blockKey).toBe('jobHistory');
 	});
 
@@ -210,24 +214,28 @@ describe('diffCVs - nested entries', () => {
 		const job = makeJob('Acme', 'Engineer');
 		const master = makeMaster({ jobHistory: listBlock([job]) });
 		const tailored = makeTailored(master);
-		tailored.blocks.jobHistory.value[0].achievements.push(makeAchievement('New tailored achievement'));
+		tailored.blocks.jobHistory.value[0].achievements.push(
+			makeAchievement('New tailored achievement')
+		);
 		expect(diffCVs(master, tailored)).toEqual([]);
 	});
 
-	it('master-added nested entry carries parentObjectId', () => {
+	it('master-added nested entry is kind:nested change:added and carries parentObjectId', () => {
 		const job = makeJob('Acme', 'Engineer');
 		const master = makeMaster({ jobHistory: listBlock([job]) });
 		const tailored = makeTailored(master);
 		master.blocks.jobHistory.value[0].achievements.push(makeAchievement('Master achievement'));
 		const items = diffCVs(master, tailored);
 		expect(items).toHaveLength(1);
-		expect(items[0].type).toBe('entryAdded');
-		if (items[0].type === 'entryAdded') {
+		expect(items[0].kind).toBe('nested');
+		if (items[0].kind === 'nested') {
+			expect(items[0].change).toBe('added');
 			expect(items[0].parentObjectId).toBe(job.objectId);
+			expect(items[0].nestedListKey).toBe('achievements');
 		}
 	});
 
-	it('master-modified nested entry carries parentObjectId', () => {
+	it('master-modified nested entry is kind:nested change:modified and carries parentObjectId', () => {
 		const ach = makeAchievement('Old text');
 		const job = makeJob('Acme', 'Engineer');
 		job.achievements.push(ach);
@@ -236,13 +244,14 @@ describe('diffCVs - nested entries', () => {
 		master.blocks.jobHistory.value[0].achievements[0].text = 'New text';
 		const items = diffCVs(master, tailored);
 		expect(items).toHaveLength(1);
-		expect(items[0].type).toBe('entryModified');
-		if (items[0].type === 'entryModified') {
+		expect(items[0].kind).toBe('nested');
+		if (items[0].kind === 'nested') {
+			expect(items[0].change).toBe('modified');
 			expect(items[0].parentObjectId).toBe(job.objectId);
 		}
 	});
 
-	it('master-deleted nested entry (kept by tailored) carries parentObjectId', () => {
+	it('master-deleted nested entry (kept by tailored) is kind:nested change:removed and carries parentObjectId', () => {
 		const ach = makeAchievement('Remove me');
 		const job = makeJob('Acme', 'Engineer');
 		job.achievements.push(ach);
@@ -251,8 +260,9 @@ describe('diffCVs - nested entries', () => {
 		master.blocks.jobHistory.value[0].achievements = [];
 		const items = diffCVs(master, tailored);
 		expect(items).toHaveLength(1);
-		expect(items[0].type).toBe('entryRemoved');
-		if (items[0].type === 'entryRemoved') {
+		expect(items[0].kind).toBe('nested');
+		if (items[0].kind === 'nested') {
+			expect(items[0].change).toBe('removed');
 			expect(items[0].parentObjectId).toBe(job.objectId);
 		}
 	});

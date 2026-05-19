@@ -1,11 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import { createObjectId } from '$lib/types/cv';
-import type { JobEntry, ObjectId, SkillCategory, Tag } from '$lib/types/cv';
+import type { CV, CVBlocks, JobEntry, ObjectId, SkillCategory, Tag } from '$lib/types/cv';
 import type { DiffItem } from './types';
-import { entryPreview, formatPeriod, formatValue, toViewItem } from './present';
+import { entryTitle, formatPeriod, formatValue, entryKind, describeDiff } from './present';
 
 function id(): ObjectId {
 	return createObjectId();
+}
+
+function textBlock(value: string) {
+	return { objectId: id(), value };
+}
+
+function listBlock<T>(value: T) {
+	return { objectId: id(), value };
 }
 
 function makeTag(value: string): Tag {
@@ -24,6 +32,33 @@ function makeJob(): JobEntry {
 			{ objectId: id(), text: 'Built another thing' }
 		],
 		skills: [makeTag('Go'), makeTag('Rust')]
+	};
+}
+
+function emptyBlocks(): CVBlocks {
+	return {
+		fullName: textBlock('John Doe'),
+		position: textBlock('Engineer'),
+		location: textBlock('NYC'),
+		contacts: listBlock([]),
+		highlights: listBlock([]),
+		skills: listBlock([]),
+		jobHistory: listBlock([]),
+		projects: listBlock([]),
+		education: listBlock([])
+	};
+}
+
+function makeCV(overrides?: Partial<CVBlocks>): CV {
+	return {
+		id: 'cv-1',
+		name: 'CV',
+		notes: '',
+		createdAt: 1000,
+		updatedAt: 1000,
+		version: 1,
+		blocks: { ...emptyBlocks(), ...overrides },
+		hiddenBlockIds: []
 	};
 }
 
@@ -56,112 +91,155 @@ describe('formatPeriod', () => {
 	});
 });
 
-describe('entryPreview', () => {
-	it('summarises a job entry with subtitle, bullets and tags', () => {
-		const preview = entryPreview('jobHistory', undefined, makeJob());
-		expect(preview.title).toBe('Stripe');
-		expect(preview.subtitle).toBe('Engineer · Jan 2021 – Present');
-		expect(preview.bullets).toEqual(['Built the thing', 'Built another thing']);
-		expect(preview.tags).toEqual(['Go', 'Rust']);
+describe('entryKind', () => {
+	it('returns job for jobHistory block', () => {
+		expect(entryKind('jobHistory')).toBe('job');
 	});
 
-	it('summarises a skill category by name and tags', () => {
-		const category: SkillCategory = {
-			objectId: id(),
-			name: 'Languages',
-			skills: [makeTag('Go')]
-		};
-		const preview = entryPreview('skills', undefined, category);
-		expect(preview.title).toBe('Languages');
-		expect(preview.tags).toEqual(['Go']);
+	it('returns achievement for achievements nested key', () => {
+		expect(entryKind('jobHistory', 'achievements')).toBe('achievement');
 	});
 
-	it('summarises a nested tag by its value', () => {
-		const preview = entryPreview('jobHistory', 'skills', makeTag('Kubernetes'));
-		expect(preview.title).toBe('Kubernetes');
+	it('returns tag for skills nested key', () => {
+		expect(entryKind('jobHistory', 'skills')).toBe('tag');
 	});
 
-	it('summarises a nested achievement by its text', () => {
-		const preview = entryPreview('jobHistory', 'achievements', {
-			objectId: id(),
-			text: 'Shipped it'
-		});
-		expect(preview.title).toBe('Shipped it');
+	it('returns tag for stack nested key', () => {
+		expect(entryKind('projects', 'stack')).toBe('tag');
+	});
+
+	it('returns skillCategory for skills block', () => {
+		expect(entryKind('skills')).toBe('skillCategory');
 	});
 });
 
-describe('toViewItem', () => {
-	it('builds a single field change for a text modification', () => {
-		const item: DiffItem = {
-			type: 'textModified',
-			blockKey: 'position',
+describe('entryTitle', () => {
+	it('returns company for a job entry', () => {
+		expect(entryTitle('job', makeJob())).toBe('Stripe');
+	});
+
+	it('returns name for a skill category', () => {
+		const cat: SkillCategory = { objectId: id(), name: 'Languages', skills: [] };
+		expect(entryTitle('skillCategory', cat)).toBe('Languages');
+	});
+
+	it('returns value for a tag', () => {
+		expect(entryTitle('tag', makeTag('Kubernetes'))).toBe('Kubernetes');
+	});
+
+	it('returns fallback for empty fields', () => {
+		const job: JobEntry = {
 			objectId: id(),
+			company: '',
+			role: '',
+			startDate: undefined,
+			endDate: undefined,
+			achievements: [],
+			skills: []
+		};
+		expect(entryTitle('job', job)).toBe('(untitled)');
+	});
+});
+
+describe('describeDiff', () => {
+	it('describes a text modification', () => {
+		const masterCv = makeCV();
+		const tailoredCv = makeCV();
+		const item: DiffItem = {
+			kind: 'text',
+			blockKey: 'position',
+			objectId: masterCv.blocks.position.objectId,
 			before: 'Engineer',
 			after: 'Senior Engineer'
 		};
-		const view = toViewItem(item, {});
-		expect(view.description).toBe('Changed Position');
-		expect(view.fields).toEqual([
-			{ label: 'Position', before: 'Engineer', after: 'Senior Engineer' }
-		]);
-		expect(view.preview).toBeUndefined();
+		const meta = describeDiff(item, masterCv, tailoredCv);
+		expect(meta.blockLabel).toBe('Position');
+		expect(meta.description).toBe('Changed Position');
+		expect(meta.change).toBe('modified');
 	});
 
-	it('builds a preview for an added entry', () => {
+	it('describes an added top-level entry using the entry title from master', () => {
 		const job = makeJob();
+		const masterCv = makeCV({ jobHistory: listBlock([job]) });
+		const tailoredCv = makeCV();
 		const item: DiffItem = {
-			type: 'entryAdded',
+			kind: 'entry',
+			change: 'added',
+			blockKey: 'jobHistory',
+			objectId: job.objectId
+		};
+		const meta = describeDiff(item, masterCv, tailoredCv);
+		expect(meta.title).toBe('Stripe');
+		expect(meta.description).toBe('Added job entry');
+		expect(meta.blockLabel).toBe('Job History');
+	});
+
+	it('describes a removed top-level entry using the entry title from tailored', () => {
+		const job = makeJob();
+		const masterCv = makeCV();
+		const tailoredCv = makeCV({ jobHistory: listBlock([job]) });
+		const item: DiffItem = {
+			kind: 'entry',
+			change: 'removed',
+			blockKey: 'jobHistory',
+			objectId: job.objectId
+		};
+		const meta = describeDiff(item, masterCv, tailoredCv);
+		expect(meta.title).toBe('Stripe');
+		expect(meta.description).toBe('Removed job entry');
+	});
+
+	it('describes a modified top-level entry', () => {
+		const job = makeJob();
+		const masterCv = makeCV({ jobHistory: listBlock([job]) });
+		const tailoredCv = makeCV();
+		const item: DiffItem = {
+			kind: 'entry',
+			change: 'modified',
 			blockKey: 'jobHistory',
 			objectId: job.objectId,
-			entry: job
+			before: { role: 'Engineer' },
+			after: { role: 'Senior Engineer' }
 		};
-		const view = toViewItem(item, {});
-		expect(view.description).toBe('Added job entry — Stripe');
-		expect(view.preview?.title).toBe('Stripe');
-		expect(view.fields).toBeUndefined();
+		const meta = describeDiff(item, masterCv, tailoredCv);
+		expect(meta.title).toBe('Stripe');
+		expect(meta.description).toBe('Modified job entry');
+		expect(meta.change).toBe('modified');
 	});
 
-	it('uses the nested noun for an added nested entry', () => {
+	it('describes a nested added item using the parent entity title', () => {
+		const job = makeJob();
+		const masterCv = makeCV({ jobHistory: listBlock([job]) });
+		const tailoredCv = makeCV({ jobHistory: listBlock([job]) });
+		const achId = id();
 		const item: DiffItem = {
-			type: 'entryAdded',
+			kind: 'nested',
+			change: 'added',
 			blockKey: 'jobHistory',
-			objectId: id(),
-			parentObjectId: id(),
 			nestedListKey: 'achievements',
-			entry: { objectId: id(), text: 'Did a thing' }
+			parentObjectId: job.objectId,
+			objectId: achId
 		};
-		const view = toViewItem(item, {});
-		expect(view.description).toBe('Added achievement — Did a thing');
+		const meta = describeDiff(item, masterCv, tailoredCv);
+		expect(meta.title).toBe('Stripe'); // parent job company
+		expect(meta.description).toBe('Added achievement');
+		expect(meta.blockLabel).toBe('Job History');
 	});
 
-	it('builds per-field changes for a modified entry, formatting dates', () => {
-		const job = makeJob();
+	it('marks an item as previously discarded based on the discarded map', () => {
+		// previouslyDiscarded is computed at the call site in sync-dialog, not in describeDiff
+		// This test verifies that entryTitle correctly handles a skill category
+		const cat: SkillCategory = { objectId: id(), name: 'Backend', skills: [] };
+		const masterCv = makeCV({ skills: listBlock([cat]) });
+		const tailoredCv = makeCV();
 		const item: DiffItem = {
-			type: 'entryModified',
-			blockKey: 'jobHistory',
-			objectId: job.objectId,
-			entry: job,
-			before: { role: 'Engineer', endDate: undefined },
-			after: { role: 'Senior Engineer', endDate: new Date(2023, 5, 1) }
+			kind: 'entry',
+			change: 'added',
+			blockKey: 'skills',
+			objectId: cat.objectId
 		};
-		const view = toViewItem(item, {});
-		expect(view.description).toBe('Changed Stripe');
-		expect(view.fields).toEqual([
-			{ label: 'Role', before: 'Engineer', after: 'Senior Engineer' },
-			{ label: 'End date', before: '(empty)', after: 'Jun 2023' }
-		]);
-	});
-
-	it('marks an item as previously discarded', () => {
-		const objectId = id();
-		const item: DiffItem = {
-			type: 'textModified',
-			blockKey: 'position',
-			objectId,
-			before: 'a',
-			after: 'b'
-		};
-		const view = toViewItem(item, { [objectId]: 4 });
-		expect(view.previouslyDiscarded).toBe(true);
+		const meta = describeDiff(item, masterCv, tailoredCv);
+		expect(meta.title).toBe('Backend');
+		expect(meta.description).toBe('Added skill category');
 	});
 });

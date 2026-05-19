@@ -25,67 +25,53 @@ export type AnyEntry =
 
 export type NestedListKey = 'achievements' | 'skills' | 'stack';
 
-export type DiffItemType = 'textModified' | 'entryAdded' | 'entryRemoved' | 'entryModified';
+export type DiffChange = 'added' | 'removed' | 'modified';
 
-export type DiffItem =
-	| {
-			type: 'textModified';
-			blockKey: TextBlockKey;
-			objectId: ObjectId;
-			before: string;
-			after: string;
-	  }
-	| {
-			type: 'entryAdded';
-			blockKey: ListBlockKey;
-			objectId: ObjectId;
-			parentObjectId?: ObjectId;
-			nestedListKey?: NestedListKey;
-			entry: AnyEntry;
-	  }
-	| {
-			type: 'entryRemoved';
-			blockKey: ListBlockKey;
-			objectId: ObjectId;
-			parentObjectId?: ObjectId;
-			nestedListKey?: NestedListKey;
-			entry: AnyEntry;
-	  }
-	| {
-			type: 'entryModified';
-			blockKey: ListBlockKey;
-			objectId: ObjectId;
-			parentObjectId?: ObjectId;
-			nestedListKey?: NestedListKey;
-			entry: AnyEntry;
-			before: Record<string, unknown>;
-			after: Record<string, unknown>;
-	  };
-
-export interface FieldChange {
-	label: string;
+export interface TextDiffItem {
+	kind: 'text';
+	blockKey: TextBlockKey;
+	objectId: ObjectId;
 	before: string;
 	after: string;
 }
 
-export interface EntryPreview {
-	title: string;
-	subtitle?: string;
-	bullets?: string[];
-	tags?: string[];
-}
+export type EntryDiffItem =
+	| {
+			kind: 'entry';
+			change: 'added' | 'removed';
+			blockKey: ListBlockKey;
+			objectId: ObjectId;
+	  }
+	| {
+			kind: 'entry';
+			change: 'modified';
+			blockKey: ListBlockKey;
+			objectId: ObjectId;
+			before: Record<string, unknown>;
+			after: Record<string, unknown>;
+	  };
 
-export interface DiffViewItem {
-	objectId: ObjectId;
-	type: DiffItemType;
-	blockKey: CVBlockKey;
-	blockLabel: string;
-	description: string;
-	parentObjectId?: ObjectId;
-	previouslyDiscarded?: boolean;
-	preview?: EntryPreview;
-	fields?: FieldChange[];
-}
+export type NestedDiffItem =
+	| {
+			kind: 'nested';
+			change: 'added' | 'removed';
+			blockKey: ListBlockKey;
+			nestedListKey: NestedListKey;
+			parentObjectId: ObjectId;
+			objectId: ObjectId;
+	  }
+	| {
+			kind: 'nested';
+			change: 'modified';
+			blockKey: ListBlockKey;
+			nestedListKey: NestedListKey;
+			parentObjectId: ObjectId;
+			objectId: ObjectId;
+			before: Record<string, unknown>;
+			after: Record<string, unknown>;
+	  };
+
+export type DiffItem = TextDiffItem | EntryDiffItem | NestedDiffItem;
 
 export const BLOCK_LABELS: Partial<Record<CVBlockKey, string>> = {
 	fullName: 'Full Name',

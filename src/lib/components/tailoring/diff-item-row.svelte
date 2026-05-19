@@ -2,27 +2,89 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Check, X, RotateCcw, Plus, Minus, ArrowLeftRight } from '@lucide/svelte';
-	import type { DiffViewItem } from '$lib/features/tailoring/types';
+	import type {
+		Achievement,
+		ContactEntry,
+		CV,
+		EducationEntry,
+		Highlight,
+		JobEntry,
+		ProjectEntry,
+		SkillCategory,
+		Tag
+	} from '$lib/types/cv';
+	import type { DiffItem } from '$lib/features/tailoring/types';
+	import { describeDiff, entryKind, formatValue } from '$lib/features/tailoring/present';
+	import { resolveDiffEntry } from '$lib/features/tailoring/locate';
+	import { FIELD_LABELS } from '$lib/features/tailoring/types';
+	import DiffFieldGrid from './diff/diff-field-grid.svelte';
+	import JobPreview from './diff/job-preview.svelte';
+	import ProjectPreview from './diff/project-preview.svelte';
+	import SkillCategoryPreview from './diff/skill-category-preview.svelte';
+	import EducationPreview from './diff/education-preview.svelte';
+	import ContactPreview from './diff/contact-preview.svelte';
+	import HighlightPreview from './diff/highlight-preview.svelte';
+	import AchievementPreview from './diff/achievement-preview.svelte';
+	import TagPreview from './diff/tag-preview.svelte';
 
 	interface Props {
-		item: DiffViewItem;
+		item: DiffItem;
+		masterCv: CV;
+		tailoredCv: CV;
 		decision: 'accepted' | 'discarded' | undefined;
+		previouslyDiscarded: boolean;
 		onAccept: () => void;
 		onDiscard: () => void;
 		onRevert: () => void;
 	}
 
-	let { item, decision, onAccept, onDiscard, onRevert }: Props = $props();
+	let {
+		item,
+		masterCv,
+		tailoredCv,
+		decision,
+		previouslyDiscarded,
+		onAccept,
+		onDiscard,
+		onRevert
+	}: Props = $props();
 
-	const isAdded = $derived(item.type === 'entryAdded');
-	const isRemoved = $derived(item.type === 'entryRemoved');
+	const meta = $derived(describeDiff(item, masterCv, tailoredCv));
 
-	const typeColor = $derived(
-		isAdded
-			? 'text-green-600 dark:text-green-400'
-			: isRemoved
-				? 'text-red-600 dark:text-red-400'
-				: 'text-blue-600 dark:text-blue-400'
+	const kind = $derived(
+		item.kind === 'text'
+			? undefined
+			: item.kind === 'nested'
+				? entryKind(item.blockKey, item.nestedListKey)
+				: entryKind(item.blockKey)
+	);
+
+	const resolvedEntry = $derived(resolveDiffEntry(item, masterCv, tailoredCv));
+
+	// Fields for text and modified items
+	const fields = $derived.by(() => {
+		if (item.kind === 'text') {
+			return [
+				{
+					label: meta.blockLabel,
+					before: item.before || '(empty)',
+					after: item.after || '(empty)'
+				}
+			];
+		}
+		if (item.change === 'modified') {
+			return Object.keys(item.after).map((key) => ({
+				label: FIELD_LABELS[key] ?? key,
+				before: formatValue(item.before[key]),
+				after: formatValue(item.after[key])
+			}));
+		}
+		return null;
+	});
+
+	// Show a colored preview box for added/removed entries (not for modified or text)
+	const showPreview = $derived(
+		meta.change !== 'modified' && item.kind !== 'text' && resolvedEntry !== undefined
 	);
 </script>
 
@@ -34,10 +96,16 @@
 			: 'border-border bg-card'}"
 >
 	<div class="flex items-start gap-3">
-		<div class="mt-0.5 shrink-0 {typeColor}">
-			{#if isAdded}
+		<div
+			class="mt-0.5 shrink-0 {meta.change === 'added'
+				? 'text-green-600 dark:text-green-400'
+				: meta.change === 'removed'
+					? 'text-red-600 dark:text-red-400'
+					: 'text-blue-600 dark:text-blue-400'}"
+		>
+			{#if meta.change === 'added'}
 				<Plus class="h-4 w-4" />
-			{:else if isRemoved}
+			{:else if meta.change === 'removed'}
 				<Minus class="h-4 w-4" />
 			{:else}
 				<ArrowLeftRight class="h-4 w-4" />
@@ -47,9 +115,9 @@
 		<div class="min-w-0 flex-1">
 			<div class="flex flex-wrap items-center gap-2">
 				<span class="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-					{item.blockLabel}
+					{meta.blockLabel}
 				</span>
-				{#if item.previouslyDiscarded}
+				{#if previouslyDiscarded}
 					<Badge variant="outline" class="text-xs">Previously dismissed</Badge>
 				{/if}
 				{#if decision === 'accepted'}
@@ -60,54 +128,42 @@
 					<Badge variant="secondary" class="text-xs">Dismissed</Badge>
 				{/if}
 			</div>
-			<p class="mt-0.5 text-sm font-medium">{item.description}</p>
 
-			{#if item.preview}
-				{@const p = item.preview}
+			{#if item.kind !== 'text'}
+				<p class="mt-0.5 text-sm font-medium">{meta.title}</p>
+				<p class="text-muted-foreground text-xs">{meta.description}</p>
+			{:else}
+				<p class="mt-0.5 text-sm font-medium">{meta.description}</p>
+			{/if}
+
+			{#if showPreview && resolvedEntry}
 				<div
-					class="mt-2 rounded border p-3 text-sm {isAdded
+					class="mt-2 rounded border p-3 text-sm {meta.change === 'added'
 						? 'border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950/30'
 						: 'border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/30'}"
 				>
-					<p class="text-foreground font-medium">{p.title}</p>
-					{#if p.subtitle}
-						<p class="text-muted-foreground mt-0.5 text-xs">{p.subtitle}</p>
-					{/if}
-					{#if p.bullets && p.bullets.length > 0}
-						<ul class="text-foreground mt-2 list-disc space-y-0.5 pl-4 text-xs">
-							{#each p.bullets as bullet, i (i)}
-								<li>{bullet}</li>
-							{/each}
-						</ul>
-					{/if}
-					{#if p.tags && p.tags.length > 0}
-						<div class="mt-2 flex flex-wrap gap-1">
-							{#each p.tags as tag, i (i)}
-								<Badge variant="secondary" class="text-xs">{tag}</Badge>
-							{/each}
-						</div>
+					{#if kind === 'job'}
+						<JobPreview entry={resolvedEntry as JobEntry} />
+					{:else if kind === 'project'}
+						<ProjectPreview entry={resolvedEntry as ProjectEntry} />
+					{:else if kind === 'skillCategory'}
+						<SkillCategoryPreview entry={resolvedEntry as SkillCategory} />
+					{:else if kind === 'education'}
+						<EducationPreview entry={resolvedEntry as EducationEntry} />
+					{:else if kind === 'contact'}
+						<ContactPreview entry={resolvedEntry as ContactEntry} />
+					{:else if kind === 'highlight'}
+						<HighlightPreview entry={resolvedEntry as Highlight} />
+					{:else if kind === 'achievement'}
+						<AchievementPreview entry={resolvedEntry as Achievement} />
+					{:else if kind === 'tag'}
+						<TagPreview entry={resolvedEntry as Tag} />
 					{/if}
 				</div>
 			{/if}
 
-			{#if item.fields && item.fields.length > 0}
-				<div class="mt-2 flex flex-col gap-2">
-					{#each item.fields as field (field.label)}
-						<div>
-							<span class="text-muted-foreground text-xs font-medium">{field.label}</span>
-							<div class="mt-1 grid grid-cols-2 gap-2 text-xs">
-								<div class="rounded bg-red-50 p-2 dark:bg-red-950/30">
-									<span class="text-muted-foreground mb-1 block font-medium">Before</span>
-									<span class="text-foreground">{field.before}</span>
-								</div>
-								<div class="rounded bg-green-50 p-2 dark:bg-green-950/30">
-									<span class="text-muted-foreground mb-1 block font-medium">After</span>
-									<span class="text-foreground">{field.after}</span>
-								</div>
-							</div>
-						</div>
-					{/each}
-				</div>
+			{#if fields}
+				<DiffFieldGrid {fields} />
 			{/if}
 		</div>
 

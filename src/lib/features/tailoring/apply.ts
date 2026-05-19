@@ -1,218 +1,117 @@
-import type {
-	CV,
-	ObjectId,
-	JobEntry,
-	ProjectEntry,
-	SkillCategory,
-	Achievement,
-	Tag,
-	EducationEntry,
-	Highlight,
-	ContactEntry
-} from '$lib/types/cv';
+import type { CV, ObjectId, WithId } from '$lib/types/cv';
 import { diffCVs } from './diff';
-import type { DiffItem } from './types';
+import type { AnyEntry, DiffItem, EntryDiffItem, NestedDiffItem } from './types';
+import { findEntry, findNestedEntry, findParentEntry } from './locate';
 
-function applyItem(tailored: CV, item: DiffItem): void {
-	const blocks = tailored.blocks;
-
-	switch (item.type) {
-		case 'textModified': {
-			const block = blocks[item.blockKey];
-			block.value = item.after;
+function applyItem(tailored: CV, master: CV, item: DiffItem): void {
+	switch (item.kind) {
+		case 'text': {
+			tailored.blocks[item.blockKey].value = item.after;
 			break;
 		}
-
-		case 'entryAdded': {
-			if (item.parentObjectId) {
-				applyNestedEntryAdded(blocks, item);
-			} else {
-				applyTopLevelEntryAdded(blocks, item);
+		case 'entry': {
+			switch (item.change) {
+				case 'added':
+					applyEntryAdded(tailored, master, item);
+					break;
+				case 'removed':
+					applyEntryRemoved(tailored, item);
+					break;
+				case 'modified':
+					applyEntryModified(tailored, item);
+					break;
 			}
 			break;
 		}
-
-		case 'entryRemoved': {
-			if (item.parentObjectId) {
-				applyNestedEntryRemoved(blocks, item);
-			} else {
-				applyTopLevelEntryRemoved(blocks, item);
-			}
-			break;
-		}
-
-		case 'entryModified': {
-			if (item.parentObjectId) {
-				applyNestedEntryModified(blocks, item);
-			} else {
-				applyTopLevelEntryModified(blocks, item);
+		case 'nested': {
+			switch (item.change) {
+				case 'added':
+					applyNestedAdded(tailored, master, item);
+					break;
+				case 'removed':
+					applyNestedRemoved(tailored, item);
+					break;
+				case 'modified':
+					applyNestedModified(tailored, item);
+					break;
 			}
 			break;
 		}
 	}
 }
 
-function applyTopLevelEntryAdded(
-	blocks: CV['blocks'],
-	item: Extract<DiffItem, { type: 'entryAdded' }>
+function applyEntryAdded(
+	tailored: CV,
+	master: CV,
+	item: Extract<EntryDiffItem, { change: 'added' | 'removed' }>
 ): void {
-	const entry = structuredClone(item.entry);
-	switch (item.blockKey) {
-		case 'contacts':
-			blocks.contacts.value.push(entry as ContactEntry);
-			break;
-		case 'highlights':
-			blocks.highlights.value.push(entry as Highlight);
-			break;
-		case 'skills':
-			blocks.skills.value.push(entry as SkillCategory);
-			break;
-		case 'jobHistory':
-			blocks.jobHistory.value.push(entry as JobEntry);
-			break;
-		case 'projects':
-			blocks.projects.value.push(entry as ProjectEntry);
-			break;
-		case 'education':
-			blocks.education.value.push(entry as EducationEntry);
-			break;
-	}
+	const entry = findEntry(master.blocks, item.blockKey, item.objectId);
+	if (!entry) return;
+	const block = tailored.blocks[item.blockKey] as unknown as { value: AnyEntry[] };
+	block.value.push(structuredClone(entry));
 }
 
-function applyTopLevelEntryRemoved(
-	blocks: CV['blocks'],
-	item: Extract<DiffItem, { type: 'entryRemoved' }>
+function applyEntryRemoved(
+	tailored: CV,
+	item: Extract<EntryDiffItem, { change: 'added' | 'removed' }>
 ): void {
-	const removeById = <T extends { objectId: ObjectId }>(arr: T[]): T[] =>
-		arr.filter((e) => e.objectId !== item.objectId);
-
-	switch (item.blockKey) {
-		case 'contacts':
-			blocks.contacts.value = removeById(blocks.contacts.value);
-			break;
-		case 'highlights':
-			blocks.highlights.value = removeById(blocks.highlights.value);
-			break;
-		case 'skills':
-			blocks.skills.value = removeById(blocks.skills.value);
-			break;
-		case 'jobHistory':
-			blocks.jobHistory.value = removeById(blocks.jobHistory.value);
-			break;
-		case 'projects':
-			blocks.projects.value = removeById(blocks.projects.value);
-			break;
-		case 'education':
-			blocks.education.value = removeById(blocks.education.value);
-			break;
-	}
+	const block = tailored.blocks[item.blockKey] as unknown as { value: WithId[] };
+	block.value = block.value.filter((e) => e.objectId !== item.objectId);
 }
 
-function applyTopLevelEntryModified(
-	blocks: CV['blocks'],
-	item: Extract<DiffItem, { type: 'entryModified' }>
+function applyEntryModified(
+	tailored: CV,
+	item: Extract<EntryDiffItem, { change: 'modified' }>
 ): void {
-	const applyFields = <T extends { objectId: ObjectId }>(arr: T[]): void => {
-		const entry = arr.find((e) => e.objectId === item.objectId);
-		if (entry) Object.assign(entry, item.after);
-	};
-
-	switch (item.blockKey) {
-		case 'contacts':
-			applyFields(blocks.contacts.value);
-			break;
-		case 'highlights':
-			applyFields(blocks.highlights.value);
-			break;
-		case 'skills':
-			applyFields(blocks.skills.value);
-			break;
-		case 'jobHistory':
-			applyFields(blocks.jobHistory.value);
-			break;
-		case 'projects':
-			applyFields(blocks.projects.value);
-			break;
-		case 'education':
-			applyFields(blocks.education.value);
-			break;
-	}
+	const entry = (tailored.blocks[item.blockKey].value as unknown as WithId[]).find(
+		(e) => e.objectId === item.objectId
+	);
+	if (entry) Object.assign(entry, item.after);
 }
 
-function applyNestedEntryAdded(
-	blocks: CV['blocks'],
-	item: Extract<DiffItem, { type: 'entryAdded' }>
+function applyNestedAdded(
+	tailored: CV,
+	master: CV,
+	item: Extract<NestedDiffItem, { change: 'added' | 'removed' }>
 ): void {
-	const parentId = item.parentObjectId!;
-	const entry = structuredClone(item.entry);
-
-	if (item.nestedListKey === 'achievements') {
-		const job = blocks.jobHistory.value.find((j) => j.objectId === parentId);
-		if (job) job.achievements.push(entry as Achievement);
-	} else if (item.nestedListKey === 'stack') {
-		const proj = blocks.projects.value.find((p) => p.objectId === parentId);
-		if (proj) proj.stack.push(entry as Tag);
-	} else if (item.nestedListKey === 'skills') {
-		if (item.blockKey === 'jobHistory') {
-			const job = blocks.jobHistory.value.find((j) => j.objectId === parentId);
-			if (job) job.skills.push(entry as Tag);
-		} else {
-			const cat = blocks.skills.value.find((c) => c.objectId === parentId);
-			if (cat) cat.skills.push(entry as Tag);
-		}
-	}
+	const entry = findNestedEntry(
+		master.blocks,
+		item.blockKey,
+		item.parentObjectId,
+		item.nestedListKey,
+		item.objectId
+	);
+	if (!entry) return;
+	const parent = findParentEntry(tailored.blocks, item.blockKey, item.parentObjectId) as
+		| Record<string, WithId[]>
+		| undefined;
+	if (!parent) return;
+	parent[item.nestedListKey].push(structuredClone(entry) as WithId);
 }
 
-function applyNestedEntryRemoved(
-	blocks: CV['blocks'],
-	item: Extract<DiffItem, { type: 'entryRemoved' }>
+function applyNestedRemoved(
+	tailored: CV,
+	item: Extract<NestedDiffItem, { change: 'added' | 'removed' }>
 ): void {
-	const parentId = item.parentObjectId!;
-	const removeById = <T extends { objectId: ObjectId }>(arr: T[]): T[] =>
-		arr.filter((e) => e.objectId !== item.objectId);
-
-	if (item.nestedListKey === 'achievements') {
-		const job = blocks.jobHistory.value.find((j) => j.objectId === parentId);
-		if (job) job.achievements = removeById(job.achievements);
-	} else if (item.nestedListKey === 'stack') {
-		const proj = blocks.projects.value.find((p) => p.objectId === parentId);
-		if (proj) proj.stack = removeById(proj.stack);
-	} else if (item.nestedListKey === 'skills') {
-		if (item.blockKey === 'jobHistory') {
-			const job = blocks.jobHistory.value.find((j) => j.objectId === parentId);
-			if (job) job.skills = removeById(job.skills);
-		} else {
-			const cat = blocks.skills.value.find((c) => c.objectId === parentId);
-			if (cat) cat.skills = removeById(cat.skills);
-		}
-	}
+	const parent = findParentEntry(tailored.blocks, item.blockKey, item.parentObjectId) as
+		| Record<string, WithId[]>
+		| undefined;
+	if (!parent) return;
+	parent[item.nestedListKey] = parent[item.nestedListKey].filter(
+		(e) => e.objectId !== item.objectId
+	);
 }
 
-function applyNestedEntryModified(
-	blocks: CV['blocks'],
-	item: Extract<DiffItem, { type: 'entryModified' }>
+function applyNestedModified(
+	tailored: CV,
+	item: Extract<NestedDiffItem, { change: 'modified' }>
 ): void {
-	const parentId = item.parentObjectId!;
-	const applyTo = <T extends { objectId: ObjectId }>(arr: T[]): void => {
-		const entry = arr.find((e) => e.objectId === item.objectId);
-		if (entry) Object.assign(entry, item.after);
-	};
-
-	if (item.nestedListKey === 'achievements') {
-		const job = blocks.jobHistory.value.find((j) => j.objectId === parentId);
-		if (job) applyTo(job.achievements);
-	} else if (item.nestedListKey === 'stack') {
-		const proj = blocks.projects.value.find((p) => p.objectId === parentId);
-		if (proj) applyTo(proj.stack);
-	} else if (item.nestedListKey === 'skills') {
-		if (item.blockKey === 'jobHistory') {
-			const job = blocks.jobHistory.value.find((j) => j.objectId === parentId);
-			if (job) applyTo(job.skills);
-		} else {
-			const cat = blocks.skills.value.find((c) => c.objectId === parentId);
-			if (cat) applyTo(cat.skills);
-		}
-	}
+	const parent = findParentEntry(tailored.blocks, item.blockKey, item.parentObjectId) as
+		| Record<string, WithId[]>
+		| undefined;
+	if (!parent) return;
+	const nested = parent[item.nestedListKey].find((e) => e.objectId === item.objectId);
+	if (nested) Object.assign(nested, item.after);
 }
 
 export function applySyncDecisions(
@@ -224,7 +123,7 @@ export function applySyncDecisions(
 
 	for (const item of items) {
 		if (decisions.get(item.objectId) === 'accepted') {
-			applyItem(tailoredCv, item);
+			applyItem(tailoredCv, masterCv, item);
 		}
 	}
 
