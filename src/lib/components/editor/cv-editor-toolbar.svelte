@@ -1,18 +1,20 @@
 <script lang="ts">
 	import { InlineField } from '$lib/components/ui/inline-field';
 	import { Badge } from '$lib/components/ui/badge';
-	import { Button } from '$lib/components/ui/button';
 	import { getCVStoreContext } from '$lib/stores/cv.svelte';
 	import { ExternalLink } from '@lucide/svelte';
 	import { TailorDialog, SyncDrawer } from '$lib/components/tailoring';
+	import ExportButton from './export-button.svelte';
 	import type { CV } from '$lib/types/cv';
+	import { resolve } from '$app/paths';
 
 	interface Props {
 		cvName: string;
 		masterCv?: CV;
+		previewOpen?: boolean;
 	}
 
-	let { cvName = $bindable(), masterCv }: Props = $props();
+	let { cvName = $bindable(), masterCv, previewOpen = $bindable(false) }: Props = $props();
 
 	const cvStore = getCVStoreContext();
 
@@ -34,7 +36,7 @@
 
 <div class="bg-background sticky top-14 z-10 px-6 py-3">
 	<div
-		class="border-foreground bg-card shadow-brutal mx-auto flex max-w-3xl items-center gap-4 border-2 px-6 py-3"
+		class="border-foreground bg-card shadow-brutal mx-auto flex max-w-7xl items-center gap-4 border-2 px-6 py-3"
 	>
 		<div class="flex flex-1 items-center gap-4">
 			<InlineField bind:value={cvName} class="text-lg font-bold" />
@@ -43,7 +45,7 @@
 		<div class="flex items-center gap-2">
 			{#if isTailored && masterCv}
 				<a
-					href="/cv/{masterCv.id}"
+					href={resolve(`/cv/${masterCv.id}`)}
 					class="text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs transition-colors"
 				>
 					<ExternalLink class="h-3 w-3" />
@@ -62,8 +64,9 @@
 			{#if cvStore.cv}
 				<TailorDialog
 					sourceCv={cvStore.cv}
-					onCreate={(id) => (window.location.href = `/cv/${id}`)}
+					onCreate={(id) => (window.location.href = resolve(`/cv/${id}`))}
 				/>
+				<ExportButton cv={cvStore.cv} />
 			{/if}
 
 			{#if cvStore.saveStatus === 'saving'}

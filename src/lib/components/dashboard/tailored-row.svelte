@@ -5,6 +5,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { SyncDrawer } from '$lib/components/tailoring';
 	import StatusBadge from './status-badge.svelte';
+	import { ExportButton } from '$lib/components/editor';
 	import { Eye, Trash2 } from '@lucide/svelte';
 
 	interface Props {
@@ -80,6 +81,7 @@
 			<Button variant="outline" size="sm" href="/cv/{cv.id}">
 				<Eye class="h-3.5 w-3.5" /> Open
 			</Button>
+			<ExportButton {cv} variant="ghost" />
 			<Button
 				variant="ghost"
 				size="sm"
