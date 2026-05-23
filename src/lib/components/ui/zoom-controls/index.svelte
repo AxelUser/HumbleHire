@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { Button } from '$lib/components/ui/button';
+	import { Minus, Plus } from '@lucide/svelte';
+
 	interface Props {
 		zoomFactor: number;
 		onZoomIn: () => void;
@@ -22,35 +25,42 @@
 	const canZoomIn = $derived(zoomFactor < maxZoom);
 </script>
 
-<div class="flex items-center gap-1">
-	<button
+<div class="flex items-center gap-1 select-none">
+	<Button
+		variant="outline"
+		size="icon-sm"
 		onclick={onZoomOut}
 		disabled={!canZoomOut}
-		class="border-foreground hover-brutal shadow-brutal-sm flex h-7 w-7 items-center justify-center border-2 font-bold transition-opacity disabled:pointer-events-none disabled:opacity-40"
+		class="select-none"
 		aria-label="Zoom out"
 	>
-		−
-	</button>
+		<Minus class="h-4 w-4" />
+	</Button>
 
 	<span
-		class="border-foreground bg-background flex h-7 min-w-[3.5rem] items-center justify-center border-2 text-xs font-bold tabular-nums"
+		class="flex h-8 min-w-[3.5rem] items-center justify-center border-2 border-foreground bg-background text-xs font-bold tabular-nums select-none"
+		aria-live="polite"
 	>
 		{displayZoom}
 	</span>
 
-	<button
+	<Button
+		variant="outline"
+		size="icon-sm"
 		onclick={onZoomIn}
 		disabled={!canZoomIn}
-		class="border-foreground hover-brutal shadow-brutal-sm flex h-7 w-7 items-center justify-center border-2 font-bold transition-opacity disabled:pointer-events-none disabled:opacity-40"
+		class="select-none"
 		aria-label="Zoom in"
 	>
-		+
-	</button>
+		<Plus class="h-4 w-4" />
+	</Button>
 
-	<button
+	<Button
+		variant="outline"
+		size="sm"
 		onclick={onFitToScreen}
-		class="border-foreground hover-brutal shadow-brutal-sm ml-1 flex h-7 items-center justify-center border-2 px-2 text-xs font-bold"
+		class="ml-1 select-none"
 	>
 		Fit
-	</button>
+	</Button>
 </div>

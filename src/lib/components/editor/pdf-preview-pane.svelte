@@ -40,7 +40,6 @@
 
 	let zoomFactor = $state(1.0);
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let pdfjsLib: typeof PDFJSLib | null = null;
 
 	async function getPdfjsLib() {
@@ -55,18 +54,15 @@
 		return pdfjsLib;
 	}
 
-	// Only blocks and hiddenBlockIds affect the PDF output — track nothing else
+	// Only blocks and hiddenBlockIds affect the PDF output
 	$effect(() => {
 		const blocks = $state.snapshot(cv.blocks);
 		const hiddenBlockIds = $state.snapshot(cv.hiddenBlockIds);
-		const timer = setTimeout(
-			() => regenerate({ ...cv, blocks, hiddenBlockIds } as CV),
-			1000
-		);
+		const timer = setTimeout(() => regenerate({ ...cv, blocks, hiddenBlockIds } as CV), 1000);
 		return () => clearTimeout(timer);
 	});
 
-	// Zoom changes → re-render from cached doc (immediate)
+	// When zoom changes, re-render from cached doc
 	$effect(() => {
 		const zoom = zoomFactor;
 		if (!cachedPdfDoc) return;
@@ -203,7 +199,7 @@
 	</div>
 
 	<!-- Scrollable pages area -->
-	<div bind:this={scrollContainer} class="flex-1 overflow-auto bg-muted">
+	<div bind:this={scrollContainer} class="bg-muted flex-1 overflow-auto">
 		<div class="min-w-full p-4">
 			{#if statusMessage}
 				<p class="text-muted-foreground p-6 text-center text-sm">{statusMessage}</p>
