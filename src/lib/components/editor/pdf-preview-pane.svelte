@@ -1,12 +1,26 @@
 <script lang="ts">
-	import { getCVStoreContext } from '$lib/stores/cv.svelte';
 	import { generatePdfBlob } from '$lib/features/export/generate';
+	import ZoomControls from '$lib/components/ui/zoom-controls/index.svelte';
 	import type * as PDFJSLib from 'pdfjs-dist';
+	import type { PDFDocumentProxy } from 'pdfjs-dist';
+	import type { CV } from '$lib/types/cv';
 
-	const cvStore = getCVStoreContext();
+	interface Props {
+		cv: CV;
+	}
 
-	let container: HTMLDivElement;
+	let { cv }: Props = $props();
+
+	let scrollContainer: HTMLDivElement;
+	let pagesContainer: HTMLDivElement;
 	let renderVersion = 0;
+	let cachedPdfDoc: PDFDocumentProxy | null = null;
+
+	const MIN_ZOOM = 0.5;
+	const MAX_ZOOM = 2.0;
+	const ZOOM_STEP = 0.1;
+
+	let zoomFactor = $state(1.0);
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let pdfjsLib: typeof PDFJSLib | null = null;
@@ -23,110 +37,175 @@
 		return pdfjsLib;
 	}
 
+	// CV changes → full regeneration (debounced)
 	$effect(() => {
-		// FIXME: In reality only blocks and hidden blocks are relevant, not the entire CV. Tracking the entire CV will re-render if e.g. title changes.
-		const cv = $state.snapshot(cvStore.cv);
-
-		const timer = setTimeout(async () => {
-			if (!cv || !container) return;
-			const width = container.getBoundingClientRect().width;
-			if (width <= 0) return;
-			await renderPages(cv);
-		}, 1000);
-
+		const snapshot = $state.snapshot(cv);
+		const timer = setTimeout(() => regenerate(snapshot as CV), 1000);
 		return () => clearTimeout(timer);
 	});
 
-	async function renderPages(cv: NonNullable<typeof cvStore.cv>) {
+	// Zoom changes → re-render from cached doc (immediate)
+	$effect(() => {
+		const zoom = zoomFactor;
+		if (!cachedPdfDoc || !pagesContainer) return;
 		const myVersion = ++renderVersion;
+		renderPages(cachedPdfDoc, zoom, myVersion);
+	});
 
-		container.innerHTML =
-			'<p class="p-6 text-center text-sm text-muted-foreground">Generating preview…</p>';
+	async function regenerate(snapshot: CV) {
+		const myVersion = ++renderVersion;
+		setMessage('Generating preview…');
 
 		try {
-			const blob = await generatePdfBlob(cv);
+			const blob = await generatePdfBlob(snapshot);
 			if (myVersion !== renderVersion) return;
 
 			const lib = await getPdfjsLib();
 			if (myVersion !== renderVersion) return;
 
 			const arrayBuffer = await blob.arrayBuffer();
+
+			if (cachedPdfDoc) {
+				cachedPdfDoc.destroy();
+				cachedPdfDoc = null;
+			}
+
 			const pdfDoc = await lib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
 			if (myVersion !== renderVersion) {
 				pdfDoc.destroy();
 				return;
 			}
 
-			container.innerHTML = '';
-			const containerWidth = container.getBoundingClientRect().width - 32;
-
-			for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
-				if (myVersion !== renderVersion) return;
-
-				const page = await pdfDoc.getPage(pageNum);
-				const naturalViewport = page.getViewport({ scale: 1 });
-				const scale = containerWidth / naturalViewport.width;
-				const viewport = page.getViewport({ scale });
-
-				const dpr = Math.min(typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1, 2);
-				const physViewport = page.getViewport({ scale: scale * dpr });
-
-				const wrapper = document.createElement('div');
-				wrapper.style.cssText = [
-					`position: relative`,
-					`width: ${viewport.width}px`,
-					`height: ${viewport.height}px`,
-					`margin: 0 auto 16px`,
-					`box-shadow: 0 1px 6px rgba(0,0,0,0.15)`,
-					`background: white`,
-					`overflow: hidden`
-				].join(';');
-
-				const canvas = document.createElement('canvas');
-				canvas.width = Math.floor(physViewport.width);
-				canvas.height = Math.floor(physViewport.height);
-				canvas.style.width = `${viewport.width}px`;
-				canvas.style.height = `${viewport.height}px`;
-
-				const textDiv = document.createElement('div');
-				// FIXME: the text div is not well aligned with the canvas. Should figure out a way to use PDF.js's text layer directly.
-				textDiv.className = 'pdfTextLayer';
-				textDiv.style.cssText = `position:absolute;inset:0;width:${viewport.width}px;height:${viewport.height}px;overflow:hidden`;
-
-				wrapper.appendChild(canvas);
-				wrapper.appendChild(textDiv);
-				// FIXME: mutating the DOM directly is not ideal, should use Svelte's API instead.
-				container.appendChild(wrapper);
-
-				await page.render({ canvas, viewport: physViewport }).promise;
-
-				if (myVersion !== renderVersion) return;
-
-				const textLayer = new lib.TextLayer({
-					textContentSource: page.streamTextContent(),
-					container: textDiv,
-					viewport
-				});
-				await textLayer.render();
-			}
+			cachedPdfDoc = pdfDoc;
+			await renderPages(pdfDoc, zoomFactor, myVersion);
 		} catch (err) {
 			if (myVersion !== renderVersion) return;
 			console.error('PDF preview error:', err);
-			if (container) {
-				// FIXME: mutating the DOM directly is not ideal, should use Svelte's API instead.
-				container.innerHTML =
-					'<p class="p-6 text-center text-sm text-muted-foreground">Preview unavailable.</p>';
-			}
+			setMessage('Preview unavailable.');
 		}
+	}
+
+	async function renderPages(pdfDoc: PDFDocumentProxy, zoom: number, myVersion: number) {
+		if (!scrollContainer || !pagesContainer) return;
+
+		const baseWidth = scrollContainer.getBoundingClientRect().width - 32;
+		if (baseWidth <= 0) return;
+
+		pagesContainer.innerHTML = '';
+
+		const lib = await getPdfjsLib();
+
+		for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+			if (myVersion !== renderVersion) return;
+
+			const page = await pdfDoc.getPage(pageNum);
+			const naturalViewport = page.getViewport({ scale: 1 });
+			const scale = (baseWidth / naturalViewport.width) * zoom;
+			const viewport = page.getViewport({ scale });
+
+			const dpr = Math.min(typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1, 2);
+			const physViewport = page.getViewport({ scale: scale * dpr });
+
+			const wrapper = document.createElement('div');
+			wrapper.style.cssText = [
+				`position: relative`,
+				`width: ${viewport.width}px`,
+				`height: ${viewport.height}px`,
+				`margin: 0 auto 16px`,
+				`box-shadow: 4px 4px 0px 0px var(--shadow-color)`,
+				`background: white`,
+				`overflow: hidden`,
+				`flex-shrink: 0`
+			].join(';');
+
+			const canvas = document.createElement('canvas');
+			canvas.width = Math.floor(physViewport.width);
+			canvas.height = Math.floor(physViewport.height);
+			canvas.style.width = `${viewport.width}px`;
+			canvas.style.height = `${viewport.height}px`;
+
+			const textDiv = document.createElement('div');
+			textDiv.className = 'pdfTextLayer';
+			textDiv.style.cssText = `position:absolute;inset:0;width:${viewport.width}px;height:${viewport.height}px;overflow:hidden`;
+
+			const badge = document.createElement('div');
+			badge.className = 'pdf-page-badge';
+			badge.textContent = `${pageNum} / ${pdfDoc.numPages}`;
+
+			wrapper.appendChild(canvas);
+			wrapper.appendChild(textDiv);
+			wrapper.appendChild(badge);
+			pagesContainer.appendChild(wrapper);
+
+			await page.render({ canvas, viewport: physViewport }).promise;
+			if (myVersion !== renderVersion) return;
+
+			const textLayer = new lib.TextLayer({
+				textContentSource: page.streamTextContent(),
+				container: textDiv,
+				viewport
+			});
+			await textLayer.render();
+		}
+	}
+
+	function setMessage(msg: string) {
+		if (pagesContainer) {
+			pagesContainer.innerHTML = `<p class="p-6 text-center text-sm text-muted-foreground">${msg}</p>`;
+		}
+	}
+
+	function zoomIn() {
+		zoomFactor = Math.min(MAX_ZOOM, Math.round((zoomFactor + ZOOM_STEP) * 10) / 10);
+	}
+
+	function zoomOut() {
+		zoomFactor = Math.max(MIN_ZOOM, Math.round((zoomFactor - ZOOM_STEP) * 10) / 10);
+	}
+
+	function fitToScreen() {
+		zoomFactor = 1.0;
 	}
 </script>
 
-<div bind:this={container} class="min-h-full bg-neutral-100 p-4">
-	<p class="text-muted-foreground p-6 text-center text-sm">Loading preview…</p>
+<div class="flex h-full flex-col">
+	<!-- Zoom toolbar -->
+	<div class="bg-background border-foreground flex shrink-0 items-center gap-3 border-b-2 px-4 py-2">
+		<span class="text-muted-foreground text-xs font-bold uppercase tracking-widest">Preview</span>
+		<ZoomControls
+			{zoomFactor}
+			onZoomIn={zoomIn}
+			onZoomOut={zoomOut}
+			onFitToScreen={fitToScreen}
+			minZoom={MIN_ZOOM}
+			maxZoom={MAX_ZOOM}
+		/>
+	</div>
+
+	<!-- Scrollable pages area -->
+	<div bind:this={scrollContainer} class="flex-1 overflow-auto bg-neutral-100">
+		<div bind:this={pagesContainer} class="min-w-full p-4">
+			<p class="text-muted-foreground p-6 text-center text-sm">Loading preview…</p>
+		</div>
+	</div>
 </div>
 
 <style>
 	:global {
+		.pdf-page-badge {
+			position: absolute;
+			top: 8px;
+			right: 8px;
+			background-color: var(--foreground);
+			color: var(--background);
+			font-size: 0.75rem;
+			font-weight: 700;
+			padding: 2px 6px;
+			line-height: 1.4;
+			pointer-events: none;
+			user-select: none;
+		}
+
 		.pdfTextLayer {
 			user-select: text;
 			-webkit-user-select: text;

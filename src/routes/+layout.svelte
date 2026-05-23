@@ -12,9 +12,9 @@
 
 <ModeWatcher />
 
-<div class="flex min-h-screen flex-col">
+<div class="flex h-screen flex-col">
 	<Header />
-	<main class="flex-1">
+	<main class="min-h-0 flex-1 overflow-y-auto">
 		{@render children()}
 	</main>
 	<Footer />

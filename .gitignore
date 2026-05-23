@@ -29,3 +29,5 @@ vite.config.ts.timestamp-*
 .agents
 *storybook.log
 storybook-static
+.playwright-cli
+.playwright-mcp

@@ -4,91 +4,66 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { db } from '$lib/db/index';
-	import { CVStore, setCVStoreContext } from '$lib/stores/cv.svelte';
-	import { Skeleton } from '$lib/components/ui/skeleton';
-	import { CvEditorToolbar, CvPreview, PdfPreviewPane } from '$lib/components/editor';
-	import {
-		Drawer,
-		DrawerContent,
-		DrawerHeader,
-		DrawerTitle
-	} from '$lib/components/ui/drawer';
+	import { CvEditor } from '$lib/components/editor';
+	import { AUTOSAVE_DEBOUNCE_MS } from '$lib/config';
 	import type { CV } from '$lib/types/cv';
+	import type { SaveStatus } from '$lib/types/save-status';
+	import { toast } from 'svelte-sonner';
 
-	const cvStore = new CVStore();
-	setCVStoreContext(cvStore);
-
+	let cv = $state<CV | null>(null);
 	let masterCv = $state<CV | undefined>(undefined);
-	let previewOpen = $state(false);
-	let innerWidth = $state(0);
-
-	const isLarge = $derived(innerWidth >= 1024);
+	let saveStatus = $state<SaveStatus>({ status: 'idle' });
 
 	onMount(async () => {
 		const id = page.params.id;
 		const loaded = await db.cvs.get(id);
 		if (!loaded) {
-			goto(resolve(`/`));
+			goto(resolve('/'));
 			return;
 		}
-		cvStore.cv = loaded;
+		cv = loaded;
 
 		if (loaded.sourceId) {
-			masterCv = await db.cvs.get(loaded.sourceId);
-			if (!masterCv) {
+			const source = await db.cvs.get(loaded.sourceId);
+			if (!source) {
 				await db.cvs.update(id, { sourceId: undefined, syncDecisions: undefined });
-				cvStore.cv = { ...loaded, sourceId: undefined, syncDecisions: undefined };
+				cv = { ...loaded, sourceId: undefined, syncDecisions: undefined };
+			} else {
+				masterCv = source;
 			}
 		}
 	});
+
+	$effect(() => {
+		if (!cv) return;
+		const snapshot = $state.snapshot(cv) as CV;
+
+		const timer = setTimeout(async () => {
+			saveStatus = { status: 'saving' };
+			try {
+				await db.cvs.put({
+					...snapshot,
+					updatedAt: Date.now(),
+					version: (snapshot.version ?? 0) + 1
+				});
+				saveStatus = { status: 'saved', savedAt: Date.now() };
+			} catch (err) {
+				saveStatus = { status: 'idle' };
+				toast.error('Auto-save failed. Changes not saved.');
+				console.error('Auto-save error:', err);
+			}
+		}, AUTOSAVE_DEBOUNCE_MS);
+
+		return () => clearTimeout(timer);
+	});
+
+	function onEdit(updated: CV) {
+		cv = updated;
+	}
 </script>
 
-<svelte:window bind:innerWidth />
-
 <svelte:head>
-	<title>{cvStore.cv?.name ? `${cvStore.cv.name} - HumbleHire` : 'HumbleHire'}</title>
+	<title>{cv?.name ? `${cv.name} - HumbleHire` : 'HumbleHire'}</title>
 </svelte:head>
 
-{#if cvStore.cv === null}
-	<div class="mx-auto max-w-5xl space-y-4 px-6 py-10">
-		<Skeleton class="h-12 w-full" />
-		<Skeleton class="h-64 w-full" />
-		<Skeleton class="h-32 w-full" />
-	</div>
-{:else}
-	<CvEditorToolbar bind:cvName={cvStore.cv.name} {masterCv} bind:previewOpen />
-
-	<div class="px-6">
-		<div class="mx-auto flex max-w-7xl items-start">
-			<!-- Block editor (left) -->
-			<div class="min-w-0 flex-1">
-				<CvPreview bind:cv={cvStore.cv} />
-			</div>
-
-			<!-- PDF preview pane (desktop ≥lg, always visible) -->
-			{#if isLarge}
-				<div
-					class="border-foreground sticky top-28 h-[calc(100vh-7rem)] w-[460px] shrink-0 overflow-y-auto border-l-2"
-				>
-					<PdfPreviewPane />
-				</div>
-			{/if}
-		</div>
-	</div>
-
-	<!-- Mobile preview drawer (< lg) -->
-	{#if !isLarge}
-		<Drawer direction="right" bind:open={previewOpen}>
-			<DrawerContent class="flex flex-col overflow-hidden">
-				<DrawerHeader class="shrink-0">
-					<DrawerTitle>PDF Preview</DrawerTitle>
-				</DrawerHeader>
-				<div class="flex-1 overflow-y-auto">
-					{#if previewOpen}
-						<PdfPreviewPane />
-					{/if}
-				</div>
-			</DrawerContent>
-		</Drawer>
-	{/if}
-{/if}
+<CvEditor {cv} {saveStatus} {masterCv} {onEdit} />
