@@ -160,6 +160,7 @@
 				viewport: data.viewport
 			});
 			await textLayer.render();
+			spec.textDiv.style.setProperty('--total-scale-factor', String(data.viewport.scale));
 		}
 	}
 
@@ -256,6 +257,8 @@
 			cursor: text;
 			transform-origin: 0% 0%;
 			color: transparent;
+			font-size: calc(var(--total-scale-factor, 1) * var(--font-height, 0px));
+			transform: scaleX(var(--scale-x, 1));
 		}
 
 		.pdfTextLayer .highlight {
