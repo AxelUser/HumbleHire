@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 	import { generatePdfBlob } from '$lib/features/export/generate';
+	import { getPdfjsLib } from '$lib/features/export/pdfjs';
+	import { PdfRenderController } from '$lib/features/export/render-controller';
+	import type { PageSpec } from '$lib/features/export/render-controller';
 	import ZoomControls from '$lib/components/ui/zoom-controls/index.svelte';
-	import type * as PDFJSLib from 'pdfjs-dist';
-	import type { PDFDocumentProxy, PageViewport, RenderTask } from 'pdfjs-dist';
-	import type { PDFPageProxy } from 'pdfjs-dist';
+	import type { PDFDocumentProxy } from 'pdfjs-dist';
 	import type { CV } from '$lib/types/cv';
 
 	interface Props {
@@ -13,47 +14,19 @@
 
 	let { cv }: Props = $props();
 
-	interface PageSpec {
-		pageNum: number;
-		numPages: number;
-		cssWidth: number;
-		cssHeight: number;
-		physWidth: number;
-		physHeight: number;
-		canvas: HTMLCanvasElement | null;
-		textDiv: HTMLElement | null;
-	}
-
 	let scrollContainer: HTMLDivElement;
-	let renderVersion = 0;
+	let generateVersion = 0;
 	let cachedPdfDoc: PDFDocumentProxy | null = null;
-	let activeRenderTasks: RenderTask[] = [];
+	const controller = new PdfRenderController();
 
 	let pages = $state<PageSpec[]>([]);
 	let statusMessage = $state('Loading preview…');
-
-	// Non-reactive: PDF.js objects must not be wrapped in Svelte proxies
-	let renderData: { page: PDFPageProxy; viewport: PageViewport; physViewport: PageViewport }[] = [];
 
 	const MIN_ZOOM = 0.5;
 	const MAX_ZOOM = 2.0;
 	const ZOOM_STEP = 0.1;
 
 	let zoomFactor = $state(1.0);
-
-	let pdfjsLib: typeof PDFJSLib | null = null;
-
-	async function getPdfjsLib() {
-		if (pdfjsLib) return pdfjsLib;
-		pdfjsLib = await import('pdfjs-dist');
-		if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
-			pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-				'pdfjs-dist/build/pdf.worker.min.mjs',
-				import.meta.url
-			).href;
-		}
-		return pdfjsLib;
-	}
 
 	// Only blocks and hiddenBlockIds affect the PDF output
 	$effect(() => {
@@ -67,20 +40,19 @@
 	$effect(() => {
 		const zoom = zoomFactor;
 		if (!cachedPdfDoc) return;
-		const myVersion = ++renderVersion;
-		renderPages(cachedPdfDoc, zoom, myVersion);
+		renderPages(cachedPdfDoc, zoom);
 	});
 
 	async function regenerate(snapshot: CV) {
-		const myVersion = ++renderVersion;
+		const myVersion = ++generateVersion;
 		setMessage('Generating preview…');
 
 		try {
 			const blob = await generatePdfBlob(snapshot);
-			if (myVersion !== renderVersion) return;
+			if (myVersion !== generateVersion) return;
 
 			const lib = await getPdfjsLib();
-			if (myVersion !== renderVersion) return;
+			if (myVersion !== generateVersion) return;
 
 			const arrayBuffer = await blob.arrayBuffer();
 
@@ -90,108 +62,37 @@
 			}
 
 			const pdfDoc = await lib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
-			if (myVersion !== renderVersion) {
+			if (myVersion !== generateVersion) {
 				pdfDoc.destroy();
 				return;
 			}
 
 			cachedPdfDoc = pdfDoc;
-			await renderPages(pdfDoc, zoomFactor, myVersion);
+			await renderPages(pdfDoc, zoomFactor);
 		} catch (err) {
-			if (myVersion !== renderVersion) return;
+			if (myVersion !== generateVersion) return;
 			console.error('PDF preview error:', err);
 			setMessage('Preview unavailable.');
 		}
 	}
 
-	async function renderPages(pdfDoc: PDFDocumentProxy, zoom: number, myVersion: number) {
+	async function renderPages(pdfDoc: PDFDocumentProxy, zoom: number) {
 		if (!scrollContainer) return;
+		const containerWidth = scrollContainer.getBoundingClientRect().width - 32;
 
-		// Cancel any in-flight PDF.js render tasks from a superseded version
-		activeRenderTasks.splice(0).forEach((t) => t.cancel());
+		const result = await controller.buildSpecs(pdfDoc, zoom, containerWidth);
+		if (!result) return;
 
-		const baseWidth = scrollContainer.getBoundingClientRect().width - 32;
-		if (baseWidth <= 0) return;
-
-		const lib = await getPdfjsLib();
-		const newSpecs: PageSpec[] = [];
-		const newRenderData: typeof renderData = [];
-
-		for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
-			if (myVersion !== renderVersion) return;
-
-			const page = await pdfDoc.getPage(pageNum);
-			const naturalViewport = page.getViewport({ scale: 1 });
-			const scale = (baseWidth / naturalViewport.width) * zoom;
-			const viewport = page.getViewport({ scale });
-
-			const dpr = Math.min(typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1, 2);
-			const physViewport = page.getViewport({ scale: scale * dpr });
-
-			newSpecs.push({
-				pageNum,
-				numPages: pdfDoc.numPages,
-				cssWidth: viewport.width,
-				cssHeight: viewport.height,
-				physWidth: Math.floor(physViewport.width),
-				physHeight: Math.floor(physViewport.height),
-				canvas: null,
-				textDiv: null
-			});
-			newRenderData.push({ page, viewport, physViewport });
-		}
-
-		if (myVersion !== renderVersion) return;
-
-		renderData = newRenderData;
-		pages = newSpecs;
+		pages = result.specs;
 		statusMessage = '';
 		await tick();
 
-		for (let i = 0; i < pages.length; i++) {
-			if (myVersion !== renderVersion) return;
-
-			const spec = pages[i];
-			const data = renderData[i];
-
-			// Capture DOM refs before any await — Svelte may rebind spec.canvas/textDiv
-			// to a newer spec object if pages is replaced by a concurrent renderPages call.
-			const canvas = spec.canvas;
-			const textDiv = spec.textDiv;
-			if (!canvas || !textDiv) continue;
-
-			textDiv.replaceChildren();
-
-			const renderTask = data.page.render({ canvas, viewport: data.physViewport });
-			activeRenderTasks.push(renderTask);
-			try {
-				await renderTask.promise;
-			} catch {
-				// Render was cancelled by a newer version — bail out silently.
-				return;
-			} finally {
-				activeRenderTasks = activeRenderTasks.filter((t) => t !== renderTask);
-			}
-
-			if (myVersion !== renderVersion) return;
-
-			const textLayer = new lib.TextLayer({
-				textContentSource: data.page.streamTextContent(),
-				container: textDiv,
-				viewport: data.viewport
-			});
-			await textLayer.render();
-
-			if (myVersion !== renderVersion) return;
-
-			textDiv.style.setProperty('--total-scale-factor', String(data.viewport.scale));
-		}
+		await controller.paint(pages, result.version);
 	}
 
 	function setMessage(msg: string) {
-		activeRenderTasks.splice(0).forEach((t) => t.cancel());
+		controller.cancelAll();
 		pages = [];
-		renderData = [];
 		statusMessage = msg;
 	}
 
