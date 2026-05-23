@@ -1,8 +1,10 @@
 <script lang="ts">
+	import { tick } from 'svelte';
 	import { generatePdfBlob } from '$lib/features/export/generate';
 	import ZoomControls from '$lib/components/ui/zoom-controls/index.svelte';
 	import type * as PDFJSLib from 'pdfjs-dist';
-	import type { PDFDocumentProxy } from 'pdfjs-dist';
+	import type { PDFDocumentProxy, PageViewport } from 'pdfjs-dist';
+	import type { PDFPageProxy } from 'pdfjs-dist';
 	import type { CV } from '$lib/types/cv';
 
 	interface Props {
@@ -11,10 +13,26 @@
 
 	let { cv }: Props = $props();
 
+	interface PageSpec {
+		pageNum: number;
+		numPages: number;
+		cssWidth: number;
+		cssHeight: number;
+		physWidth: number;
+		physHeight: number;
+		canvas: HTMLCanvasElement | null;
+		textDiv: HTMLElement | null;
+	}
+
 	let scrollContainer: HTMLDivElement;
-	let pagesContainer: HTMLDivElement;
 	let renderVersion = 0;
 	let cachedPdfDoc: PDFDocumentProxy | null = null;
+
+	let pages = $state<PageSpec[]>([]);
+	let statusMessage = $state('Loading preview…');
+
+	// Non-reactive: PDF.js objects must not be wrapped in Svelte proxies
+	let renderData: { page: PDFPageProxy; viewport: PageViewport; physViewport: PageViewport }[] = [];
 
 	const MIN_ZOOM = 0.5;
 	const MAX_ZOOM = 2.0;
@@ -37,17 +55,21 @@
 		return pdfjsLib;
 	}
 
-	// CV changes → full regeneration (debounced)
+	// Only blocks and hiddenBlockIds affect the PDF output — track nothing else
 	$effect(() => {
-		const snapshot = $state.snapshot(cv);
-		const timer = setTimeout(() => regenerate(snapshot as CV), 1000);
+		const blocks = $state.snapshot(cv.blocks);
+		const hiddenBlockIds = $state.snapshot(cv.hiddenBlockIds);
+		const timer = setTimeout(
+			() => regenerate({ ...cv, blocks, hiddenBlockIds } as CV),
+			1000
+		);
 		return () => clearTimeout(timer);
 	});
 
 	// Zoom changes → re-render from cached doc (immediate)
 	$effect(() => {
 		const zoom = zoomFactor;
-		if (!cachedPdfDoc || !pagesContainer) return;
+		if (!cachedPdfDoc) return;
 		const myVersion = ++renderVersion;
 		renderPages(cachedPdfDoc, zoom, myVersion);
 	});
@@ -86,14 +108,14 @@
 	}
 
 	async function renderPages(pdfDoc: PDFDocumentProxy, zoom: number, myVersion: number) {
-		if (!scrollContainer || !pagesContainer) return;
+		if (!scrollContainer) return;
 
 		const baseWidth = scrollContainer.getBoundingClientRect().width - 32;
 		if (baseWidth <= 0) return;
 
-		pagesContainer.innerHTML = '';
-
 		const lib = await getPdfjsLib();
+		const newSpecs: PageSpec[] = [];
+		const newRenderData: typeof renderData = [];
 
 		for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
 			if (myVersion !== renderVersion) return;
@@ -106,53 +128,49 @@
 			const dpr = Math.min(typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1, 2);
 			const physViewport = page.getViewport({ scale: scale * dpr });
 
-			const wrapper = document.createElement('div');
-			wrapper.style.cssText = [
-				`position: relative`,
-				`width: ${viewport.width}px`,
-				`height: ${viewport.height}px`,
-				`margin: 0 auto 16px`,
-				`box-shadow: 4px 4px 0px 0px var(--shadow-color)`,
-				`background: white`,
-				`overflow: hidden`,
-				`flex-shrink: 0`
-			].join(';');
+			newSpecs.push({
+				pageNum,
+				numPages: pdfDoc.numPages,
+				cssWidth: viewport.width,
+				cssHeight: viewport.height,
+				physWidth: Math.floor(physViewport.width),
+				physHeight: Math.floor(physViewport.height),
+				canvas: null,
+				textDiv: null
+			});
+			newRenderData.push({ page, viewport, physViewport });
+		}
 
-			const canvas = document.createElement('canvas');
-			canvas.width = Math.floor(physViewport.width);
-			canvas.height = Math.floor(physViewport.height);
-			canvas.style.width = `${viewport.width}px`;
-			canvas.style.height = `${viewport.height}px`;
+		if (myVersion !== renderVersion) return;
 
-			const textDiv = document.createElement('div');
-			textDiv.className = 'pdfTextLayer';
-			textDiv.style.cssText = `position:absolute;inset:0;width:${viewport.width}px;height:${viewport.height}px;overflow:hidden`;
+		renderData = newRenderData;
+		pages = newSpecs;
+		statusMessage = '';
+		await tick();
 
-			const badge = document.createElement('div');
-			badge.className = 'pdf-page-badge';
-			badge.textContent = `${pageNum} / ${pdfDoc.numPages}`;
+		for (let i = 0; i < pages.length; i++) {
+			if (myVersion !== renderVersion) return;
 
-			wrapper.appendChild(canvas);
-			wrapper.appendChild(textDiv);
-			wrapper.appendChild(badge);
-			pagesContainer.appendChild(wrapper);
+			const spec = pages[i];
+			const data = renderData[i];
+			if (!spec.canvas || !spec.textDiv) continue;
 
-			await page.render({ canvas, viewport: physViewport }).promise;
+			await data.page.render({ canvas: spec.canvas, viewport: data.physViewport }).promise;
 			if (myVersion !== renderVersion) return;
 
 			const textLayer = new lib.TextLayer({
-				textContentSource: page.streamTextContent(),
-				container: textDiv,
-				viewport
+				textContentSource: data.page.streamTextContent(),
+				container: spec.textDiv,
+				viewport: data.viewport
 			});
 			await textLayer.render();
 		}
 	}
 
 	function setMessage(msg: string) {
-		if (pagesContainer) {
-			pagesContainer.innerHTML = `<p class="p-6 text-center text-sm text-muted-foreground">${msg}</p>`;
-		}
+		pages = [];
+		renderData = [];
+		statusMessage = msg;
 	}
 
 	function zoomIn() {
@@ -170,8 +188,10 @@
 
 <div class="flex h-full flex-col">
 	<!-- Zoom toolbar -->
-	<div class="bg-background border-foreground flex shrink-0 items-center gap-3 border-b-2 px-4 py-2">
-		<span class="text-muted-foreground text-xs font-bold uppercase tracking-widest">Preview</span>
+	<div
+		class="bg-background border-foreground flex shrink-0 items-center gap-3 border-b-2 px-4 py-2"
+	>
+		<span class="text-muted-foreground text-xs font-bold tracking-widest uppercase">Preview</span>
 		<ZoomControls
 			{zoomFactor}
 			onZoomIn={zoomIn}
@@ -183,9 +203,30 @@
 	</div>
 
 	<!-- Scrollable pages area -->
-	<div bind:this={scrollContainer} class="flex-1 overflow-auto bg-neutral-100">
-		<div bind:this={pagesContainer} class="min-w-full p-4">
-			<p class="text-muted-foreground p-6 text-center text-sm">Loading preview…</p>
+	<div bind:this={scrollContainer} class="flex-1 overflow-auto bg-muted">
+		<div class="min-w-full p-4">
+			{#if statusMessage}
+				<p class="text-muted-foreground p-6 text-center text-sm">{statusMessage}</p>
+			{:else}
+				{#each pages as spec (spec.pageNum)}
+					<div
+						style="position:relative; width:{spec.cssWidth}px; height:{spec.cssHeight}px; margin:0 auto 16px; box-shadow:4px 4px 0px 0px var(--shadow-color); background:white; overflow:hidden; flex-shrink:0"
+					>
+						<canvas
+							bind:this={spec.canvas}
+							width={spec.physWidth}
+							height={spec.physHeight}
+							style="width:{spec.cssWidth}px; height:{spec.cssHeight}px"
+						></canvas>
+						<div
+							bind:this={spec.textDiv}
+							class="pdfTextLayer"
+							style="position:absolute;inset:0;width:{spec.cssWidth}px;height:{spec.cssHeight}px;overflow:hidden"
+						></div>
+						<div class="pdf-page-badge">{spec.pageNum} / {spec.numPages}</div>
+					</div>
+				{/each}
+			{/if}
 		</div>
 	</div>
 </div>
