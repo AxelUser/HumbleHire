@@ -1,9 +1,9 @@
-import type { ThemeModule, CVDocDefinition } from '../types';
+import type { ThemeModule, TDocumentDefinitions } from '../../types';
 import type { CVBlocks, JobEntry, ProjectEntry, EducationEntry } from '$lib/types/cv';
-import { formatDateRange, trimUrl, formatSkillCategory } from '../format';
+import { formatDateRange, trimUrl, formatSkillCategory } from './format';
 
 // A4: 595.28pt × 841.89pt. Margins: 15mm L/R (~42.5pt), 20mm T/B (~56.7pt)
-const PAGE_MARGINS = [42.5, 56.7, 42.5, 56.7];
+const PAGE_MARGINS: [number, number, number, number] = [42.5, 56.7, 42.5, 56.7];
 const CONTENT_WIDTH = 595.28 - 42.5 * 2; // ~510pt
 
 function hairline() {
@@ -112,7 +112,7 @@ function sectionEntries<T>(
 export const classicTheme: ThemeModule = {
 	name: 'Classic',
 
-	build(blocks: Partial<CVBlocks>): CVDocDefinition {
+	build(blocks: Partial<CVBlocks>): TDocumentDefinitions {
 		const content: object[] = [];
 
 		// Header
@@ -188,8 +188,9 @@ export const classicTheme: ThemeModule = {
 			);
 		}
 
+		// pdfmake's content DSL uses plain objects; cast content to satisfy the interface contract
 		return {
-			content,
+			content: content as unknown as TDocumentDefinitions['content'],
 			pageSize: 'A4',
 			pageMargins: PAGE_MARGINS,
 			defaultStyle: {

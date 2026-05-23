@@ -1,9 +1,9 @@
 import type { CVBlocks } from '$lib/types/cv';
+import type { TDocumentDefinitions } from 'pdfmake/interfaces';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type CVDocDefinition = Record<string, any>;
+export type { TDocumentDefinitions };
 
 export type ThemeModule = {
 	name: string;
-	build: (blocks: Partial<CVBlocks>) => CVDocDefinition;
+	build: (blocks: Partial<CVBlocks>) => TDocumentDefinitions;
 };

@@ -23,23 +23,23 @@ async function getPdfMake() {
 	return pdfMake;
 }
 
-function buildDocDef(cv: CV) {
+export function buildDocDef(cv: CV, themeKey = DEFAULT_THEME_KEY) {
 	const blocks = preprocessBlocks(cv);
-	const theme = themes[DEFAULT_THEME_KEY];
+	const theme = themes[themeKey] ?? themes[DEFAULT_THEME_KEY];
 	return theme.build(blocks);
 }
 
-function sanitizeFilename(name: string): string {
+export function sanitizeFilename(name: string): string {
 	return name.replace(/[<>:"/\\|?*\x00-\x1f]/g, '').trim() || 'cv';
 }
 
-export async function generatePdfBlob(cv: CV): Promise<Blob> {
+export async function generatePdfBlob(cv: CV, themeKey = DEFAULT_THEME_KEY): Promise<Blob> {
 	const pdfMake = await getPdfMake();
-	return pdfMake.createPdf(buildDocDef(cv)).getBlob();
+	return pdfMake.createPdf(buildDocDef(cv, themeKey)).getBlob();
 }
 
-export async function downloadPdf(cv: CV): Promise<void> {
+export async function downloadPdf(cv: CV, themeKey = DEFAULT_THEME_KEY): Promise<void> {
 	const pdfMake = await getPdfMake();
 	const filename = `${sanitizeFilename(cv.name)}.pdf`;
-	await pdfMake.createPdf(buildDocDef(cv)).download(filename);
+	await pdfMake.createPdf(buildDocDef(cv, themeKey)).download(filename);
 }

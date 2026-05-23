@@ -1,4 +1,4 @@
-import { classicTheme } from './classic';
+import { classicTheme } from './classic/classic';
 import type { ThemeModule } from '../types';
 
 export const themes: Record<string, ThemeModule> = {

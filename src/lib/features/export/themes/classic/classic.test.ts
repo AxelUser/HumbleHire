@@ -29,7 +29,7 @@ describe('classicTheme.build', () => {
 
 	it('uses Roboto as the default font', () => {
 		const doc = classicTheme.build(makeBlocks());
-		expect(doc.defaultStyle.font).toBe('Roboto');
+		expect(doc.defaultStyle!.font).toBe('Roboto');
 	});
 
 	it('produces non-empty content for a full CV', () => {
@@ -69,7 +69,7 @@ describe('classicTheme.build', () => {
 		});
 		const doc = classicTheme.build(blocks);
 		expect(Array.isArray(doc.content)).toBe(true);
-		expect(doc.content.length).toBeGreaterThan(0);
+		expect((doc.content as unknown[]).length).toBeGreaterThan(0);
 	});
 
 	it('produces empty content array for empty blocks', () => {
@@ -151,7 +151,7 @@ describe('classicTheme.build', () => {
 			}
 		};
 		const doc = classicTheme.build(blocks);
-		const hasAvoid = doc.content.some(
+		const hasAvoid = (doc.content as unknown[]).some(
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			(item: any) => item.pageBreak === 'avoid'
 		);

@@ -78,6 +78,9 @@ importers:
       '@types/node':
         specifier: ^24
         version: 24.12.0
+      '@types/pdfmake':
+        specifier: ^0.3.3
+        version: 0.3.3
       '@vitest/browser':
         specifier: 3.2.4
         version: 3.2.4(playwright@1.58.2)(vite@6.4.1(@types/node@24.12.0)(jiti@2.6.1)(lightningcss@1.31.1))(vitest@3.2.4)
@@ -1042,6 +1045,12 @@ packages:
 
   '@types/node@24.12.0':
     resolution: {integrity: sha512-GYDxsZi3ChgmckRT9HPU0WEhKLP08ev/Yfcq2AstjrDASOYCSXeyjDsHg4v5t4jOj7cyDX3vmprafKlWIG9MXQ==}
+
+  '@types/pdfkit@0.17.6':
+    resolution: {integrity: sha512-tIwzxk2uWKp0Cq9JIluQXJid77lYhF52EsIOwhsMF4iWLA6YneoBR1xVKYYdAysHuepUB0OX4tdwMiUDdGKmig==}
+
+  '@types/pdfmake@0.3.3':
+    resolution: {integrity: sha512-ufbceB4Q3dKpmFUMKEbZvJcfLi8+C5b1+rTFVG6urtkS3FHwaTQH6NCh/iEEDINlApCxH/W3/rsq99pP5E9/JA==}
 
   '@types/react@19.2.14':
     resolution: {integrity: sha512-ilcTH/UniCkMdtexkoCN0bI7pMcJDvmQFPvuPvmEaYA/NSfFTAgdUSLAoVjaRJm7+6PvcM+q1zYOwS4wTYMF9w==}
@@ -3416,6 +3425,15 @@ snapshots:
   '@types/node@24.12.0':
     dependencies:
       undici-types: 7.16.0
+
+  '@types/pdfkit@0.17.6':
+    dependencies:
+      '@types/node': 24.12.0
+
+  '@types/pdfmake@0.3.3':
+    dependencies:
+      '@types/node': 24.12.0
+      '@types/pdfkit': 0.17.6
 
   '@types/react@19.2.14':
     dependencies:

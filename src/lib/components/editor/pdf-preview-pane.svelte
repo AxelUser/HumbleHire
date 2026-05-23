@@ -3,7 +3,7 @@
 	import { generatePdfBlob } from '$lib/features/export/generate';
 	import ZoomControls from '$lib/components/ui/zoom-controls/index.svelte';
 	import type * as PDFJSLib from 'pdfjs-dist';
-	import type { PDFDocumentProxy, PageViewport } from 'pdfjs-dist';
+	import type { PDFDocumentProxy, PageViewport, RenderTask } from 'pdfjs-dist';
 	import type { PDFPageProxy } from 'pdfjs-dist';
 	import type { CV } from '$lib/types/cv';
 
@@ -27,6 +27,7 @@
 	let scrollContainer: HTMLDivElement;
 	let renderVersion = 0;
 	let cachedPdfDoc: PDFDocumentProxy | null = null;
+	let activeRenderTasks: RenderTask[] = [];
 
 	let pages = $state<PageSpec[]>([]);
 	let statusMessage = $state('Loading preview…');
@@ -106,6 +107,9 @@
 	async function renderPages(pdfDoc: PDFDocumentProxy, zoom: number, myVersion: number) {
 		if (!scrollContainer) return;
 
+		// Cancel any in-flight PDF.js render tasks from a superseded version
+		activeRenderTasks.splice(0).forEach((t) => t.cancel());
+
 		const baseWidth = scrollContainer.getBoundingClientRect().width - 32;
 		if (baseWidth <= 0) return;
 
@@ -149,22 +153,43 @@
 
 			const spec = pages[i];
 			const data = renderData[i];
-			if (!spec.canvas || !spec.textDiv) continue;
 
-			await data.page.render({ canvas: spec.canvas, viewport: data.physViewport }).promise;
+			// Capture DOM refs before any await — Svelte may rebind spec.canvas/textDiv
+			// to a newer spec object if pages is replaced by a concurrent renderPages call.
+			const canvas = spec.canvas;
+			const textDiv = spec.textDiv;
+			if (!canvas || !textDiv) continue;
+
+			textDiv.replaceChildren();
+
+			const renderTask = data.page.render({ canvas, viewport: data.physViewport });
+			activeRenderTasks.push(renderTask);
+			try {
+				await renderTask.promise;
+			} catch {
+				// Render was cancelled by a newer version — bail out silently.
+				return;
+			} finally {
+				activeRenderTasks = activeRenderTasks.filter((t) => t !== renderTask);
+			}
+
 			if (myVersion !== renderVersion) return;
 
 			const textLayer = new lib.TextLayer({
 				textContentSource: data.page.streamTextContent(),
-				container: spec.textDiv,
+				container: textDiv,
 				viewport: data.viewport
 			});
 			await textLayer.render();
-			spec.textDiv.style.setProperty('--total-scale-factor', String(data.viewport.scale));
+
+			if (myVersion !== renderVersion) return;
+
+			textDiv.style.setProperty('--total-scale-factor', String(data.viewport.scale));
 		}
 	}
 
 	function setMessage(msg: string) {
+		activeRenderTasks.splice(0).forEach((t) => t.cancel());
 		pages = [];
 		renderData = [];
 		statusMessage = msg;
