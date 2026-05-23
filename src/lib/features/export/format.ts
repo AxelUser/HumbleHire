@@ -1,7 +1,7 @@
 const monthYear = new Intl.DateTimeFormat('en', { month: 'short', year: 'numeric' });
 
 /**
- * PRD rule: drop range entirely if start is missing; missing end becomes "Present".
+ * Formats a date range as "Month Year – Month Year" or "Month Year – Present".
  */
 export function formatDateRange(start?: Date, end?: Date): string | undefined {
 	if (!start) return undefined;
