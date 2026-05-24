@@ -38,7 +38,9 @@
 </script>
 
 <div class="bg-background shrink-0 px-6 py-3">
-	<div class="border-foreground bg-card shadow-brutal flex w-full items-center gap-4 border-2 px-6 py-3">
+	<div
+		class="border-foreground bg-card shadow-brutal flex w-full items-center gap-4 border-2 px-6 py-3"
+	>
 		<!-- Left: save status -->
 		<div class="flex shrink-0 items-center">
 			{#if saveStatus.status === 'saving'}

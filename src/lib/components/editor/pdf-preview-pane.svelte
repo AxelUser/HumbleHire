@@ -161,7 +161,9 @@
 				{#each pages as spec (spec.pageNum)}
 					<div
 						class="animate-in fade-in duration-150"
-						style="position:relative; width:{spec.cssWidth}px; height:{spec.cssHeight}px; margin:0 auto 16px; box-shadow:4px 4px 0px 0px var(--shadow-color); background:white; overflow:hidden; flex-shrink:0; opacity:{isPending ? 0.35 : 1}; transition:opacity 200ms ease;"
+						style="position:relative; width:{spec.cssWidth}px; height:{spec.cssHeight}px; margin:0 auto 16px; box-shadow:4px 4px 0px 0px var(--shadow-color); background:white; overflow:hidden; flex-shrink:0; opacity:{isPending
+							? 0.35
+							: 1}; transition:opacity 200ms ease;"
 					>
 						<canvas
 							bind:this={spec.canvas}

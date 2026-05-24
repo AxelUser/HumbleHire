@@ -69,8 +69,8 @@ A theme module satisfies this contract:
 
 ```typescript
 type ThemeModule = {
-  name: string;
-  build: (blocks: Partial<CVBlocks>) => TDocumentDefinitions;
+	name: string;
+	build: (blocks: Partial<CVBlocks>) => TDocumentDefinitions;
 };
 ```
 
@@ -86,18 +86,18 @@ The theme switcher is not exposed in the UI for v1. The infrastructure to regist
 
 ### Classic theme specifics
 
-| Aspect             | Classic theme                                                                                                                                                            |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Font               | Roboto (pdfmake's built-in font, so no extra bundle cost)                                                                                                                |
-| Page size          | A4                                                                                                                                                                       |
-| Margins            | 20 mm top and bottom, 15 mm left and right                                                                                                                               |
-| Header             | Left-aligned. Name in the largest weight, position directly below, then a single contacts row                                                                           |
-| Contacts row       | Location first, then contact entries as `label: value`, separated by pipes (`\|`)                                                                                        |
-| Section headings   | Bold uppercase label with a full-width hairline rule below                                                                                                               |
-| Date formatting    | `MMM YYYY`, always English (e.g. `Jan 2023`). A missing `endDate` becomes `Present`; if either date is absent, the range is dropped                                      |
-| Skills             | A `SkillCategory` with a name renders as `Category: skill, skill` per line. A category with an empty name renders as one comma-separated inline line                     |
+| Aspect             | Classic theme                                                                                                                                                             |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Font               | Roboto (pdfmake's built-in font, so no extra bundle cost)                                                                                                                 |
+| Page size          | A4                                                                                                                                                                        |
+| Margins            | 20 mm top and bottom, 15 mm left and right                                                                                                                                |
+| Header             | Left-aligned. Name in the largest weight, position directly below, then a single contacts row                                                                             |
+| Contacts row       | Location first, then contact entries as `label: value`, separated by pipes (`\|`)                                                                                         |
+| Section headings   | Bold uppercase label with a full-width hairline rule below                                                                                                                |
+| Date formatting    | `MMM YYYY`, always English (e.g. `Jan 2023`). A missing `endDate` becomes `Present`; if either date is absent, the range is dropped                                       |
+| Skills             | A `SkillCategory` with a name renders as `Category: skill, skill` per line. A category with an empty name renders as one comma-separated inline line                      |
 | Project links      | Project name as a clickable link, then an em dash and the plain-text URL trimmed to domain + path (e.g. `github.com/user/repo`), so the URL stays readable to ATS parsers |
-| Highlights heading | "Summary"                                                                                                                                                                |
+| Highlights heading | "Summary"                                                                                                                                                                 |
 
 The Classic theme deliberately steps away from the editor's Soft Neo-Brutalist UI. Hard offset shadows, square borders, and steel-blue accents look right in an authoring tool, but they would be loud and unconventional on an actual resume. The export leans on quiet typography and hairline separators instead.
 
@@ -149,7 +149,7 @@ The export consumes the same `CVBlocks` shape used by the editor. Each block has
 | Highlights  | Bulleted list under a "Summary" heading                                                                                                                     |
 | Skills      | If a `SkillCategory` has a non-empty name: `Category: skill, skill, skill` per line. If name is empty: comma-separated inline (flat mode)                   |
 | Job History | Per entry: company + role on one line, dates right-aligned on the same line, achievements as a bulleted list, skill tags as a comma-separated trailing line |
-| Projects    | Per entry: name (clickable link) `—` plain-text URL (domain + path) on one line, description below, stack as a comma-separated trailing line               |
+| Projects    | Per entry: name (clickable link) `—` plain-text URL (domain + path) on one line, description below, stack as a comma-separated trailing line                |
 | Education   | Per entry: institution + degree on one line, dates right-aligned                                                                                            |
 
 ### Visibility

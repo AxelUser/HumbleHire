@@ -44,27 +44,41 @@ describe('classicTheme.build', () => {
 			},
 			jobHistory: {
 				objectId: id(),
-				value: [{
-					objectId: id(), company: 'Acme', role: 'Engineer',
-					startDate: new Date('2020-01-01'), endDate: undefined,
-					achievements: [{ objectId: id(), text: 'Shipped features.' }],
-					skills: []
-				}]
+				value: [
+					{
+						objectId: id(),
+						company: 'Acme',
+						role: 'Engineer',
+						startDate: new Date('2020-01-01'),
+						endDate: undefined,
+						achievements: [{ objectId: id(), text: 'Shipped features.' }],
+						skills: []
+					}
+				]
 			},
 			projects: {
 				objectId: id(),
-				value: [{
-					objectId: id(), name: 'MyApp', description: 'Cool app.',
-					stack: [{ objectId: id(), value: 'Svelte' }],
-					link: 'https://github.com/user/myapp'
-				}]
+				value: [
+					{
+						objectId: id(),
+						name: 'MyApp',
+						description: 'Cool app.',
+						stack: [{ objectId: id(), value: 'Svelte' }],
+						link: 'https://github.com/user/myapp'
+					}
+				]
 			},
 			education: {
 				objectId: id(),
-				value: [{
-					objectId: id(), institution: 'University', degree: 'BSc',
-					startDate: new Date('2015-01-01'), endDate: new Date('2019-01-01')
-				}]
+				value: [
+					{
+						objectId: id(),
+						institution: 'University',
+						degree: 'BSc',
+						startDate: new Date('2015-01-01'),
+						endDate: new Date('2019-01-01')
+					}
+				]
 			}
 		});
 		const doc = classicTheme.build(blocks);
@@ -81,11 +95,17 @@ describe('classicTheme.build', () => {
 		const blocks = makeBlocks({
 			jobHistory: {
 				objectId: id(),
-				value: [{
-					objectId: id(), company: 'Acme', role: 'Dev',
-					startDate: undefined, endDate: undefined,
-					achievements: [], skills: []
-				}]
+				value: [
+					{
+						objectId: id(),
+						company: 'Acme',
+						role: 'Dev',
+						startDate: undefined,
+						endDate: undefined,
+						achievements: [],
+						skills: []
+					}
+				]
 			}
 		});
 		const doc = classicTheme.build(blocks);
@@ -98,7 +118,14 @@ describe('classicTheme.build', () => {
 			skills: {
 				objectId: id(),
 				value: [
-					{ objectId: id(), name: 'Backend', skills: [{ objectId: id(), value: 'Go' }, { objectId: id(), value: 'Postgres' }] },
+					{
+						objectId: id(),
+						name: 'Backend',
+						skills: [
+							{ objectId: id(), value: 'Go' },
+							{ objectId: id(), value: 'Postgres' }
+						]
+					},
 					{ objectId: id(), name: '', skills: [{ objectId: id(), value: 'Docker' }] }
 				]
 			}
@@ -114,11 +141,17 @@ describe('classicTheme.build', () => {
 		const blocks: Partial<CVBlocks> = {
 			jobHistory: {
 				objectId: id(),
-				value: [{
-					objectId: id(), company: 'Startup', role: 'Lead',
-					startDate: new Date('2022-06-01'), endDate: undefined,
-					achievements: [], skills: []
-				}]
+				value: [
+					{
+						objectId: id(),
+						company: 'Startup',
+						role: 'Lead',
+						startDate: new Date('2022-06-01'),
+						endDate: undefined,
+						achievements: [],
+						skills: []
+					}
+				]
 			}
 		};
 		const doc = classicTheme.build(blocks);
@@ -129,10 +162,15 @@ describe('classicTheme.build', () => {
 		const blocks: Partial<CVBlocks> = {
 			projects: {
 				objectId: id(),
-				value: [{
-					objectId: id(), name: 'Repo', description: '',
-					stack: [], link: 'https://github.com/user/repo'
-				}]
+				value: [
+					{
+						objectId: id(),
+						name: 'Repo',
+						description: '',
+						stack: [],
+						link: 'https://github.com/user/repo'
+					}
+				]
 			}
 		};
 		const doc = classicTheme.build(blocks);
@@ -143,11 +181,17 @@ describe('classicTheme.build', () => {
 		const blocks: Partial<CVBlocks> = {
 			jobHistory: {
 				objectId: id(),
-				value: [{
-					objectId: id(), company: 'Co', role: 'Dev',
-					startDate: undefined, endDate: undefined,
-					achievements: [], skills: []
-				}]
+				value: [
+					{
+						objectId: id(),
+						company: 'Co',
+						role: 'Dev',
+						startDate: undefined,
+						endDate: undefined,
+						achievements: [],
+						skills: []
+					}
+				]
 			}
 		};
 		const doc = classicTheme.build(blocks);

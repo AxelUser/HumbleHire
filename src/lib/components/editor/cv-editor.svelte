@@ -1,12 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { Skeleton } from '$lib/components/ui/skeleton';
-	import {
-		Drawer,
-		DrawerContent,
-		DrawerHeader,
-		DrawerTitle
-	} from '$lib/components/ui/drawer';
+	import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '$lib/components/ui/drawer';
 	import type { CV } from '$lib/types/cv';
 	import type { SaveStatus } from '$lib/types/save-status';
 	import CvEditorToolbar from './cv-editor-toolbar.svelte';

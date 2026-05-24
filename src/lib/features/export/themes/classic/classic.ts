@@ -25,7 +25,12 @@ function sectionHeading(title: string) {
 
 function inlineText(main: string, bold: boolean, suffix?: string) {
 	if (!suffix) return { text: main, bold };
-	return { text: [{ text: main, bold }, { text: suffix, bold: false }] };
+	return {
+		text: [
+			{ text: main, bold },
+			{ text: suffix, bold: false }
+		]
+	};
 }
 
 function entryHeader(left: object, dateRange?: string) {
@@ -65,9 +70,7 @@ function renderProject(project: ProjectEntry) {
 	const nameEl = project.link
 		? { text: project.name, link: project.link, style: 'link' }
 		: { text: project.name, bold: true };
-	const urlEl = project.link
-		? { text: ` — ${trimUrl(project.link)}`, style: 'urlText' }
-		: null;
+	const urlEl = project.link ? { text: ` — ${trimUrl(project.link)}`, style: 'urlText' } : null;
 
 	const items: object[] = [{ text: [nameEl, ...(urlEl ? [urlEl] : [])], margin: [0, 0, 0, 0] }];
 	if (project.description.trim()) {
@@ -85,11 +88,7 @@ function renderProject(project: ProjectEntry) {
 
 function renderEducation(edu: EducationEntry) {
 	const dateRange = formatDateRange(edu.startDate, edu.endDate);
-	const label = inlineText(
-		edu.institution,
-		true,
-		edu.degree ? ` · ${edu.degree}` : undefined
-	);
+	const label = inlineText(edu.institution, true, edu.degree ? ` · ${edu.degree}` : undefined);
 	return { stack: [{ ...entryHeader(label, dateRange) }] };
 }
 
@@ -155,7 +154,12 @@ export const classicTheme: ThemeModule = {
 		if (blocks.skills && blocks.skills.value.length > 0) {
 			const lines = blocks.skills.value
 				.filter((cat) => cat.skills.length > 0)
-				.map((cat) => formatSkillCategory(cat.name, cat.skills.map((s) => s.value)));
+				.map((cat) =>
+					formatSkillCategory(
+						cat.name,
+						cat.skills.map((s) => s.value)
+					)
+				);
 			if (lines.length > 0) {
 				content.push({
 					stack: [

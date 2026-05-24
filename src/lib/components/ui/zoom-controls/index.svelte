@@ -38,7 +38,7 @@
 	</Button>
 
 	<span
-		class="flex h-8 min-w-[3.5rem] items-center justify-center border-2 border-foreground bg-background text-xs font-bold tabular-nums select-none"
+		class="border-foreground bg-background flex h-8 min-w-[3.5rem] items-center justify-center border-2 text-xs font-bold tabular-nums select-none"
 		aria-live="polite"
 	>
 		{displayZoom}
@@ -55,12 +55,5 @@
 		<Plus class="h-4 w-4" />
 	</Button>
 
-	<Button
-		variant="outline"
-		size="sm"
-		onclick={onFitToScreen}
-		class="ml-1 select-none"
-	>
-		Fit
-	</Button>
+	<Button variant="outline" size="sm" onclick={onFitToScreen} class="ml-1 select-none">Fit</Button>
 </div>
