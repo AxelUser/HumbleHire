@@ -30,15 +30,9 @@ export class PdfRenderController {
 
 	// Phase 1: compute page dimensions and fetch PDF.js page objects.
 	// Returns null if superseded by a newer call before completing.
-	async buildSpecs(
-		pdfDoc: PDFDocumentProxy,
-		zoom: number,
-		containerWidth: number
-	): Promise<BuildResult | null> {
+	async buildSpecs(pdfDoc: PDFDocumentProxy, scale: number): Promise<BuildResult | null> {
 		this.activeTasks.splice(0).forEach((t) => t.cancel());
 		const myVersion = ++this.version;
-
-		if (containerWidth <= 0) return null;
 
 		const newSpecs: PageSpec[] = [];
 		const newRenderData = new Map<number, RenderData>();
@@ -47,8 +41,6 @@ export class PdfRenderController {
 			if (myVersion !== this.version) return null;
 
 			const page = await pdfDoc.getPage(pageNum);
-			const naturalViewport = page.getViewport({ scale: 1 });
-			const scale = (containerWidth / naturalViewport.width) * zoom;
 			const viewport = page.getViewport({ scale });
 
 			const dpr = Math.min(typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1, 2);

@@ -10,12 +10,15 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import type { PDFDocumentProxy } from 'pdfjs-dist';
 	import type { CV } from '$lib/types/cv';
+	import { ZOOM_STOPS } from '$lib/types/zoom';
+	import type { ZoomState } from '$lib/types/zoom';
 
 	interface Props {
 		cv: CV;
+		zoomState: ZoomState;
 	}
 
-	let { cv }: Props = $props();
+	let { cv, zoomState = $bindable() }: Props = $props();
 
 	let scrollContainer: HTMLDivElement;
 	let generateVersion = 0;
@@ -26,11 +29,22 @@
 	let statusMessage = $state('');
 	let isPending = $state(false);
 	let pendingVersion = 0;
-	const MIN_ZOOM = 0.5;
-	const MAX_ZOOM = 2.0;
-	const ZOOM_STEP = 0.1;
+	let naturalPageSize = $state<{ width: number; height: number } | null>(null);
 
-	let zoomFactor = $state(1.0);
+	function computeRenderScale(): number {
+		if (!naturalPageSize || !scrollContainer) return zoomState.zoom;
+		const cw = scrollContainer.getBoundingClientRect().width - 32;
+		if (zoomState.mode === 'fit-width') return cw / naturalPageSize.width;
+		if (zoomState.mode === 'fit-page') {
+			const ch = scrollContainer.getBoundingClientRect().height;
+			return Math.min(cw / naturalPageSize.width, ch / naturalPageSize.height);
+		}
+		return zoomState.zoom;
+	}
+
+	const effectiveZoom = $derived(computeRenderScale());
+	const canZoomIn = $derived(ZOOM_STOPS.some((s) => s > effectiveZoom + 0.001));
+	const canZoomOut = $derived(ZOOM_STOPS.some((s) => s < effectiveZoom - 0.001));
 
 	// Only blocks and hiddenBlockIds affect the PDF output
 	$effect(() => {
@@ -42,11 +56,11 @@
 		return () => clearTimeout(timer);
 	});
 
-	// When zoom changes, re-render from cached doc
+	// Re-render when zoom state changes
 	$effect(() => {
-		const zoom = zoomFactor;
+		const { mode, zoom } = zoomState;
 		if (!cachedPdfDoc) return;
-		renderPages(cachedPdfDoc, zoom);
+		renderPages(cachedPdfDoc);
 	});
 
 	async function regenerate(snapshot: CV, pv: number) {
@@ -73,7 +87,11 @@
 			}
 
 			cachedPdfDoc = pdfDoc;
-			await renderPages(pdfDoc, zoomFactor, pv);
+			const firstPage = await pdfDoc.getPage(1);
+			const nv = firstPage.getViewport({ scale: 1 });
+			naturalPageSize = { width: nv.width, height: nv.height };
+
+			await renderPages(pdfDoc, pv);
 		} catch (err) {
 			if (myVersion !== generateVersion) return;
 			console.error('PDF preview error:', err);
@@ -82,11 +100,11 @@
 		}
 	}
 
-	async function renderPages(pdfDoc: PDFDocumentProxy, zoom: number, pv?: number) {
+	async function renderPages(pdfDoc: PDFDocumentProxy, pv?: number) {
 		if (!scrollContainer) return;
-		const containerWidth = scrollContainer.getBoundingClientRect().width - 32;
+		const scale = effectiveZoom;
 
-		const result = await controller.buildSpecs(pdfDoc, zoom, containerWidth);
+		const result = await controller.buildSpecs(pdfDoc, scale);
 		if (!result) return;
 
 		pages = result.specs;
@@ -104,15 +122,26 @@
 	}
 
 	function zoomIn() {
-		zoomFactor = Math.min(MAX_ZOOM, Math.round((zoomFactor + ZOOM_STEP) * 10) / 10);
+		const next = ZOOM_STOPS.find((s) => s > effectiveZoom + 0.001);
+		if (next !== undefined) zoomState = { mode: 'custom', zoom: next };
 	}
 
 	function zoomOut() {
-		zoomFactor = Math.max(MIN_ZOOM, Math.round((zoomFactor - ZOOM_STEP) * 10) / 10);
+		const next = [...ZOOM_STOPS].reverse().find((s) => s < effectiveZoom - 0.001);
+		if (next !== undefined) zoomState = { mode: 'custom', zoom: next };
 	}
 
-	function fitToScreen() {
-		zoomFactor = 1.0;
+	function fitWidth() {
+		if (!scrollContainer || !naturalPageSize) return;
+		const cw = scrollContainer.getBoundingClientRect().width - 32;
+		zoomState = { mode: 'fit-width', zoom: cw / naturalPageSize.width };
+	}
+
+	function fitPage() {
+		if (!scrollContainer || !naturalPageSize) return;
+		const cw = scrollContainer.getBoundingClientRect().width - 32;
+		const ch = scrollContainer.getBoundingClientRect().height;
+		zoomState = { mode: 'fit-page', zoom: Math.min(cw / naturalPageSize.width, ch / naturalPageSize.height) };
 	}
 </script>
 
@@ -143,12 +172,14 @@
 	>
 		<span class="text-muted-foreground text-xs font-bold tracking-widest uppercase">Preview</span>
 		<ZoomControls
-			{zoomFactor}
+			{effectiveZoom}
+			mode={zoomState.mode}
+			{canZoomIn}
+			{canZoomOut}
 			onZoomIn={zoomIn}
 			onZoomOut={zoomOut}
-			onFitToScreen={fitToScreen}
-			minZoom={MIN_ZOOM}
-			maxZoom={MAX_ZOOM}
+			onFitWidth={fitWidth}
+			onFitPage={fitPage}
 		/>
 	</div>
 

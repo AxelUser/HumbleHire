@@ -1,28 +1,23 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import { Minus, Plus } from '@lucide/svelte';
+	import type { ZoomMode } from '$lib/types/zoom';
 
 	interface Props {
-		zoomFactor: number;
+		effectiveZoom: number;
+		mode: ZoomMode;
+		canZoomIn: boolean;
+		canZoomOut: boolean;
 		onZoomIn: () => void;
 		onZoomOut: () => void;
-		onFitToScreen: () => void;
-		minZoom?: number;
-		maxZoom?: number;
+		onFitWidth: () => void;
+		onFitPage: () => void;
 	}
 
-	let {
-		zoomFactor,
-		onZoomIn,
-		onZoomOut,
-		onFitToScreen,
-		minZoom = 0.5,
-		maxZoom = 2.0
-	}: Props = $props();
+	let { effectiveZoom, mode, canZoomIn, canZoomOut, onZoomIn, onZoomOut, onFitWidth, onFitPage }: Props =
+		$props();
 
-	const displayZoom = $derived(Math.round(zoomFactor * 100) + '%');
-	const canZoomOut = $derived(zoomFactor > minZoom);
-	const canZoomIn = $derived(zoomFactor < maxZoom);
+	const displayZoom = $derived(Math.round(effectiveZoom * 100) + '%');
 </script>
 
 <div class="flex items-center gap-1 select-none">
@@ -55,5 +50,19 @@
 		<Plus class="h-4 w-4" />
 	</Button>
 
-	<Button variant="outline" size="sm" onclick={onFitToScreen} class="ml-1 select-none">Fit</Button>
+	<Button
+		variant={mode === 'fit-width' ? 'default' : 'outline'}
+		size="sm"
+		onclick={onFitWidth}
+		aria-pressed={mode === 'fit-width'}
+		class="ml-1 select-none"
+	>Fit W</Button>
+
+	<Button
+		variant={mode === 'fit-page' ? 'default' : 'outline'}
+		size="sm"
+		onclick={onFitPage}
+		aria-pressed={mode === 'fit-page'}
+		class="select-none"
+	>Fit Page</Button>
 </div>

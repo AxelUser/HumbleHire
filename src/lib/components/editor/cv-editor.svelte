@@ -1,9 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { PersistedState } from 'runed';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '$lib/components/ui/drawer';
 	import type { CV } from '$lib/types/cv';
 	import type { SaveStatus } from '$lib/types/save-status';
+	import { ZOOM_DEFAULT } from '$lib/types/zoom';
+	import type { ZoomState } from '$lib/types/zoom';
 	import CvEditorToolbar from './cv-editor-toolbar.svelte';
 	import CvEditorControls from './cv-editor-controls.svelte';
 	import PdfPreviewPane from './pdf-preview-pane.svelte';
@@ -16,6 +19,8 @@
 	}
 
 	let { cv: cvProp, saveStatus, masterCv, onEdit }: Props = $props();
+
+	const zoomPref = new PersistedState<ZoomState>('pdf-preview-zoom-v1', ZOOM_DEFAULT);
 
 	let internalCv = $state<CV | null>(null);
 	let previewOpen = $state(false);
@@ -73,7 +78,7 @@
 			<!-- PDF preview pane (desktop ≥lg) -->
 			{#if isLarge}
 				<div class="border-foreground flex-1 overflow-hidden border-l-2">
-					<PdfPreviewPane cv={internalCv} />
+					<PdfPreviewPane cv={internalCv} bind:zoomState={zoomPref.current} />
 				</div>
 			{/if}
 		</div>
@@ -87,7 +92,7 @@
 					</DrawerHeader>
 					<div class="flex-1 overflow-y-auto">
 						{#if previewOpen}
-							<PdfPreviewPane cv={internalCv} />
+							<PdfPreviewPane cv={internalCv} bind:zoomState={zoomPref.current} />
 						{/if}
 					</div>
 				</DrawerContent>
