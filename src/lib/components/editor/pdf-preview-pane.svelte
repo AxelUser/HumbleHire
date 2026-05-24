@@ -12,6 +12,7 @@
 	import type { CV } from '$lib/types/cv';
 	import { ZOOM_STOPS } from '$lib/types/zoom';
 	import type { ZoomState } from '$lib/types/zoom';
+	import { watch } from 'runed';
 
 	interface Props {
 		cv: CV;
@@ -19,6 +20,8 @@
 	}
 
 	let { cv, zoomState = $bindable() }: Props = $props();
+
+	const PDF_PREVIEW_PADDING = 16;
 
 	let scrollContainer: HTMLDivElement;
 	let generateVersion = 0;
@@ -36,7 +39,7 @@
 		const cw = scrollContainer.getBoundingClientRect().width - 32;
 		if (zoomState.mode === 'fit-width') return cw / naturalPageSize.width;
 		if (zoomState.mode === 'fit-page') {
-			const ch = scrollContainer.getBoundingClientRect().height;
+			const ch = scrollContainer.getBoundingClientRect().height - PDF_PREVIEW_PADDING * 3;
 			return Math.min(cw / naturalPageSize.width, ch / naturalPageSize.height);
 		}
 		return zoomState.zoom;
@@ -57,11 +60,13 @@
 	});
 
 	// Re-render when zoom state changes
-	$effect(() => {
-		const { mode, zoom } = zoomState;
-		if (!cachedPdfDoc) return;
-		renderPages(cachedPdfDoc);
-	});
+	watch(
+		() => zoomState,
+		() => {
+			if (!cachedPdfDoc) return;
+			renderPages(cachedPdfDoc);
+		}
+	);
 
 	async function regenerate(snapshot: CV, pv: number) {
 		const myVersion = ++generateVersion;
@@ -140,8 +145,11 @@
 	function fitPage() {
 		if (!scrollContainer || !naturalPageSize) return;
 		const cw = scrollContainer.getBoundingClientRect().width - 32;
-		const ch = scrollContainer.getBoundingClientRect().height;
-		zoomState = { mode: 'fit-page', zoom: Math.min(cw / naturalPageSize.width, ch / naturalPageSize.height) };
+		const ch = scrollContainer.getBoundingClientRect().height - PDF_PREVIEW_PADDING * 3;
+		zoomState = {
+			mode: 'fit-page',
+			zoom: Math.min(cw / naturalPageSize.width, ch / naturalPageSize.height)
+		};
 	}
 </script>
 
@@ -185,7 +193,7 @@
 
 	<!-- Scrollable pages area -->
 	<div bind:this={scrollContainer} class="bg-muted flex-1 overflow-auto">
-		<div class="min-w-full p-4">
+		<div class="min-w-full" style={`padding: ${PDF_PREVIEW_PADDING}px;`}>
 			{#if statusMessage}
 				<p class="text-muted-foreground p-6 text-center text-sm">{statusMessage}</p>
 			{:else if pages.length === 0}
