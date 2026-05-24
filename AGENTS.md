@@ -38,3 +38,17 @@ Always use `pnpm`, never `npm`.
 5. Open a coding session with the feature PRD and DESIGN as context
 6. As you build, capture unexpected decisions as new ADRs in docs/decisions/
 7. Build the feature using
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in GitHub Issues (`github.com/AxelUser/HumbleHire`). See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Using the five canonical label strings (no custom mapping). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context repo. No `CONTEXT.md` yet — create it at the root when ready. ADRs live in `docs/decisions/`. See `docs/agents/domain.md`.

@@ -6,7 +6,7 @@
 
 ## Design Philosophy
 
-HumbleHire expresses the "humble but grinding" feeling of job hunting. The aesthetic is **assertive without aggression** — calm surfaces communicating quiet determination through strong geometry rather than flashy polish.
+HumbleHire expresses the "humble but grinding" feeling of job hunting. The aesthetic is **assertive without aggression**: geometry over softness, weight without noise.
 
 > Not loud. Not timid. Just steady.
 
@@ -112,7 +112,7 @@ Sizing: `size="lg"` for primary CTAs (New CV, Get Started). `size="sm"` for inli
 
 ### Block Spacing — CV Editor Internals
 
-Spacing inside CV block components follows a strict three-tier hierarchy. Use `gap` on parent flex containers, not `mb-*` on individual children.
+Spacing inside CV block components uses three tiers. Use `gap` on parent flex containers, not `mb-*` on individual children.
 
 | Role              | Class     | px  | Where                                                 |
 | ----------------- | --------- | --- | ----------------------------------------------------- |
@@ -146,7 +146,7 @@ PanelCard (px-4 py-4)
 
 ### Bullet Points
 
-List items with bullet points use a geometric square (■) to maintain Neo-Brutalist rectangular aesthetic:
+List items with bullet points use a geometric square (■) for the rectangular Neo-Brutalist look:
 
 - Size: `text-lg` (1.125rem) with `leading-none`
 - Positioning: `mt-[0.2rem]` to vertically center with first line of text
@@ -157,11 +157,28 @@ List items with bullet points use a geometric square (■) to maintain Neo-Bruta
 
 ## Layout
 
-- **Max content width:** `max-w-5xl` (1024px) with `px-6` side padding.
+- **Page content width:** `max-w-5xl` (1024px) with `px-6` side padding. Applied per-page, not globally.
 - **Global structure:** sticky Header → `flex-1` main content → Footer.
 - **Header:** sticky, `border-b-2 border-foreground`, shows logo + contextual back button.
 - **Footer:** `border-t-2 border-foreground`, author credit.
 - **CV editor toolbar:** `sticky top-14` (below global header), `border-b-2 border-foreground`.
+
+### Header width
+
+The header uses its own width constraint, separate from page content:
+
+- `<header>` background and border always span 100% viewport width — never cap the outer element.
+- Inner content (logo + back button): `max-w-7xl` (1280px), `px-6` gutters, `mx-auto` centered. Put `px-6` on the inner div, not the `<header>`.
+
+`max-w-5xl` puts the logo ~208px from the left edge on a 1440px monitor — reads as centered, not left-anchored. `max-w-7xl` brings it to ~80px, clearly left. Still visibly bounded on 1920px+.
+
+### Full-bleed pages
+
+Some pages break `max-w-5xl` by design. The CV editor is one — it needs full viewport width for the panel + PDF preview split. These are **full-bleed** pages:
+
+- No outer `max-w-5xl` container.
+- The header ignores them — `max-w-7xl` stays regardless.
+- Full-bleed is an exception, not a default. A new full-bleed page needs a layout reason (split-pane tool, canvas editor), not just a preference.
 
 ---
 
