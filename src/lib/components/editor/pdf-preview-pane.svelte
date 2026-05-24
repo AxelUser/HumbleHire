@@ -6,6 +6,8 @@
 	import type { PageSpec } from '$lib/features/export/render-controller';
 	import ZoomControls from '$lib/components/ui/zoom-controls/index.svelte';
 	import { Skeleton } from '$lib/components/ui/skeleton';
+	import { Spinner } from '$lib/components/ui/spinner';
+	import { Badge } from '$lib/components/ui/badge';
 	import type { PDFDocumentProxy } from 'pdfjs-dist';
 	import type { CV } from '$lib/types/cv';
 
@@ -76,7 +78,7 @@
 			if (myVersion !== generateVersion) return;
 			console.error('PDF preview error:', err);
 			isPending = false;
-			setMessage('Preview unavailable.');
+			cancelAndShowError('Preview unavailable.');
 		}
 	}
 
@@ -95,7 +97,7 @@
 		if (pv !== undefined && pv === pendingVersion) isPending = false;
 	}
 
-	function setMessage(msg: string) {
+	function cancelAndShowError(msg: string) {
 		controller.cancelAll();
 		pages = [];
 		statusMessage = msg;
@@ -176,13 +178,17 @@
 							class="pdfTextLayer"
 							style="position:absolute;inset:0;width:{spec.cssWidth}px;height:{spec.cssHeight}px;overflow:hidden"
 						></div>
-						<div class="pdf-page-badge">
+						<Badge
+							class="bg-foreground text-background pointer-events-none absolute top-2 right-2 border-transparent select-none"
+						>
 							{#if isPending}
-								<span class="pdf-spinner"></span>
+								<div>
+									<Spinner class="size-4" />
+								</div>
 							{:else}
 								{spec.pageNum} / {spec.numPages}
 							{/if}
-						</div>
+						</Badge>
 					</div>
 				{/each}
 			{/if}
@@ -192,40 +198,6 @@
 
 <style>
 	:global {
-		.pdf-page-badge {
-			position: absolute;
-			top: 8px;
-			right: 8px;
-			background-color: var(--foreground);
-			color: var(--background);
-			font-size: 0.75rem;
-			font-weight: 700;
-			padding: 2px 6px;
-			line-height: 1.4;
-			pointer-events: none;
-			user-select: none;
-			min-width: 2rem;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-		}
-
-		.pdf-spinner {
-			display: inline-block;
-			width: 10px;
-			height: 10px;
-			border: 2px solid var(--background);
-			border-top-color: transparent;
-			border-radius: 50%;
-			animation: pdf-spin 0.6s linear infinite;
-		}
-
-		@keyframes pdf-spin {
-			to {
-				transform: rotate(360deg);
-			}
-		}
-
 		.pdfTextLayer {
 			user-select: text;
 			-webkit-user-select: text;
