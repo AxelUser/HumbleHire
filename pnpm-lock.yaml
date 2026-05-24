@@ -23,6 +23,9 @@ importers:
       pdfmake:
         specifier: ^0.3.8
         version: 0.3.8
+      runed:
+        specifier: ^0.37.1
+        version: 0.37.1(@sveltejs/kit@2.55.0(@sveltejs/vite-plugin-svelte@5.1.1(svelte@5.53.12)(vite@6.4.1(@types/node@24.12.0)(jiti@2.6.1)(lightningcss@1.31.1)))(svelte@5.53.12)(typescript@5.9.3)(vite@6.4.1(@types/node@24.12.0)(jiti@2.6.1)(lightningcss@1.31.1)))(svelte@5.53.12)
     devDependencies:
       '@chromatic-com/storybook':
         specifier: ^5.0.1
@@ -2194,6 +2197,18 @@ packages:
       svelte: ^5.7.0
     peerDependenciesMeta:
       '@sveltejs/kit':
+        optional: true
+
+  runed@0.37.1:
+    resolution: {integrity: sha512-MeFY73xBW8IueWBm012nNFIGy19WUGPLtknavyUPMpnyt350M47PhGSGrGoSLbidwn+Zlt/O0cp8/OZE3LASWA==}
+    peerDependencies:
+      '@sveltejs/kit': ^2.21.0
+      svelte: ^5.7.0
+      zod: ^4.1.0
+    peerDependenciesMeta:
+      '@sveltejs/kit':
+        optional: true
+      zod:
         optional: true
 
   sade@1.8.1:
@@ -4548,6 +4563,15 @@ snapshots:
       svelte: 5.53.12
 
   runed@0.35.1(@sveltejs/kit@2.55.0(@sveltejs/vite-plugin-svelte@5.1.1(svelte@5.53.12)(vite@6.4.1(@types/node@24.12.0)(jiti@2.6.1)(lightningcss@1.31.1)))(svelte@5.53.12)(typescript@5.9.3)(vite@6.4.1(@types/node@24.12.0)(jiti@2.6.1)(lightningcss@1.31.1)))(svelte@5.53.12):
+    dependencies:
+      dequal: 2.0.3
+      esm-env: 1.2.2
+      lz-string: 1.5.0
+      svelte: 5.53.12
+    optionalDependencies:
+      '@sveltejs/kit': 2.55.0(@sveltejs/vite-plugin-svelte@5.1.1(svelte@5.53.12)(vite@6.4.1(@types/node@24.12.0)(jiti@2.6.1)(lightningcss@1.31.1)))(svelte@5.53.12)(typescript@5.9.3)(vite@6.4.1(@types/node@24.12.0)(jiti@2.6.1)(lightningcss@1.31.1))
+
+  runed@0.37.1(@sveltejs/kit@2.55.0(@sveltejs/vite-plugin-svelte@5.1.1(svelte@5.53.12)(vite@6.4.1(@types/node@24.12.0)(jiti@2.6.1)(lightningcss@1.31.1)))(svelte@5.53.12)(typescript@5.9.3)(vite@6.4.1(@types/node@24.12.0)(jiti@2.6.1)(lightningcss@1.31.1)))(svelte@5.53.12):
     dependencies:
       dequal: 2.0.3
       esm-env: 1.2.2
