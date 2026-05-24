@@ -14,8 +14,16 @@
 		onFitPage: () => void;
 	}
 
-	let { effectiveZoom, mode, canZoomIn, canZoomOut, onZoomIn, onZoomOut, onFitWidth, onFitPage }: Props =
-		$props();
+	let {
+		effectiveZoom,
+		mode,
+		canZoomIn,
+		canZoomOut,
+		onZoomIn,
+		onZoomOut,
+		onFitWidth,
+		onFitPage
+	}: Props = $props();
 
 	const displayZoom = $derived(Math.round(effectiveZoom * 100) + '%');
 </script>
@@ -55,14 +63,14 @@
 		size="sm"
 		onclick={onFitWidth}
 		aria-pressed={mode === 'fit-width'}
-		class="ml-1 select-none"
-	>Fit W</Button>
+		class="ml-1 select-none">Fit W</Button
+	>
 
 	<Button
 		variant={mode === 'fit-page' ? 'default' : 'outline'}
 		size="sm"
 		onclick={onFitPage}
 		aria-pressed={mode === 'fit-page'}
-		class="select-none"
-	>Fit Page</Button>
+		class="select-none">Fit Page</Button
+	>
 </div>
