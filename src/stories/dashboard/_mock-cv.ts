@@ -23,7 +23,6 @@ const now = Date.now();
 export const masterCv: CV = {
 	id: 'master-1',
 	name: 'Software Engineer',
-	notes: '',
 	version: 5,
 	createdAt: now - 86400000 * 14,
 	updatedAt: now - 86400000 * 4,
@@ -35,7 +34,6 @@ export const syncedTailored: CV = {
 	id: 'tailored-1',
 	name: 'Senior Frontend Engineer',
 	company: 'Stripe',
-	notes: '',
 	version: 2,
 	createdAt: now - 86400000 * 5,
 	updatedAt: now,
@@ -49,7 +47,6 @@ export const staleTailored: CV = {
 	id: 'tailored-2',
 	name: 'SWE L5',
 	company: 'Google',
-	notes: '',
 	version: 1,
 	createdAt: now - 86400000 * 9,
 	updatedAt: now - 86400000 * 9,
@@ -62,7 +59,6 @@ export const staleTailored: CV = {
 export const masterCv2: CV = {
 	id: 'master-2',
 	name: 'Product Manager',
-	notes: '',
 	version: 2,
 	createdAt: now - 86400000 * 30,
 	updatedAt: now - 86400000 * 7,

@@ -54,7 +54,6 @@ function makeMaster(overrides?: Partial<CVBlocks>): CV {
 	return {
 		id: 'master-1',
 		name: 'Master CV',
-		notes: '',
 		createdAt: 1000,
 		updatedAt: 1000,
 		version: 5,
@@ -67,7 +66,6 @@ function makeTailored(master: CV): CV {
 	return {
 		id: 'tailored-1',
 		name: 'Tailored CV',
-		notes: '',
 		createdAt: 2000,
 		updatedAt: 2000,
 		version: 1,

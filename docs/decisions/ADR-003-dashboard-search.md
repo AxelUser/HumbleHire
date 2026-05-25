@@ -12,6 +12,8 @@ The dashboard CV list needed fuzzy search with highlight support. Two decisions 
 
 Fuse.js won out because of `includeMatches`: it returns character-level index ranges per matched key, which feed directly into highlight rendering. uFuzzy is smaller but requires rebuilding that extraction manually. MiniSearch is built for larger corpora — overkill for a list of a few dozen CVs.
 
+Fuse indexes against `CVIndexEntry` — a small internal type (`{ id, name, company? }`) rather than the full CV. This keeps the index small and gives typed key constraints on match results. Card components continue reading `cv.*` directly; `CVIndexEntry` is an unexported implementation detail of the search module.
+
 ## Asymmetric group filter rule
 
 CVs on the dashboard sit in master/tailored groups. Filtering each CV independently breaks the grouping: tailored copies appear orphaned, or masters vanish while their children remain.

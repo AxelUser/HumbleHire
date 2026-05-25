@@ -7,7 +7,6 @@
 	const sourceCv: CV = {
 		id: 'cv-source-1',
 		name: 'Master CV',
-		notes: '',
 		version: 3,
 		createdAt: Date.now() - 86400000 * 7,
 		updatedAt: Date.now() - 3600000,

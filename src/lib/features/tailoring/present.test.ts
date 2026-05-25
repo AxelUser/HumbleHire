@@ -53,7 +53,6 @@ function makeCV(overrides?: Partial<CVBlocks>): CV {
 	return {
 		id: 'cv-1',
 		name: 'CV',
-		notes: '',
 		createdAt: 1000,
 		updatedAt: 1000,
 		version: 1,

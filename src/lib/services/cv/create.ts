@@ -14,7 +14,6 @@ export function createCVFromTemplate(
 	return {
 		id,
 		name,
-		notes: '',
 		createdAt: now,
 		updatedAt: now,
 		version: 1,

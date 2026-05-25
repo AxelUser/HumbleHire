@@ -31,7 +31,6 @@
 	const masterCv: CV = {
 		id: 'master-1',
 		name: 'Master CV',
-		notes: '',
 		version: 2,
 		createdAt: Date.now() - 86400000 * 7,
 		updatedAt: Date.now() - 3600000,
@@ -42,7 +41,6 @@
 	const tailoredCv: CV = {
 		id: 'tailored-1',
 		name: 'Stripe — Engineer',
-		notes: '',
 		version: 1,
 		createdAt: Date.now() - 86400000 * 3,
 		updatedAt: Date.now() - 86400000,

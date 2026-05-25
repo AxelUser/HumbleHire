@@ -31,7 +31,6 @@
 		{
 			id: 'cv-1',
 			name: 'Senior Developer — Stripe',
-			notes: '',
 			version: 5,
 			createdAt: now - 86400000 * 5,
 			updatedAt: now - 3600000,
@@ -41,7 +40,6 @@
 		{
 			id: 'cv-2',
 			name: 'Frontend Lead — Vercel',
-			notes: '',
 			version: 2,
 			createdAt: now - 86400000 * 2,
 			updatedAt: now - 7200000,
@@ -51,7 +49,6 @@
 		{
 			id: 'cv-3',
 			name: 'Open Source Contributor',
-			notes: '',
 			version: 3,
 			createdAt: now - 86400000,
 			updatedAt: now - 900000,

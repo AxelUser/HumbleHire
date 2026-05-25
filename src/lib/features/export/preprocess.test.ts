@@ -21,7 +21,6 @@ function makeCV(overrides: Partial<CV> = {}): CV {
 	return {
 		id: 'test-cv',
 		name: 'Test CV',
-		notes: '',
 		createdAt: Date.now(),
 		updatedAt: Date.now(),
 		version: 1,

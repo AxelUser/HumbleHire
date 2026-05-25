@@ -70,7 +70,6 @@
 	const masterCv: CV = {
 		id: 'master',
 		name: 'Master CV',
-		notes: '',
 		version: 2,
 		createdAt: 0,
 		updatedAt: 0,
@@ -81,7 +80,6 @@
 	const tailoredCv: CV = {
 		id: 'tailored',
 		name: 'Stripe — Engineer',
-		notes: '',
 		version: 1,
 		createdAt: 0,
 		updatedAt: 0,

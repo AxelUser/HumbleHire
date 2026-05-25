@@ -4,7 +4,6 @@ import type { CV } from '$lib/types/cv';
 export async function createTailoredCV(
 	master: CV,
 	name: string,
-	notes: string,
 	company?: string
 ): Promise<string> {
 	const id = crypto.randomUUID();
@@ -13,7 +12,6 @@ export async function createTailoredCV(
 	const tailored: CV = {
 		id,
 		name,
-		notes,
 		company: company || undefined,
 		createdAt: now,
 		updatedAt: now,

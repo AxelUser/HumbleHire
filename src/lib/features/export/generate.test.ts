@@ -8,7 +8,6 @@ function makeCV(overrides: Partial<CV> = {}): CV {
 	return {
 		id: 'test-id',
 		name: 'Jane Doe',
-		notes: '',
 		createdAt: 0,
 		updatedAt: 0,
 		version: 1,
