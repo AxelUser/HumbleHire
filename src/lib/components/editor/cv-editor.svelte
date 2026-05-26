@@ -71,7 +71,7 @@
 
 		<div class="flex min-h-0 flex-1 overflow-hidden px-6">
 			<!-- Editor controls (left column) -->
-			<div class="w-[520px] shrink-0 overflow-y-auto">
+			<div class="w-[560px] shrink-0 overflow-y-auto">
 				<CvEditorControls bind:cv={internalCv} />
 			</div>
 

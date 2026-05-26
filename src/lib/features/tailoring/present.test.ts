@@ -27,6 +27,7 @@ function makeJob(): JobEntry {
 		role: 'Engineer',
 		startDate: new Date(2021, 0, 1),
 		endDate: undefined,
+		current: true,
 		achievements: [
 			{ objectId: id(), text: 'Built the thing' },
 			{ objectId: id(), text: 'Built another thing' }
@@ -77,12 +78,16 @@ describe('formatValue', () => {
 });
 
 describe('formatPeriod', () => {
-	it('returns undefined when both dates are missing', () => {
+	it('returns undefined when both dates are missing and not current', () => {
 		expect(formatPeriod(undefined, undefined)).toBeUndefined();
 	});
 
-	it('uses "Present" when the end date is missing', () => {
-		expect(formatPeriod(new Date(2021, 0, 1), undefined)).toBe('Jan 2021 – Present');
+	it('uses "Present" when current is true', () => {
+		expect(formatPeriod(new Date(2021, 0, 1), undefined, true)).toBe('Jan 2021 – Present');
+	});
+
+	it('collapses to start only when end is missing and not current', () => {
+		expect(formatPeriod(new Date(2021, 0, 1), undefined)).toBe('Jan 2021');
 	});
 
 	it('renders a full range', () => {
@@ -133,6 +138,7 @@ describe('entryTitle', () => {
 			role: '',
 			startDate: undefined,
 			endDate: undefined,
+			current: false,
 			achievements: [],
 			skills: []
 		};

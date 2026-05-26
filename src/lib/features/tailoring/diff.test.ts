@@ -22,6 +22,7 @@ function makeJob(company: string, role: string): JobEntry {
 		role,
 		startDate: undefined,
 		endDate: undefined,
+		current: false,
 		achievements: [],
 		skills: []
 	};

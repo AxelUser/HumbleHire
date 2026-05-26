@@ -27,9 +27,7 @@ export function buildAllGroups(cvs: CV[]): CVGroup[] {
 	const masters = cvs.filter((c) => !c.sourceId || !allIds.has(c.sourceId));
 	return masters.map((master) => ({
 		master,
-		tailored: cvs
-			.filter((c) => c.sourceId === master.id)
-			.sort((a, b) => b.createdAt - a.createdAt)
+		tailored: cvs.filter((c) => c.sourceId === master.id).sort((a, b) => b.createdAt - a.createdAt)
 	}));
 }
 
@@ -37,9 +35,7 @@ function buildIndex(cvs: CV[]): Fuse<CVIndexEntry> {
 	return new Fuse(cvs.map(toCVIndexEntry), SEARCH_OPTIONS);
 }
 
-function buildHighlightsMap(
-	results: FuseResult<CVIndexEntry>[]
-): Map<string, CVHighlights> {
+function buildHighlightsMap(results: FuseResult<CVIndexEntry>[]): Map<string, CVHighlights> {
 	const map = new Map<string, CVHighlights>();
 	for (const result of results) {
 		if (!result.matches?.length) continue;

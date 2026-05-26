@@ -45,7 +45,7 @@ function entryHeader(left: object, dateRange?: string) {
 }
 
 function renderJob(job: JobEntry) {
-	const dateRange = formatDateRange(job.startDate, job.endDate);
+	const dateRange = formatDateRange(job.startDate, job.endDate, job.current);
 	const label = inlineText(job.company, true, job.role ? ` · ${job.role}` : undefined);
 	const items: object[] = [{ ...entryHeader(label, dateRange), margin: [0, 0, 0, 0] }];
 
@@ -87,7 +87,7 @@ function renderProject(project: ProjectEntry) {
 }
 
 function renderEducation(edu: EducationEntry) {
-	const dateRange = formatDateRange(edu.startDate, edu.endDate);
+	const dateRange = formatDateRange(edu.startDate, edu.endDate, edu.current);
 	const label = inlineText(edu.institution, true, edu.degree ? ` · ${edu.degree}` : undefined);
 	return { stack: [{ ...entryHeader(label, dateRange) }] };
 }

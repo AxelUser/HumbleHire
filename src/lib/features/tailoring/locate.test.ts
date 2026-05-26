@@ -29,6 +29,7 @@ function makeJob(company: string): JobEntry {
 		role: 'Engineer',
 		startDate: undefined,
 		endDate: undefined,
+		current: false,
 		achievements: [],
 		skills: []
 	};

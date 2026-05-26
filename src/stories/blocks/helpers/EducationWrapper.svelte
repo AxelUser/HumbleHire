@@ -21,7 +21,8 @@
 						institution: 'MIT',
 						degree: 'BSc Computer Science',
 						startDate: new Date(Date.UTC(2014, 8, 1)),
-						endDate: new Date(Date.UTC(2017, 5, 1))
+						endDate: new Date(Date.UTC(2017, 5, 1)),
+						current: false
 					}
 				]
 	);

@@ -3,6 +3,7 @@
 	import { DatePickerField } from '$lib/components/ui/date-picker';
 	import { BlockWrapper } from '$lib/components/ui/block-wrapper';
 	import { Button } from '$lib/components/ui/button';
+	import { ButtonGroup } from '$lib/components/ui/button-group';
 	import { DragDropProvider, DragOverlay } from '@dnd-kit/svelte';
 	import { createSortable } from '@dnd-kit/svelte/sortable';
 	import { move } from '@dnd-kit/helpers';
@@ -26,7 +27,8 @@
 				institution: '',
 				degree: '',
 				startDate: undefined,
-				endDate: undefined
+				endDate: undefined,
+				current: false
 			}
 		];
 	}
@@ -51,9 +53,11 @@
 				{@const sortable = createSortable({ id: entry.objectId, index: (() => index) as any })}
 				<div
 					{@attach sortable.attach}
-					class="rounded-lg p-4 {sortable.isDragging
+					class="relative rounded-lg p-4 {sortable.isDragging
 						? 'border-muted border-2 border-dashed'
-						: 'border'}"
+						: 'border'} {entry.current && !sortable.isDragging
+						? 'pl-[18px] shadow-[inset_4px_0_0_0_var(--accent)]'
+						: ''}"
 				>
 					<div class="flex flex-col gap-2 {sortable.isDragging ? 'invisible' : ''}">
 						<div class="flex items-start justify-between gap-2">
@@ -81,10 +85,34 @@
 							placeholder="Degree / Field of study"
 							class="w-full"
 						/>
-						<div class="flex items-center gap-2">
+						<div class="flex flex-wrap items-center gap-2">
 							<DatePickerField bind:value={entry.startDate} placeholder="Start date" />
-							<span class="text-muted-foreground">–</span>
-							<DatePickerField bind:value={entry.endDate} placeholder="End date" />
+							<span class="text-muted-foreground">—</span>
+							{#if entry.current}
+								<span class="text-muted-foreground font-mono font-bold tracking-wider uppercase">
+									Present
+								</span>
+							{:else}
+								<DatePickerField bind:value={entry.endDate} placeholder="End date" />
+							{/if}
+							<ButtonGroup class="ml-auto font-mono tracking-wider uppercase" role="radiogroup">
+								<Button
+									size="sm"
+									variant={entry.current ? 'outline' : 'default'}
+									role="radio"
+									aria-checked={!entry.current}
+									aria-label="Completed study"
+									onclick={() => (entry.current = false)}>Done</Button
+								>
+								<Button
+									size="sm"
+									variant={entry.current ? 'default' : 'outline'}
+									role="radio"
+									aria-checked={entry.current}
+									aria-label="Ongoing study"
+									onclick={() => (entry.current = true)}>Ongoing</Button
+								>
+							</ButtonGroup>
 						</div>
 					</div>
 				</div>

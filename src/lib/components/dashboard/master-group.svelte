@@ -48,8 +48,8 @@
 		<!-- Title block -->
 		<div class="flex min-w-0 flex-1 flex-col gap-1">
 			<span class="text-lg font-extrabold tracking-tight">
-					<HighlightedText text={master.name} ranges={myHighlights?.name} />
-				</span>
+				<HighlightedText text={master.name} ranges={myHighlights?.name} />
+			</span>
 			<span class="text-muted-foreground text-xs font-medium">
 				Edited {editedRelative}
 			</span>

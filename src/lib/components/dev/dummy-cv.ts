@@ -65,6 +65,7 @@ export function createDummyCV(): CV {
 			role: 'Senior Software Engineer',
 			startDate: new Date('2021-03-01'),
 			endDate: undefined,
+			current: true,
 			achievements: [
 				{
 					objectId: createObjectId(),
@@ -91,6 +92,7 @@ export function createDummyCV(): CV {
 			role: 'Software Engineer',
 			startDate: new Date('2018-06-01'),
 			endDate: new Date('2021-02-01'),
+			current: false,
 			achievements: [
 				{
 					objectId: createObjectId(),
@@ -107,6 +109,7 @@ export function createDummyCV(): CV {
 			role: 'Junior Developer',
 			startDate: new Date('2016-09-01'),
 			endDate: new Date('2018-05-01'),
+			current: false,
 			achievements: [
 				{
 					objectId: createObjectId(),
@@ -141,14 +144,16 @@ export function createDummyCV(): CV {
 			institution: 'Technical University of Munich',
 			degree: 'M.Sc. Computer Science',
 			startDate: new Date('2014-10-01'),
-			endDate: new Date('2016-07-01')
+			endDate: new Date('2016-07-01'),
+			current: false
 		},
 		{
 			objectId: createObjectId(),
 			institution: 'University of Vienna',
 			degree: 'B.Sc. Software Engineering',
 			startDate: new Date('2011-10-01'),
-			endDate: new Date('2014-07-01')
+			endDate: new Date('2014-07-01'),
+			current: false
 		}
 	];
 

@@ -47,6 +47,7 @@ function makeCV(overrides: Partial<CV> = {}): CV {
 						role: 'Engineer',
 						startDate: new Date('2020-01-01'),
 						endDate: undefined,
+						current: true,
 						achievements: [{ objectId: id(), text: 'Did stuff.' }],
 						skills: []
 					}
@@ -64,7 +65,8 @@ function makeCV(overrides: Partial<CV> = {}): CV {
 						institution: 'Uni',
 						degree: 'BSc',
 						startDate: new Date('2015-01-01'),
-						endDate: new Date('2019-01-01')
+						endDate: new Date('2019-01-01'),
+						current: false
 					}
 				]
 			}

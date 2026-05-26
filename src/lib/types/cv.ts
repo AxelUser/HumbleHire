@@ -26,6 +26,7 @@ export interface JobEntry extends WithId {
 	role: string;
 	startDate: Date | undefined;
 	endDate: Date | undefined;
+	current: boolean;
 	achievements: Achievement[];
 	skills: Tag[];
 }
@@ -55,6 +56,7 @@ export interface EducationEntry extends WithId {
 	degree: string;
 	startDate: Date | undefined;
 	endDate: Date | undefined;
+	current: boolean;
 }
 
 export interface SyncDecisions {

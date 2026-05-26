@@ -5,6 +5,7 @@
 	import { TagInput } from '$lib/components/ui/tag-input';
 	import { BlockWrapper } from '$lib/components/ui/block-wrapper';
 	import { Button } from '$lib/components/ui/button';
+	import { ButtonGroup } from '$lib/components/ui/button-group';
 	import { Trash2, Plus, GripVertical } from '@lucide/svelte';
 	import { DragDropProvider, DragOverlay } from '@dnd-kit/svelte';
 	import { createSortable } from '@dnd-kit/svelte/sortable';
@@ -29,6 +30,7 @@
 				role: '',
 				startDate: undefined,
 				endDate: undefined,
+				current: false,
 				achievements: [],
 				skills: []
 			}
@@ -54,9 +56,11 @@
 			{#each jobs as job, index (job.objectId)}
 				{@const sortable = createSortable({ id: job.objectId, index: (() => index) as any })}
 				<div
-					class="rounded-lg p-4 {sortable.isDragging
+					class="relative rounded-lg p-4 {sortable.isDragging
 						? 'border-muted border-2 border-dashed'
-						: 'border'}"
+						: 'border'} {job.current && !sortable.isDragging
+						? 'pl-[18px] shadow-[inset_4px_0_0_0_var(--accent)]'
+						: ''}"
 					{@attach sortable.attach}
 				>
 					<div class="flex flex-col gap-2 {sortable.isDragging ? 'invisible' : ''}">
@@ -81,10 +85,34 @@
 								<Trash2 class="h-4 w-4" />
 							</Button>
 						</div>
-						<div class="flex items-center gap-2">
+						<div class="flex flex-wrap items-center gap-2">
 							<DatePickerField bind:value={job.startDate} placeholder="Start date" />
-							<span class="text-muted-foreground">–</span>
-							<DatePickerField bind:value={job.endDate} placeholder="End date" />
+							<span class="text-muted-foreground">—</span>
+							{#if job.current}
+								<span class="text-muted-foreground font-mono font-bold tracking-wider uppercase">
+									Present
+								</span>
+							{:else}
+								<DatePickerField bind:value={job.endDate} placeholder="End date" />
+							{/if}
+							<ButtonGroup class="ml-auto font-mono tracking-wider uppercase" role="radiogroup">
+								<Button
+									size="sm"
+									variant={job.current ? 'outline' : 'default'}
+									role="radio"
+									aria-checked={!job.current}
+									aria-label="Past role"
+									onclick={() => (job.current = false)}>Past</Button
+								>
+								<Button
+									size="sm"
+									variant={job.current ? 'default' : 'outline'}
+									role="radio"
+									aria-checked={job.current}
+									aria-label="Current role"
+									onclick={() => (job.current = true)}>Current</Button
+								>
+							</ButtonGroup>
 						</div>
 						<EditableList
 							bind:items={job.achievements}

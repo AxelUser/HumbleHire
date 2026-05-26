@@ -34,6 +34,7 @@
 		role: 'Senior Engineer',
 		startDate: new Date(2021, 0, 1),
 		endDate: undefined,
+		current: true,
 		achievements: [
 			{ objectId: IDS.ach1, text: 'Led the payments platform rewrite' },
 			{ objectId: mkId('ach2'), text: 'Cut checkout latency by 40%' }

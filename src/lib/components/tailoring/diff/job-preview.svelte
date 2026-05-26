@@ -8,7 +8,9 @@
 	}
 
 	let { entry }: Props = $props();
-	const subtitle = $derived(joinParts(entry.role, formatPeriod(entry.startDate, entry.endDate)));
+	const subtitle = $derived(
+		joinParts(entry.role, formatPeriod(entry.startDate, entry.endDate, entry.current))
+	);
 </script>
 
 {#if subtitle}
