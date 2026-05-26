@@ -64,10 +64,10 @@
 					{@attach sortable.attach}
 				>
 					<div class="flex flex-col gap-2 {sortable.isDragging ? 'invisible' : ''}">
-						<div class="flex items-start justify-between gap-2">
+						<div class="flex items-center justify-between gap-2">
 							<span
 								{@attach sortable.attachHandle}
-								class="text-muted-foreground mt-1 shrink-0 cursor-grab"
+								class="text-muted-foreground shrink-0 cursor-grab"
 							>
 								<GripVertical class="h-4 w-4" />
 							</span>
