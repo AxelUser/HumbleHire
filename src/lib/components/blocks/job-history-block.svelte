@@ -5,7 +5,7 @@
 	import { TagInput } from '$lib/components/ui/tag-input';
 	import { BlockWrapper } from '$lib/components/ui/block-wrapper';
 	import { Button } from '$lib/components/ui/button';
-	import { ButtonGroup } from '$lib/components/ui/button-group';
+	import { SegmentedControl, SegmentedControlItem } from '$lib/components/ui/segmented-control';
 	import { Trash2, Plus, GripVertical } from '@lucide/svelte';
 	import { DragDropProvider, DragOverlay } from '@dnd-kit/svelte';
 	import { createSortable } from '@dnd-kit/svelte/sortable';
@@ -95,24 +95,14 @@
 							{:else}
 								<DatePickerField bind:value={job.endDate} placeholder="End date" />
 							{/if}
-							<ButtonGroup class="ml-auto font-mono tracking-wider uppercase" role="radiogroup">
-								<Button
-									size="sm"
-									variant={job.current ? 'outline' : 'default'}
-									role="radio"
-									aria-checked={!job.current}
-									aria-label="Past role"
-									onclick={() => (job.current = false)}>Past</Button
-								>
-								<Button
-									size="sm"
-									variant={job.current ? 'default' : 'outline'}
-									role="radio"
-									aria-checked={job.current}
-									aria-label="Current role"
-									onclick={() => (job.current = true)}>Current</Button
-								>
-							</ButtonGroup>
+							<SegmentedControl
+								bind:value={job.current}
+								aria-label="Occupation status"
+								class="ml-auto font-mono tracking-wider uppercase"
+							>
+								<SegmentedControlItem value={false} aria-label="Past role">Past</SegmentedControlItem>
+								<SegmentedControlItem value={true} aria-label="Current role">Current</SegmentedControlItem>
+							</SegmentedControl>
 						</div>
 						<EditableList
 							bind:items={job.achievements}

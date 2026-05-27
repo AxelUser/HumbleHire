@@ -3,7 +3,7 @@
 	import { DatePickerField } from '$lib/components/ui/date-picker';
 	import { BlockWrapper } from '$lib/components/ui/block-wrapper';
 	import { Button } from '$lib/components/ui/button';
-	import { ButtonGroup } from '$lib/components/ui/button-group';
+	import { SegmentedControl, SegmentedControlItem } from '$lib/components/ui/segmented-control';
 	import { DragDropProvider, DragOverlay } from '@dnd-kit/svelte';
 	import { createSortable } from '@dnd-kit/svelte/sortable';
 	import { move } from '@dnd-kit/helpers';
@@ -95,24 +95,14 @@
 							{:else}
 								<DatePickerField bind:value={entry.endDate} placeholder="End date" />
 							{/if}
-							<ButtonGroup class="ml-auto font-mono tracking-wider uppercase" role="radiogroup">
-								<Button
-									size="sm"
-									variant={entry.current ? 'outline' : 'default'}
-									role="radio"
-									aria-checked={!entry.current}
-									aria-label="Completed study"
-									onclick={() => (entry.current = false)}>Done</Button
-								>
-								<Button
-									size="sm"
-									variant={entry.current ? 'default' : 'outline'}
-									role="radio"
-									aria-checked={entry.current}
-									aria-label="Ongoing study"
-									onclick={() => (entry.current = true)}>Ongoing</Button
-								>
-							</ButtonGroup>
+							<SegmentedControl
+								bind:value={entry.current}
+								aria-label="Study status"
+								class="ml-auto font-mono tracking-wider uppercase"
+							>
+								<SegmentedControlItem value={false} aria-label="Completed study">Done</SegmentedControlItem>
+								<SegmentedControlItem value={true} aria-label="Ongoing study">Ongoing</SegmentedControlItem>
+							</SegmentedControl>
 						</div>
 					</div>
 				</div>
