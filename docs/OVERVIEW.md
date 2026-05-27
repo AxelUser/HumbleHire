@@ -1,78 +1,58 @@
-# HumbleHire - Project Overview
+# HumbleHire — Project Overview
 
-## What Is It
+## Problem
 
-HumbleHire is a resume builder that keeps your CVs organised: one master CV, tailored copies for each opportunity, and a clear record of what you sent where.
+Job seekers keep one comprehensive CV and tailor it per application. The usual workflow is copy the file, edit the copy, export, apply, repeat. A few applications in, the folder is full of `cv_v3_backend_FINAL2.pdf` files with no record of what came from what or what changed when.
 
----
+HumbleHire fixes that. One master CV holds the full record. Tailored copies branch off it for specific roles and stay linked. When the master changes, each tailored copy can pull in the parts that matter and ignore the rest.
 
-## Why It Exists
+## What it is
 
-This project is a free (and open-source) alternative to my own Google Docs workflow, which required copy-pasting entire documents to create job-specific variants.
-You end up with a bunch of `cv_v3_backend.pdf` files and no clear lineage, making it really chaotic to manage, especially when you have to update your master CV with new information.
-HumbleHire aims to replace that manual process with a structured workflow where every change is visual and traceable.
+A local-first, block-based CV builder that runs in the browser. Free, open source, static SvelteKit. No backend, no account, no cloud. All data lives in IndexedDB.
 
----
+## How it works
 
-## Goals
+### Block-based editor
 
-- **Interactive block-based editor** - CV is composed of discrete, editable blocks (name, position, contacts, highlights, job history, projects, education).
-- **Tailoring** - create a tailored copy from any CV for a specific company or role, with sync back from the master CV.
-- **Local-first** - all data is stored locally on your machine, no need to sync with the cloud.
-- **Diff and merge** - compare versions side-by-side and selectively merge changes across tailored copies.
-- **Export** - produce clean, formatted PDF/HTML output from any version.
+A CV has nine fixed blocks in fixed order: Full Name, Position, Location, Contacts, Highlights, Skills, Job History, Projects, Education. The last six are repeatable. Clicking a field edits it in place; changes auto-save a second after typing stops. Any block can be hidden without losing its content; hidden blocks are skipped on export.
 
-## Non-Goals
+### Dashboard
 
-- Not a SaaS application.
-- Not a job board or application tracker.
-- Not an AI-powered CV writer or optimizer.
-- Not a collaborative/multi-user tool.
-- Not a general document editor - structure is fixed to CV blocks.
+Lists every CV, grouping tailored copies under their master. Fuzzy search filters and highlights matches. The group filter is asymmetric: a master that matches shows all its children; a child that matches shows its master as context. See [ADR-003](decisions/ADR-003-dashboard-search.md).
 
----
+### Tailoring and sync
 
-## CV Blocks
+A tailored CV starts as a full copy of a master at a moment in time and keeps a link back. From then on the two are independent.
 
-I've tried to keep the blocks as minimal as possible, while still being able to express the most common CV content. This list may be opinionated, but it's what I've found to be the most common and useful.
+When the master changes, the tailored copy gets an "updates available" indicator. The sync view splits the change set into diff items at the finest reasonable grain: a text edit, an added or removed entry, a modified entry, or a single new achievement inside a job. The user accepts or discards each one. Discards are remembered against the master's current state, so the same dismissed change does not keep reappearing.
 
-| Block       | Description                                                |
-| ----------- | ---------------------------------------------------------- |
-| Full Name   | Applicant's legal or preferred name                        |
-| Position    | Target job title                                           |
-| Location    | City, country, or remote preference                        |
-| Contacts    | Email, phone, LinkedIn, GitHub, etc.                       |
-| Highlights  | 3-5 bullet points of professional summary                  |
-| Job History | Per-company: name, dates, role, achievements (bullet list) |
-| Projects    | Name, description, stack, link                             |
-| Education   | Institution, degree, dates                                 |
-
----
-
-## User Stories
-
-### Versioning
-
-- As a user, I can create a new CV from scratch by filling in structured blocks.
-- As a user, I can create a tailored copy of my CV for a specific job posting.
-- As a user, I can view the full version history of any CV.
-- As a user, I can compare two CV versions and see what changed.
-
-### Editing
-
-- As a user, I can edit any block inline and see a live preview of the CV.
-- As a user, I can reorder, hide, or show blocks without deleting content.
-- As a user, I can add multiple entries within repeatable blocks (jobs, projects).
+Sync is one-way only: master into tailored. Tailored copies cannot derive from other tailored copies.
 
 ### Export
 
-- As a user, I can export any CV version to PDF.
-- As a user, I can share a CV version as a static HTML page.
+Export builds the PDF in the browser with pdfmake and downloads it directly. No print dialog. The editor's side-by-side preview renders the same PDF with PDF.js, so the preview is the file. Hidden and empty blocks are stripped before the theme runs. The v1 theme is Classic: single-column, conservative typography, ATS-parseable. The theme interface allows more later. See [ADR-002](decisions/ADR-002-client-side-pdf-generation.md).
 
----
+### Storage
 
-## Out of Scope (v1)
+IndexedDB via Dexie.js. Nothing leaves the browser. Clearing site data wipes everything, which is what export is for. See [ADR-001](decisions/ADR-001-indexeddb-dexie.md).
 
-- Import from LinkedIn or existing PDF
-- ATS score analysis
-- MCP server for building CV using AI Agents
+## Scope
+
+### In
+
+- Block-based editor with click-to-edit and auto-save
+- Master / tailored relationships with selective, one-way sync
+- Dashboard with fuzzy search and master-grouped listing
+- Single-click PDF export with live byte-accurate preview
+- Local-first storage
+
+### Out
+
+- Cloud sync, accounts, multi-device
+- Multi-user or collaborative editing
+- Tailored-to-tailored derivation, tailored-to-master sync
+- Job application tracking beyond the optional company label
+- LinkedIn or PDF import
+- AI-driven writing, ATS scoring, recommendations
+- Custom block types or user-editable block order
+- Named version snapshots or version history
