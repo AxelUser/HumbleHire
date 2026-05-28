@@ -2,10 +2,9 @@
 	import { InlineField } from '$lib/components/ui/inline-field';
 	import { BlockWrapper } from '$lib/components/ui/block-wrapper';
 	import { Button } from '$lib/components/ui/button';
-	import { Trash2, Plus, GripVertical } from '@lucide/svelte';
+	import { SortableItem, createSortableDragHandlers } from '$lib/components/ui/sortable';
 	import { DragDropProvider, DragOverlay } from '@dnd-kit/svelte';
-	import { createSortable } from '@dnd-kit/svelte/sortable';
-	import { move } from '@dnd-kit/helpers';
+	import { Trash2, Plus, GripVertical } from '@lucide/svelte';
 	import type { ContactEntry, ObjectId } from '$lib/types/cv';
 	import { createObjectId } from '$lib/types/cv';
 
@@ -17,6 +16,13 @@
 
 	let { contacts = $bindable(), blockId, hiddenBlockIds = $bindable() }: Props = $props();
 
+	const drag = createSortableDragHandlers(
+		() => contacts,
+		(items) => {
+			contacts = items;
+		}
+	);
+
 	function addContact() {
 		contacts = [...contacts, { objectId: createObjectId(), label: '', value: '' }];
 	}
@@ -24,47 +30,40 @@
 	function removeContact(objectId: ObjectId) {
 		contacts = contacts.filter((c) => c.objectId !== objectId);
 	}
-
-	function onDragOver(event: any) {
-		contacts = move(contacts as any, event) as ContactEntry[];
-	}
-
-	function onDragEnd(event: any) {
-		contacts = move(contacts as any, event) as ContactEntry[];
-	}
 </script>
 
 <BlockWrapper title="Contacts" {blockId} bind:hiddenBlockIds>
-	<DragDropProvider {onDragEnd} {onDragOver}>
+	<DragDropProvider {...drag}>
 		<div class="flex flex-col">
 			<div class="flex flex-col gap-2">
 				{#each contacts as contact, index (contact.objectId)}
-					{@const sortable = createSortable({ id: contact.objectId, index: (() => index) as any })}
-					<div
-						class="flex items-center gap-2 {sortable.isDragging
-							? 'border-muted rounded border-2 border-dashed'
-							: ''}"
-						{@attach sortable.attach}
+					<SortableItem
+						id={contact.objectId}
+						{index}
+						class="flex items-center gap-2 rounded"
+						borderWhenIdle={false}
 					>
-						<div class="flex flex-1 items-center gap-2 {sortable.isDragging ? 'invisible' : ''}">
-							<span
-								{@attach sortable.attachHandle}
-								class="text-muted-foreground shrink-0 cursor-grab"
-							>
-								<GripVertical class="h-4 w-4" />
-							</span>
-							<InlineField bind:value={contact.label} placeholder="Label" class="w-32 shrink-0" />
-							<InlineField bind:value={contact.value} placeholder="Value" class="flex-1" />
-							<Button
-								variant="ghost"
-								size="icon"
-								class="text-muted-foreground hover:text-destructive shrink-0"
-								onclick={() => removeContact(contact.objectId)}
-							>
-								<Trash2 class="h-4 w-4" />
-							</Button>
-						</div>
-					</div>
+						{#snippet children({ attachHandle, isDragging })}
+							<div class="flex flex-1 items-center gap-2 {isDragging ? 'invisible' : ''}">
+								<span
+									{@attach attachHandle}
+									class="text-muted-foreground shrink-0 cursor-grab"
+								>
+									<GripVertical class="h-4 w-4" />
+								</span>
+								<InlineField bind:value={contact.label} placeholder="Label" class="w-32 shrink-0" />
+								<InlineField bind:value={contact.value} placeholder="Value" class="flex-1" />
+								<Button
+									variant="ghost"
+									size="icon"
+									class="text-muted-foreground hover:text-destructive shrink-0"
+									onclick={() => removeContact(contact.objectId)}
+								>
+									<Trash2 class="h-4 w-4" />
+								</Button>
+							</div>
+						{/snippet}
+					</SortableItem>
 				{/each}
 			</div>
 			<Button variant="outline" size="sm" class="mt-2 self-start" onclick={addContact}>
