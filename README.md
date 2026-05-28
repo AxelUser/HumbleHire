@@ -50,7 +50,7 @@ To the libraries doing all the the heavy lifting:
 - **[PDF.js](https://github.com/mozilla/pdf.js)** — renders the live preview
 - **[Dexie.js](https://dexie.org/)** — local storage layer over IndexedDB
 - **[Fuse.js](https://fusejs.io/)** — fuzzy search
-- **[@dnd-kit/svelte](https://github.com/dnd-kit-svelte/dnd-kit-svelte)** — for all drag-and-drop interactions
+- **[@dnd-kit/svelte](https://dndkit.com/)** — for all drag-and-drop interactions
 - **[Shadcn-Svelte](https://shadcn-svelte.com/)** and **[bits-ui](https://bits-ui.com/)** — main UI primitives
 
 ## License
