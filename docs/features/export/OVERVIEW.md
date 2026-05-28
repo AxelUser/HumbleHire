@@ -12,13 +12,11 @@ On narrower screens the preview collapses into a panel you can open from the too
 
 Export is one click. The action is available from the editor toolbar and on each CV card on the dashboard. Triggering it downloads a PDF file directly. The downloaded filename is taken from the CV's name.
 
-Hidden blocks are excluded from the export, as are blocks with no content. The dashboard export reflects the last saved state of the CV, so any unsaved edits in the editor are not in the file.
+Hidden blocks are excluded from the export, as are blocks with no content.
 
 ## Themes
 
-A theme controls how the CV data lays out on the page. The current theme is **Classic**: single column, conservative typography, name and position as the top focal point, sections separated by hairline rules. Text is real selectable text, so the file stays parseable by applicant tracking systems.
-
-The Classic theme deliberately reads differently from the editor surface. The editor has bold borders and offset shadows that look right in an authoring tool. A resume in front of a recruiter calls for quiet typography instead.
+A theme controls how the CV data lays out on the page. Currently, there is only **Classic** theme: single column, conservative typography, name and position as the top focal point, sections separated by hairline rules. Text is real selectable text, so the file stays parseable by applicant tracking systems.
 
 ## Background
 

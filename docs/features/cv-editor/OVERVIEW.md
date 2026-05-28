@@ -1,18 +1,30 @@
 # Editor
 
-The editor is where you build and revise a CV in HumbleHire. The preview and the editor are the same surface: you see the CV as it would render, and click any field to change it. There is no separate "edit" mode and no save button.
+The editor is where you build and revise a CV in HumbleHire. The left sidebar is the editor, the right sidebar is the preview: you see the CV as it would render.
 
 ## Blocks
 
-A CV is composed of nine fixed blocks: Full Name, Position, Location, Contacts, Highlights, Skills, Job History, Projects, Education. Order is fixed; you cannot rearrange blocks. The first three hold a single text value each; the rest can hold multiple entries.
+Currently, a CV is composed of nine fixed blocks:
 
-Any block can be hidden. Hidden blocks keep their content but drop out of the export, which matters most when one tailored CV needs Education shown and another needs it dropped.
+- Full Name
+- Position
+- Location
+- Contacts
+- Highlights
+- Skills
+- Job History
+- Projects
+- Education
+
+Order is fixed; you cannot rearrange blocks. "Full Name", "Position", and "Location" hold a single text value each; the rest can hold multiple entries.
+
+Any block can be hidden. Hidden blocks keep their content but drop out from the preview and export.
 
 ## Editing
 
-Clicking a field opens an input in place. Typing updates the visible CV immediately. Pressing Escape or clicking elsewhere closes the field. Tab moves to the next editable field, so you can fill out a block top-to-bottom without leaving the keyboard.
+Clicking a field opens an input in place. Typing updates the visible CV practically immediately, with a small delay for debouncing because PDF generation is CPU-intensive.
 
-Changes save automatically about a second after you stop typing. A small status line shows when the most recent save happened.
+Changes are persisted (i.e. saved to the database) automatically about a second after you stop typing.
 
 ## Repeatable blocks
 
