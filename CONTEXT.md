@@ -69,7 +69,7 @@ _Avoid_: Outdated, stale, behind
 ### Surfaces
 
 **Dashboard**:
-The home page that lists all CVs, grouped by master with tailored copies nested underneath. Hosts fuzzy search and the master / tailored group filter.
+The CV list view, grouped by master with tailored copies nested underneath. Hosts fuzzy search and the master / tailored group filter.
 _Avoid_: Home, library, list page
 
 **Preview**:

@@ -3,7 +3,6 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { db } from '$lib/db/index';
-	import { createCVFromTemplate } from '$lib/services/cv/create';
 	import CvList from './cv-list.svelte';
 	import NewCvButton from './new-cv-button.svelte';
 	import { Skeleton } from '$lib/components/ui/skeleton';
@@ -18,7 +17,6 @@
 		AlertDialogCancel,
 		AlertDialogAction
 	} from '$lib/components/ui/alert-dialog';
-	import { Plus } from '@lucide/svelte';
 	import type { CV } from '$lib/types/cv';
 
 	let cvs = $state<CV[]>([]);
@@ -81,12 +79,6 @@
 		cvs = cvs.map((cv) => (cv.id === persisted.id ? persisted : cv));
 	}
 
-	async function handleCreateFirstCv() {
-		const id = crypto.randomUUID();
-		const cv = createCVFromTemplate(id, 'Untitled CV');
-		await db.cvs.add(cv);
-		goto(resolve(`/cv/${id}`));
-	}
 </script>
 
 <!-- Title row -->
@@ -112,15 +104,6 @@
 				{#each { length: 2 } as _, i (i)}
 					<Skeleton class="h-24 w-full rounded-none" />
 				{/each}
-			</div>
-		{:else if cvs.length === 0}
-			<div
-				class="border-foreground flex flex-col items-center gap-4 border-2 border-dashed px-8 py-16 text-center"
-			>
-				<p class="text-muted-foreground text-sm font-medium">No CVs yet.</p>
-				<Button variant="accent" onclick={handleCreateFirstCv}>
-					<Plus class="h-4 w-4" /> Create your first CV
-				</Button>
 			</div>
 		{:else}
 			<CvList {cvs} onDelete={handleDelete} onTailor={handleTailor} onSync={handleSync} />
