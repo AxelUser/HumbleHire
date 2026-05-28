@@ -5,7 +5,7 @@
 	import MasterGroup from './master-group.svelte';
 	import SearchBar from './search-bar.svelte';
 	import { Button } from '$lib/components/ui/button';
-	import { X } from '@lucide/svelte';
+	import { X, FileQuestionMark } from '@lucide/svelte';
 
 	interface Props {
 		cvs: CV[];
@@ -40,6 +40,9 @@
 			{#if search.query.trim()}
 				<Empty.Root>
 					<Empty.Header>
+						<Empty.Media variant="icon">
+							<FileQuestionMark class="size-10" />
+						</Empty.Media>
 						<Empty.Title>No matches</Empty.Title>
 						<Empty.Description>
 							Nothing matched "{search.query}".

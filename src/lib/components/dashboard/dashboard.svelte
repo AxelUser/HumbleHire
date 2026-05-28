@@ -18,6 +18,8 @@
 		AlertDialogAction
 	} from '$lib/components/ui/alert-dialog';
 	import type { CV } from '$lib/types/cv';
+	import * as Empty from '$lib/components/ui/empty';
+	import { FileQuestionMark } from '@lucide/svelte';
 
 	let cvs = $state<CV[]>([]);
 	let loading = $state(true);
@@ -78,7 +80,6 @@
 		await db.cvs.put(persisted);
 		cvs = cvs.map((cv) => (cv.id === persisted.id ? persisted : cv));
 	}
-
 </script>
 
 <!-- Title row -->
@@ -105,8 +106,21 @@
 					<Skeleton class="h-24 w-full rounded-none" />
 				{/each}
 			</div>
-		{:else}
+		{:else if cvs.length > 0}
 			<CvList {cvs} onDelete={handleDelete} onTailor={handleTailor} onSync={handleSync} />
+		{:else}
+			<Empty.Root>
+				<Empty.Header>
+					<Empty.Media>
+						<FileQuestionMark class="size-10" />
+					</Empty.Media>
+					<Empty.Title>You don't have any CVs yet</Empty.Title>
+					<Empty.Description>Why not create one?</Empty.Description>
+				</Empty.Header>
+				<Empty.Content>
+					<NewCvButton onCreate={handleCreate} />
+				</Empty.Content>
+			</Empty.Root>
 		{/if}
 	</div>
 </div>

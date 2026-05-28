@@ -19,6 +19,6 @@
 </script>
 
 <Button variant="accent" size="lg" onclick={handleClick}>
-	<Plus class="mr-2 h-4 w-4" />
+	<Plus class="size-4" />
 	New CV
 </Button>
