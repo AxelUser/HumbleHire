@@ -3,6 +3,7 @@ import { createObjectId } from '$lib/types/cv';
 import type { CV, CVBlocks, JobEntry, ObjectId, SkillCategory, Tag } from '$lib/types/cv';
 import type { DiffItem } from './types';
 import { entryTitle, formatPeriod, formatValue, entryKind, describeDiff } from './present';
+import { computeBlockHashes } from './hash';
 
 function id(): ObjectId {
 	return createObjectId();
@@ -51,13 +52,14 @@ function emptyBlocks(): CVBlocks {
 }
 
 function makeCV(overrides?: Partial<CVBlocks>): CV {
+	const blocks = { ...emptyBlocks(), ...overrides };
 	return {
 		id: 'cv-1',
 		name: 'CV',
 		createdAt: 1000,
 		updatedAt: 1000,
-		version: 1,
-		blocks: { ...emptyBlocks(), ...overrides },
+		blocks,
+		blockHashes: computeBlockHashes(blocks),
 		hiddenBlockIds: []
 	};
 }

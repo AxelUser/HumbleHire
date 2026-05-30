@@ -18,6 +18,14 @@ For each item you pick **Accept** or **Discard**. Accept applies it to this tail
 
 This shape matters because tailoring has intent behind it. If you removed an irrelevant job from a tailored copy, you do not want a sweeping "sync from master" to put it back. Selective sync preserves the intentional differences.
 
+## Orphaning
+
+If the master is deleted, the tailored copies that point to it become **orphaned**. An orphaned tailored CV keeps everything it had — content, hidden block choices, name, company — and simply loses the link back. From that point on it behaves like a standalone CV: no sync indicator, no baseline, no master to pull from. The sync history is forgotten because there is nothing left to be in sync with.
+
+There are two paths into this state. From the dashboard, deleting a master with tailored copies offers a choice between deleting everything or keeping the copies as standalone CVs. The second choice triggers orphaning. The other path is silent: opening a tailored CV whose master is no longer in the database orphans it on the spot, with a one-time notice explaining what happened.
+
+An orphaned CV is just a CV. It can become a master itself the moment something is tailored from it.
+
 ## Constraints
 
 Sync is one-way. A tailored copy never pushes changes into its master. If you improved a bullet on a tailored copy and want it in the master, you copy it across by hand.

@@ -58,13 +58,13 @@ _Avoid_: Sync state, sync log
 A single unit of change shown in the sync view. One of three kinds: a text edit on a single-text block, an entry change (added, removed, or modified at the top level), or a nested change (added, removed, or modified inside an entry). Each diff item is accepted or discarded independently.
 _Avoid_: Change, delta, hunk
 
-**Master version**:
-An integer counter on the master CV that increments when it is edited. Used by the sync detector to decide whether a tailored copy has unseen master changes. Internal only; not a snapshot store and not exposed to users as a version history.
-_Avoid_: Version (bare). Users may read "version" as Git-style snapshot versioning, which HumbleHire does not support.
-
 **Updates available**:
-The indicator on a tailored CV showing that its master has changed in a way that has not been reviewed yet.
+The indicator on a tailored CV showing that its master has changed in a way that has not been reviewed yet. Determined by comparing per-block content hashes between the master and the tailored's sync baseline, skipping blocks that are hidden on either side.
 _Avoid_: Outdated, stale, behind
+
+**Orphaned tailored CV**:
+A tailored CV whose master no longer exists. Functionally equivalent to a standalone CV: no sync indicator, no baseline, no remembered link. Reached either through the dashboard's master-delete dialog (the "Keep as standalone" choice) or silently on load when the linked master is unreachable.
+_Avoid_: Detached, broken, dangling
 
 ### Surfaces
 
@@ -82,10 +82,9 @@ _Avoid_: Template, style, layout
 
 ## Flagged ambiguities
 
-**"Version"** is the easiest term to misuse in this codebase.
+**"Version"** has no place in HumbleHire language.
 
-- _Acceptable_: "master version counter," the internal integer used by sync detection.
-- _Not acceptable_: "CV version," "version history," "save a version." These imply a Git-style snapshot store that does not exist. Use "tailored CV" for a derived copy or "sync baseline" for the captured-at-tailoring snapshot.
+- _Not acceptable_: "CV version," "version history," "save a version," "master version." These imply a Git-style snapshot store that does not exist. Use "tailored CV" for a derived copy or "sync baseline" for the captured-at-tailoring snapshot. Sync detection works off per-block content hashes, not a version counter.
 
 **"Block"** sometimes appears in code to mean the `Block<T>` wrapper object (a `{ objectId, value }` pair). That is an implementation detail. In product language, "block" always means one of the nine CV sections.
 

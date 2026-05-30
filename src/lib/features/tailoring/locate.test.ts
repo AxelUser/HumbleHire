@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createObjectId } from '$lib/types/cv';
 import type { CV, CVBlocks, JobEntry, ObjectId, SkillCategory } from '$lib/types/cv';
 import type { DiffItem } from './types';
+import { computeBlockHashes } from './hash';
 import {
 	findEntry,
 	findNestedEntry,
@@ -50,13 +51,14 @@ function emptyBlocks(): CVBlocks {
 }
 
 function makeCV(overrides?: Partial<CVBlocks>): CV {
+	const blocks = { ...emptyBlocks(), ...overrides };
 	return {
 		id: 'cv-1',
 		name: 'CV',
 		createdAt: 1000,
 		updatedAt: 1000,
-		version: 1,
-		blocks: { ...emptyBlocks(), ...overrides },
+		blocks,
+		blockHashes: computeBlockHashes(blocks),
 		hiddenBlockIds: []
 	};
 }

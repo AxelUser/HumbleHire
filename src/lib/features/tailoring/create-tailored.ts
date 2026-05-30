@@ -15,15 +15,12 @@ export async function createTailoredCV(
 		company: company || undefined,
 		createdAt: now,
 		updatedAt: now,
-		version: 1,
 		blocks: structuredClone(master.blocks),
+		blockHashes: { ...master.blockHashes },
 		hiddenBlockIds: [...master.hiddenBlockIds],
 		sourceId: master.id,
 		syncBaseline: structuredClone(master.blocks),
-		syncDecisions: {
-			sourceSyncedVersion: master.version,
-			discarded: {}
-		}
+		syncBaselineHashes: { ...master.blockHashes }
 	};
 
 	await db.cvs.add(tailored);

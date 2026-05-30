@@ -19,8 +19,9 @@ import type { DiffItem, NestedListKey } from './types';
  */
 export function diffCVs(master: CV, tailored: CV): DiffItem[] {
 	const items: DiffItem[] = [];
-	const hidden = new Set(master.hiddenBlockIds);
-	const visible = (id: ObjectId) => !hidden.has(id);
+	const masterHidden = new Set(master.hiddenBlockIds);
+	const tailoredHidden = new Set(tailored.hiddenBlockIds);
+	const visible = (id: ObjectId) => !masterHidden.has(id) && !tailoredHidden.has(id);
 	const baseline = tailored.syncBaseline ?? master.blocks;
 
 	for (const key of ['fullName', 'position', 'location'] as const) {

@@ -1,77 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { createObjectId } from '$lib/types/cv';
-import type { Achievement, CV, CVBlocks, JobEntry, ObjectId } from '$lib/types/cv';
+import type { ObjectId } from '$lib/types/cv';
 import { diffCVs } from './diff';
+import {
+	emptyBlocks,
+	listBlock,
+	makeAchievement,
+	makeJob,
+	makeMaster,
+	makeTailored
+} from './_fixtures';
 
-function id(): ObjectId {
-	return createObjectId();
-}
-
-function textBlock(value: string) {
-	return { objectId: id(), value };
-}
-
-function listBlock<T>(value: T) {
-	return { objectId: id(), value };
-}
-
-function makeJob(company: string, role: string): JobEntry {
-	return {
-		objectId: id(),
-		company,
-		role,
-		startDate: undefined,
-		endDate: undefined,
-		current: false,
-		achievements: [],
-		skills: []
-	};
-}
-
-function makeAchievement(text: string): Achievement {
-	return { objectId: id(), text };
-}
-
-function emptyBlocks(): CVBlocks {
-	return {
-		fullName: textBlock('John Doe'),
-		position: textBlock('Engineer'),
-		location: textBlock('NYC'),
-		contacts: listBlock([]),
-		highlights: listBlock([]),
-		skills: listBlock([]),
-		jobHistory: listBlock([]),
-		projects: listBlock([]),
-		education: listBlock([])
-	};
-}
-
-function makeMaster(overrides?: Partial<CVBlocks>): CV {
-	return {
-		id: 'master-1',
-		name: 'Master CV',
-		createdAt: 1000,
-		updatedAt: 1000,
-		version: 5,
-		blocks: { ...emptyBlocks(), ...overrides },
-		hiddenBlockIds: []
-	};
-}
-
-function makeTailored(master: CV): CV {
-	return {
-		id: 'tailored-1',
-		name: 'Tailored CV',
-		createdAt: 2000,
-		updatedAt: 2000,
-		version: 1,
-		blocks: structuredClone(master.blocks),
-		hiddenBlockIds: [],
-		sourceId: master.id,
-		syncBaseline: structuredClone(master.blocks),
-		syncDecisions: { sourceSyncedVersion: master.version, discarded: {} }
-	};
-}
+void emptyBlocks;
+void ({} as ObjectId);
 
 describe('diffCVs - text blocks', () => {
 	it('no changes, no diff', () => {
@@ -268,12 +208,44 @@ describe('diffCVs - nested entries', () => {
 });
 
 describe('diffCVs - hidden blocks', () => {
-	it('hidden blocks are skipped even if master changed them', () => {
+	it('master-hidden blocks are skipped even if master changed them', () => {
 		const job = makeJob('Acme', 'Engineer');
 		const master = makeMaster({ jobHistory: listBlock([job]) });
 		master.hiddenBlockIds = [master.blocks.jobHistory.objectId];
 		const tailored = makeTailored(master);
 		master.blocks.jobHistory.value[0].role = 'Changed Role';
+		expect(diffCVs(master, tailored)).toEqual([]);
+	});
+
+	it('tailored-hidden blocks are skipped even if master changed them', () => {
+		const job = makeJob('Acme', 'Engineer');
+		const master = makeMaster({ jobHistory: listBlock([job]) });
+		const tailored = makeTailored(master);
+		tailored.hiddenBlockIds = [master.blocks.jobHistory.objectId];
+		master.blocks.jobHistory.value[0].role = 'Changed Role';
+		expect(diffCVs(master, tailored)).toEqual([]);
+	});
+
+	it('unhiding on tailored surfaces the accumulated backlog', () => {
+		const job = makeJob('Acme', 'Engineer');
+		const master = makeMaster({ jobHistory: listBlock([job]) });
+		const tailored = makeTailored(master);
+		tailored.hiddenBlockIds = [master.blocks.jobHistory.objectId];
+
+		master.blocks.jobHistory.value[0].role = 'Staff Engineer';
+		master.blocks.jobHistory.value[0].achievements.push(makeAchievement('New achievement'));
+		expect(diffCVs(master, tailored)).toEqual([]);
+
+		tailored.hiddenBlockIds = [];
+		const items = diffCVs(master, tailored);
+		expect(items.length).toBeGreaterThanOrEqual(2);
+	});
+
+	it('text block hidden on tailored is skipped', () => {
+		const master = makeMaster();
+		const tailored = makeTailored(master);
+		tailored.hiddenBlockIds = [master.blocks.position.objectId];
+		master.blocks.position.value = 'New Position';
 		expect(diffCVs(master, tailored)).toEqual([]);
 	});
 });

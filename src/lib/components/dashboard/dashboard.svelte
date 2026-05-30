@@ -20,6 +20,7 @@
 	import type { CV } from '$lib/types/cv';
 	import * as Empty from '$lib/components/ui/empty';
 	import { FileQuestionMark } from '@lucide/svelte';
+	import { orphanTailored } from '$lib/features/tailoring/orphan';
 
 	let cvs = $state<CV[]>([]);
 	let loading = $state(true);
@@ -51,16 +52,13 @@
 			await db.cvs.bulkDelete(ids);
 			cvs = cvs.filter((cv) => !ids.includes(cv.id));
 		} else {
-			for (const dep of deleteTargetDependents) {
-				await db.cvs.update(dep.id, { sourceId: undefined, syncDecisions: undefined });
+			const orphanedDeps = deleteTargetDependents.map(orphanTailored);
+			for (const dep of orphanedDeps) {
+				await db.cvs.put(dep);
 			}
 			await db.cvs.delete(deleteTargetId);
 			cvs = cvs.filter((cv) => cv.id !== deleteTargetId);
-			cvs = cvs.map((cv) =>
-				deleteTargetDependents.some((d) => d.id === cv.id)
-					? { ...cv, sourceId: undefined, syncDecisions: undefined }
-					: cv
-			);
+			cvs = cvs.map((cv) => orphanedDeps.find((o) => o.id === cv.id) ?? cv);
 		}
 		deleteDialogOpen = false;
 		deleteTargetId = null;
@@ -76,7 +74,7 @@
 	}
 
 	async function handleSync(updated: CV) {
-		const persisted = { ...updated, updatedAt: Date.now(), version: (updated.version ?? 0) + 1 };
+		const persisted = { ...updated, updatedAt: Date.now() };
 		await db.cvs.put(persisted);
 		cvs = cvs.map((cv) => (cv.id === persisted.id ? persisted : cv));
 	}

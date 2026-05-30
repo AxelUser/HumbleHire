@@ -1,28 +1,30 @@
 import { describe, expect, it } from 'vitest';
 import { createObjectId } from '$lib/types/cv';
-import type { CV } from '$lib/types/cv';
+import type { CV, CVBlocks } from '$lib/types/cv';
 import { buildDocDef, sanitizeFilename } from './generate';
+import { computeBlockHashes } from '$lib/features/tailoring/hash';
 
 function makeCV(overrides: Partial<CV> = {}): CV {
 	const id = createObjectId();
+	const blocks: CVBlocks = {
+		fullName: { objectId: id, value: 'Jane Doe' },
+		position: { objectId: createObjectId(), value: 'Engineer' },
+		location: { objectId: createObjectId(), value: 'London' },
+		contacts: { objectId: createObjectId(), value: [] },
+		highlights: { objectId: createObjectId(), value: [] },
+		skills: { objectId: createObjectId(), value: [] },
+		jobHistory: { objectId: createObjectId(), value: [] },
+		projects: { objectId: createObjectId(), value: [] },
+		education: { objectId: createObjectId(), value: [] }
+	};
 	return {
 		id: 'test-id',
 		name: 'Jane Doe',
 		createdAt: 0,
 		updatedAt: 0,
-		version: 1,
 		hiddenBlockIds: [],
-		blocks: {
-			fullName: { objectId: id, value: 'Jane Doe' },
-			position: { objectId: createObjectId(), value: 'Engineer' },
-			location: { objectId: createObjectId(), value: 'London' },
-			contacts: { objectId: createObjectId(), value: [] },
-			highlights: { objectId: createObjectId(), value: [] },
-			skills: { objectId: createObjectId(), value: [] },
-			jobHistory: { objectId: createObjectId(), value: [] },
-			projects: { objectId: createObjectId(), value: [] },
-			education: { objectId: createObjectId(), value: [] }
-		},
+		blocks,
+		blockHashes: computeBlockHashes(blocks),
 		...overrides
 	};
 }

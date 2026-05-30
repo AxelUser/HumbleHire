@@ -12,7 +12,6 @@
 	import DiffItemRow from './diff-item-row.svelte';
 	import { diffCVs } from '$lib/features/tailoring/diff';
 	import { applySyncDecisions } from '$lib/features/tailoring/apply';
-	import { hasUpdatesAvailable } from '$lib/features/tailoring/detection';
 	import type { DiffItem } from '$lib/features/tailoring/types';
 	import type { CV, ObjectId } from '$lib/types/cv';
 	import { dev } from '$app/environment';
@@ -28,15 +27,9 @@
 
 	let decisions = $state(new Map<ObjectId, 'accepted' | 'discarded'>());
 
-	const updatesAvailable = $derived(hasUpdatesAvailable(masterCv, tailoredCv));
-
 	const diffItems = $derived.by((): DiffItem[] =>
 		diffCVs($state.snapshot(masterCv), $state.snapshot(tailoredCv))
 	);
-
-	function isPreviouslyDiscarded(objectId: ObjectId): boolean {
-		return (tailoredCv.syncDecisions?.discarded ?? {})[objectId] !== undefined;
-	}
 
 	function accept(objectId: ObjectId) {
 		decisions.set(objectId, 'accepted');
@@ -109,7 +102,6 @@
 				{#if diffItems.length === 0}
 					<div class="text-muted-foreground py-8 text-center text-sm">
 						<p>No relevant changes from the master CV.</p>
-						<p class="mt-1 text-xs">Closing will clear the sync indicator.</p>
 					</div>
 				{:else}
 					<div class="flex items-center justify-between gap-2 pb-3">
@@ -128,7 +120,6 @@
 								{item}
 								{masterCv}
 								{tailoredCv}
-								previouslyDiscarded={isPreviouslyDiscarded(item.objectId)}
 								decision={decisions.get(item.objectId)}
 								onAccept={() => accept(item.objectId)}
 								onDiscard={() => discard(item.objectId)}

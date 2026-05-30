@@ -59,11 +59,6 @@ export interface EducationEntry extends WithId {
 	current: boolean;
 }
 
-export interface SyncDecisions {
-	sourceSyncedVersion: number;
-	discarded: Record<string, number>;
-}
-
 export interface CVBlocks {
 	fullName: Block<string>;
 	position: Block<string>;
@@ -92,17 +87,19 @@ export type ListBlockKey = {
 	[K in keyof CVBlocks]: CVBlocks[K] extends Block<Array<WithId>> ? K : never;
 }[keyof CVBlocks];
 
+export type BlockHashes = Record<CVBlockKey, string>;
+
 export interface CV {
 	id: string;
 	name: string;
 	company?: string;
 	createdAt: number;
 	updatedAt: number;
-	version: number;
 	blocks: CVBlocks;
+	blockHashes: BlockHashes;
 	hiddenBlockIds: ObjectId[];
 
 	sourceId?: string;
-	syncDecisions?: SyncDecisions;
 	syncBaseline?: CVBlocks;
+	syncBaselineHashes?: BlockHashes;
 }

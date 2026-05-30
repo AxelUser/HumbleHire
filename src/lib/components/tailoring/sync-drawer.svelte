@@ -47,10 +47,6 @@
 		return groups;
 	});
 
-	function isPreviouslyDiscarded(objectId: ObjectId): boolean {
-		return (tailoredCv.syncDecisions?.discarded ?? {})[objectId] !== undefined;
-	}
-
 	function accept(objectId: ObjectId) {
 		decisions.set(objectId, 'accepted');
 		decisions = new Map(decisions);
@@ -143,11 +139,10 @@
 				{#if diffItems.length === 0}
 					<div class="text-muted-foreground py-8 text-center text-sm">
 						<p>No relevant changes from the master CV.</p>
-						<p class="mt-1 text-xs">Closing will clear the sync indicator.</p>
 					</div>
 				{:else}
 					<div class="flex flex-col gap-4">
-						{#each groupedItems as group}
+						{#each groupedItems as group (group.label)}
 							<div>
 								<span
 									class="text-accent mb-2 block text-xs font-extrabold tracking-widest uppercase"
@@ -160,7 +155,6 @@
 											{item}
 											{masterCv}
 											{tailoredCv}
-											previouslyDiscarded={isPreviouslyDiscarded(item.objectId)}
 											decision={decisions.get(item.objectId)}
 											onAccept={() => accept(item.objectId)}
 											onDiscard={() => discard(item.objectId)}

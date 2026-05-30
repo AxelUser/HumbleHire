@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { createObjectId } from '$lib/types/cv';
-import type { CV, ObjectId } from '$lib/types/cv';
+import type { CV, CVBlocks, ObjectId } from '$lib/types/cv';
 import { preprocessBlocks } from './preprocess';
+import { computeBlockHashes } from '$lib/features/tailoring/hash';
 
 function id(): ObjectId {
 	return createObjectId();
@@ -18,14 +19,7 @@ function makeCV(overrides: Partial<CV> = {}): CV {
 	const projectsId = id();
 	const educationId = id();
 
-	return {
-		id: 'test-cv',
-		name: 'Test CV',
-		createdAt: Date.now(),
-		updatedAt: Date.now(),
-		version: 1,
-		hiddenBlockIds: [],
-		blocks: {
+	const blocks: CVBlocks = {
 			fullName: { objectId: fullNameId, value: 'Jane Doe' },
 			position: { objectId: positionId, value: 'Software Engineer' },
 			location: { objectId: locationId, value: 'London, UK' },
@@ -70,7 +64,16 @@ function makeCV(overrides: Partial<CV> = {}): CV {
 					}
 				]
 			}
-		},
+		};
+
+	return {
+		id: 'test-cv',
+		name: 'Test CV',
+		createdAt: Date.now(),
+		updatedAt: Date.now(),
+		hiddenBlockIds: [],
+		blocks,
+		blockHashes: computeBlockHashes(blocks),
 		...overrides
 	};
 }
