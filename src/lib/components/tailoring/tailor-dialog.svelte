@@ -23,7 +23,8 @@
 	let { sourceCv, onCreate, open = $bindable(false) }: Props = $props();
 
 	let company = $state('');
-	let name = $state('');
+	// svelte-ignore state_referenced_locally
+	let name = $state(sourceCv.name);
 	let loading = $state(false);
 
 	function reset() {
