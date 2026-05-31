@@ -1,10 +1,7 @@
 import type { CV } from '$lib/types/cv';
 
 export function orphanTailored(cv: CV): CV {
-	return {
-		...cv,
-		sourceId: undefined,
-		syncBaseline: undefined,
-		syncBaselineHashes: undefined
-	};
+	const { sourceId: _sourceId, syncBaseline: _syncBaseline, syncBaselineHashes: _syncBaselineHashes, ...rest } =
+		cv;
+	return rest;
 }

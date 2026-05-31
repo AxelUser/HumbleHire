@@ -31,7 +31,7 @@
 	);
 </script>
 
-<div class="border-foreground bg-card shadow-brutal border-2">
+<div class="border-foreground bg-card shadow-brutal border-2" data-testid="master-group">
 	<!-- Master row -->
 	<div
 		class="flex items-center gap-4 px-[18px] py-4 {hasTailored
@@ -72,6 +72,7 @@
 				variant="ghost"
 				size="sm"
 				class="text-muted-foreground hover:text-foreground px-2"
+				aria-label="Delete CV"
 				onclick={() => onDelete(master.id)}
 			>
 				<Trash2 class="h-3.5 w-3.5" />

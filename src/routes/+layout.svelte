@@ -1,6 +1,7 @@
 <script lang="ts">
 	import '../app.css';
 	import { dev } from '$app/environment';
+	import { onMount } from 'svelte';
 	import { ModeWatcher, toggleMode, mode } from 'mode-watcher';
 	import { Sun, Moon } from '@lucide/svelte';
 	import Header from '$lib/components/layout/header.svelte';
@@ -8,6 +9,12 @@
 	import DevToolbox from '$lib/components/dev/dev-toolbox.svelte';
 
 	let { children } = $props();
+
+	onMount(() => {
+		if (import.meta.env.VITE_E2E) {
+			import('$lib/e2e-bridge').then((m) => m.initE2eBridge());
+		}
+	});
 </script>
 
 <ModeWatcher />

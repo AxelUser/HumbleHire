@@ -16,6 +16,7 @@
 		idleClass?: string;
 		borderWhenIdle?: boolean;
 		children: Snippet<[SortableItemHandle]>;
+		'data-testid'?: string;
 	}
 
 	let {
@@ -24,7 +25,8 @@
 		class: className,
 		idleClass,
 		borderWhenIdle = true,
-		children
+		children,
+		'data-testid': testid
 	}: Props = $props();
 
 	const sortable = createSortable({
@@ -44,6 +46,7 @@
 			? 'border-muted border-2 border-dashed'
 			: cn(borderWhenIdle && 'border', idleClass)
 	)}
+	data-testid={testid}
 	{@attach sortable.attach}
 >
 	{@render children({

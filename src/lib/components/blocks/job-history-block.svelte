@@ -57,6 +57,7 @@
 					{index}
 					class="relative rounded-lg p-4"
 					idleClass={job.current ? 'pl-[18px] shadow-[inset_4px_0_0_0_var(--accent)]' : undefined}
+					data-testid="job-entry"
 				>
 					{#snippet children({ attachHandle, isDragging })}
 						<div class="flex flex-col gap-2 {isDragging ? 'invisible' : ''}">
@@ -64,6 +65,7 @@
 								<span
 									{@attach attachHandle}
 									class="text-muted-foreground shrink-0 cursor-grab"
+									data-testid="drag-handle"
 								>
 									<GripVertical class="h-4 w-4" />
 								</span>
@@ -76,6 +78,7 @@
 									variant="ghost"
 									size="icon"
 									class="text-muted-foreground hover:text-destructive shrink-0"
+									aria-label="Remove job"
 									onclick={() => removeJob(job.objectId)}
 								>
 									<Trash2 class="h-4 w-4" />

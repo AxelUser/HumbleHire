@@ -24,7 +24,7 @@
 	}
 </script>
 
-<PanelCard {title}>
+<PanelCard {title} testid="block-{title.toLowerCase().replace(/\s+/g, '-')}">
 	{#snippet action()}
 		<button
 			type="button"

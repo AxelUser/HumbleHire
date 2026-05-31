@@ -12,6 +12,10 @@ const dirname =
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
 	plugins: [tailwindcss(), sveltekit()],
+	build: {
+		// xxhash-wasm uses top-level await which requires es2022+
+		target: 'es2022'
+	},
 	test: {
 		workspace: [
 			{

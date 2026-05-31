@@ -8,6 +8,10 @@ declare global {
 		// interface PageState {}
 		// interface Platform {}
 	}
+
+	interface Window {
+		__hhTest?: import('$lib/e2e-bridge').HhTestBridge;
+	}
 }
 
 export {};

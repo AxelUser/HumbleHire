@@ -52,7 +52,9 @@
 			await db.cvs.bulkDelete(ids);
 			cvs = cvs.filter((cv) => !ids.includes(cv.id));
 		} else {
-			const orphanedDeps = deleteTargetDependents.map(orphanTailored);
+			const orphanedDeps = deleteTargetDependents.map((d) =>
+				orphanTailored($state.snapshot(d) as CV)
+			);
 			for (const dep of orphanedDeps) {
 				await db.cvs.put(dep);
 			}
@@ -74,7 +76,7 @@
 	}
 
 	async function handleSync(updated: CV) {
-		const persisted = { ...updated, updatedAt: Date.now() };
+		const persisted = { ...($state.snapshot(updated) as CV), updatedAt: Date.now() };
 		await db.cvs.put(persisted);
 		cvs = cvs.map((cv) => (cv.id === persisted.id ? persisted : cv));
 	}
