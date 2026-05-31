@@ -3,6 +3,7 @@
 	import { Download } from '@lucide/svelte';
 	import { downloadPdf } from '$lib/features/export/generate';
 	import { toast } from 'svelte-sonner';
+	import { capture } from '$lib/analytics';
 	import type { CV } from '$lib/types/cv';
 
 	interface Props {
@@ -21,6 +22,7 @@
 		exporting = true;
 		try {
 			await downloadPdf(cv);
+			capture('cv_exported', { is_tailored: !!cv.sourceId });
 		} catch (err) {
 			console.error('Export failed:', err);
 			toast.error('Export failed. Please try again.');

@@ -7,6 +7,7 @@
 	import { getHasCvsHint } from '$lib/services/cv/has-cvs-hint';
 	import { Hero, About } from '$lib/components/landing';
 	import { Dashboard } from '$lib/components/dashboard';
+	import { capture } from '$lib/analytics';
 
 	let mode = $state<'hero' | 'dashboard'>(getHasCvsHint() ? 'dashboard' : 'hero');
 
@@ -20,6 +21,7 @@
 		const id = crypto.randomUUID();
 		const cv = createCVFromTemplate(id, 'Untitled CV');
 		await db.cvs.add(cv);
+		capture('cv_created', { source: 'hero' });
 		await goto(resolve(`/cv/${id}`));
 	}
 </script>

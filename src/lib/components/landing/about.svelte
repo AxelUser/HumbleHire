@@ -20,7 +20,7 @@
 		{
 			icon: HardDrive,
 			title: 'Local-first storage',
-			body: 'Your CVs live in your browser. No account, no cloud, no sync server, no surprise data exposure.'
+			body: 'Your CVs live in your browser. No account, no cloud, no sync server. Your CV content never leaves your device.'
 		},
 		{
 			icon: Pencil,
@@ -267,11 +267,12 @@
 				↳ Why local-first
 			</p>
 			<h2 class="mb-5 text-3xl font-extrabold tracking-tight md:text-4xl">
-				Your CV is yours. Nothing in between.
+				Your CV is yours. Instant. No lock-in.
 			</h2>
 			<p class="text-muted-foreground mb-4 text-base leading-relaxed">
-				HumbleHire is free to use and fully client-side, everything you write stays in your
-				browser's storage. You don't need to create an account to make it work.
+				HumbleHire is free to use and fully client-side. Everything you write is stored in your
+				browser — no account required, no server in the loop. Every save is instant because
+				nothing leaves your device.
 			</p>
 		</div>
 
@@ -280,13 +281,13 @@
 		>
 			<div class="flex items-center gap-3">
 				<span class="border-foreground bg-accent h-2.5 w-2.5 shrink-0 border-2"></span>
-				<span>browser storage</span>
-				<span class="text-accent ml-auto font-bold">● your data</span>
+				<span>CV content lives in</span>
+				<span class="text-accent ml-auto font-bold">your browser</span>
 			</div>
 			<div class="flex items-center gap-3">
 				<span class="border-foreground bg-card h-2.5 w-2.5 shrink-0 border-2"></span>
-				<span>app runs at</span>
-				<span class="text-muted-foreground ml-auto">your machine</span>
+				<span>save latency</span>
+				<span class="text-muted-foreground ml-auto">instant</span>
 			</div>
 			<div class="flex items-center gap-3 opacity-50">
 				<span class="border-foreground h-2.5 w-2.5 shrink-0 border-2 border-dashed"></span>
@@ -294,7 +295,7 @@
 			</div>
 			<hr class="border-foreground border-t-2" />
 			<div class="flex justify-between">
-				<span>Telemetry sent</span>
+				<span>CV data uploaded</span>
 				<strong>0 bytes</strong>
 			</div>
 			<div class="flex justify-between">
@@ -302,8 +303,8 @@
 				<strong>0</strong>
 			</div>
 			<div class="flex justify-between">
-				<span>Network requests</span>
-				<strong>app shell only</strong>
+				<span>Account required</span>
+				<strong>none</strong>
 			</div>
 		</div>
 	</div>

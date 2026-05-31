@@ -26,6 +26,10 @@ _Avoid_: Sub-entry, child item
 A block whose content is preserved but excluded from the export. Hidden state is per CV, stored as a list of block IDs.
 _Avoid_: Disabled block, off block
 
+**Local-first**:
+Every CV lives only in the user's own browser storage (IndexedDB) and its content is never sent to a server. "Local-first" describes where CV _content_ lives; it is not a promise of zero network activity. The app legitimately makes non-content requests (the app shell, web fonts, anonymous cookieless usage metrics). Product copy must not claim "zero telemetry," "0 bytes sent," or "no network requests" — those are false. The honest, durable guarantee is that **CV content never leaves the device**.
+_Avoid_: "Zero telemetry", "no network", "offline-only" used as synonyms for local-first.
+
 ### Tailoring
 
 **Master CV**:

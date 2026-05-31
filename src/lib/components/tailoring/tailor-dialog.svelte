@@ -12,6 +12,7 @@
 	import { Label } from '$lib/components/ui/label';
 	import { Scissors } from '@lucide/svelte';
 	import { createTailoredCV } from '$lib/features/tailoring/create-tailored';
+	import { capture } from '$lib/analytics';
 	import type { CV } from '$lib/types/cv';
 
 	interface Props {
@@ -42,6 +43,7 @@
 				name.trim(),
 				company.trim() || undefined
 			);
+			capture('cv_tailored', { has_company: !!company.trim() });
 			open = false;
 			reset();
 			onCreate(id);
