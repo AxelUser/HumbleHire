@@ -9,6 +9,9 @@ What HumbleHire covers and what it deliberately does not. For context on each it
 - Dashboard with fuzzy search and master-grouped listing
 - Single-click PDF export with live byte-accurate preview
 - Local-first storage
+- Offline-ready app shell and PDF engine (no network required after first visit)
+- PWA installability with a custom install control and iOS guidance
+- Durable storage — persistent IndexedDB, storage-durability status shown to the user
 
 ## Out of scope
 

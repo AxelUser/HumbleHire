@@ -84,6 +84,28 @@ _Avoid_: Render, output, view
 A self-contained PDF rendering module that takes filtered CV blocks and produces a PDF layout. The v1 theme is "Classic." Adding a theme means adding a module, not editing the editor or the data model.
 _Avoid_: Template, style, layout
 
+### Offline & durability
+
+**Install**:
+Adding HumbleHire to the device so it runs as a standalone app in its own window. Beyond the native-app feel, installing is the lever that makes local storage durable: on Chrome it unlocks the persistent-storage grant, on iOS it exempts the data from periodic clean-up. Product copy ties the two together ("Install to protect your CVs").
+_Avoid_: Download, "get the app", add to desktop (used loosely).
+
+**Offline-ready**:
+The state in which the app shell and the PDF engine are cached so HumbleHire opens, edits, previews, and exports with no network. Reached after the first online visit.
+_Avoid_: Offline mode (implies a user-toggled state), offline-only.
+
+**Durable storage**:
+Browser storage exempt from automatic eviction, so CV content survives storage pressure and a browser's periodic clean-up. Requested through the Storage API and reinforced by [[install]]. Describes resistance to eviction on _this device_; it never implies an off-device copy.
+_Avoid_: "Saved to cloud", "backed up" (durable is not the same as backed up), permanent.
+
+**Export**:
+Turning a single CV into a PDF for sending to an employer. It is the output, not a safety net: a PDF cannot be re-imported as editable CV content.
+_Avoid_: Backup, save.
+
+**Backup**:
+A single downloadable file containing every CV, re-importable to restore them. The only copy that survives cleared site data, a different browser, or a dead disk. Distinct from [[export]].
+_Avoid_: Export, dump, save.
+
 ## Flagged ambiguities
 
 **"Version"** has no place in HumbleHire language.
@@ -93,6 +115,11 @@ _Avoid_: Template, style, layout
 **"Block"** sometimes appears in code to mean the `Block<T>` wrapper object (a `{ objectId, value }` pair). That is an implementation detail. In product language, "block" always means one of the nine CV sections.
 
 **"Master"** is a role, not a flag. A CV is a master whenever it has no `sourceId`. The same CV can have many tailored copies pointing to it; there is no inverse list on the master side.
+
+**"Update" is overloaded — keep the two senses apart.**
+
+- _Sync sense (reserved)_: "Updates available" / "updated" is the tailored-CV indicator that its master changed. See [[updates-available]] under Tailoring. Only sync uses this word.
+- _App sense_: when a new build is deployed and the service worker has a fresh version ready, the reload prompt must **not** say "update available." Use "a new version of HumbleHire is available" and "Reload." This keeps "updates" unambiguously about sync.
 
 ## Example dialogue
 

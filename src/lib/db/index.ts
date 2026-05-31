@@ -1,6 +1,7 @@
 import Dexie, { type Table } from 'dexie';
 import type { CV } from '$lib/types/cv';
 import { setHasCvsHint } from '$lib/services/cv/has-cvs-hint';
+import { ensurePersistent } from '$lib/pwa/persistence';
 
 class HumbleHireDB extends Dexie {
 	cvs!: Table<CV>;
@@ -13,6 +14,7 @@ class HumbleHireDB extends Dexie {
 
 		this.cvs.hook('creating', () => {
 			setHasCvsHint(true);
+			ensurePersistent();
 		});
 
 		this.cvs.hook('deleting', (_primKey, _obj, trans) => {

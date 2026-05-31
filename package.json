@@ -16,7 +16,8 @@
 		"test": "npm run test:unit -- --run && npm run test:e2e",
 		"test:e2e": "playwright test",
 		"storybook": "storybook dev -p 6006",
-		"build-storybook": "storybook build"
+		"build-storybook": "storybook build",
+		"generate-pwa-assets": "pwa-assets-generator"
 	},
 	"devDependencies": {
 		"@chromatic-com/storybook": "^5.0.1",
@@ -38,6 +39,7 @@
 		"@testing-library/svelte": "^5.2.4",
 		"@types/node": "^24",
 		"@types/pdfmake": "^0.3.3",
+		"@vite-pwa/assets-generator": "^1.0.2",
 		"@vitest/browser": "3.2.4",
 		"@vitest/coverage-v8": "3.2.4",
 		"bits-ui": "^2.16.3",
@@ -76,6 +78,7 @@
 	"dependencies": {
 		"@dnd-kit/helpers": "^0.3.2",
 		"@dnd-kit/svelte": "^0.3.2",
+		"@fontsource-variable/space-grotesk": "^5.2.10",
 		"dexie": "^4.3.0",
 		"fuse.js": "^7.3.0",
 		"pdfjs-dist": "^5.7.284",
