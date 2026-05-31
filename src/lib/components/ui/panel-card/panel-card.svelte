@@ -10,6 +10,7 @@
 		class?: string;
 		headerClass?: string;
 		contentClass?: string;
+		testid?: string;
 	}
 
 	let {
@@ -19,13 +20,14 @@
 		children,
 		class: className,
 		headerClass,
-		contentClass
+		contentClass,
+		testid
 	}: Props = $props();
 
 	const hasHeader = $derived(title !== undefined || titleSlot !== undefined);
 </script>
 
-<div class={cn('border-foreground bg-card shadow-brutal border-2', className)}>
+<div class={cn('border-foreground bg-card shadow-brutal border-2', className)} data-testid={testid}>
 	{#if hasHeader}
 		<div
 			class={cn(

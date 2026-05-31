@@ -5,6 +5,7 @@
 	import type { ComponentProps } from 'svelte';
 	import type { CV, CVBlocks, JobEntry, ObjectId, SkillCategory } from '$lib/types/cv';
 	import type { DiffItem } from '$lib/features/tailoring/types';
+	import { computeBlockHashes } from '$lib/features/tailoring/hash';
 
 	type Props = ComponentProps<typeof DiffItemRow>;
 
@@ -34,6 +35,7 @@
 		role: 'Senior Engineer',
 		startDate: new Date(2021, 0, 1),
 		endDate: undefined,
+		current: true,
 		achievements: [
 			{ objectId: IDS.ach1, text: 'Led the payments platform rewrite' },
 			{ objectId: mkId('ach2'), text: 'Cut checkout latency by 40%' }
@@ -67,27 +69,30 @@
 		};
 	}
 
+	const masterBlocks = mkBlocks('Senior Software Engineer', true, true);
+	const masterHashes = computeBlockHashes(masterBlocks);
 	const masterCv: CV = {
 		id: 'master',
 		name: 'Master CV',
-		notes: '',
-		version: 2,
 		createdAt: 0,
 		updatedAt: 0,
-		blocks: mkBlocks('Senior Software Engineer', true, true),
+		blocks: masterBlocks,
+		blockHashes: masterHashes,
 		hiddenBlockIds: []
 	};
 
+	const tailoredBlocks = mkBlocks('Software Engineer', true, true);
 	const tailoredCv: CV = {
 		id: 'tailored',
 		name: 'Stripe — Engineer',
-		notes: '',
-		version: 1,
 		createdAt: 0,
 		updatedAt: 0,
-		blocks: mkBlocks('Software Engineer', true, true),
+		blocks: tailoredBlocks,
+		blockHashes: computeBlockHashes(tailoredBlocks),
 		hiddenBlockIds: [],
-		sourceId: 'master'
+		sourceId: 'master',
+		syncBaseline: masterBlocks,
+		syncBaselineHashes: masterHashes
 	};
 
 	// --- diff items ---
@@ -150,7 +155,6 @@
 			masterCv,
 			tailoredCv,
 			decision: undefined,
-			previouslyDiscarded: false,
 			onAccept: fn(),
 			onDiscard: fn(),
 			onRevert: fn()
@@ -222,14 +226,6 @@
 	{/snippet}
 </Story>
 
-<Story name="PreviouslyDiscarded" args={{ item: entryAddedItem, previouslyDiscarded: true }}>
-	{#snippet template(args: Props)}
-		<div class="max-w-2xl p-4">
-			<DiffItemRow {...args} />
-		</div>
-	{/snippet}
-</Story>
-
 <Story name="AllVariants" asChild>
 	<div class="max-w-2xl space-y-2 p-4">
 		{#each [textItem, entryAddedItem, entryRemovedItem, entryModifiedItem, nestedAddedItem, nestedRemovedItem] as item, i (i)}
@@ -238,7 +234,6 @@
 				{masterCv}
 				{tailoredCv}
 				decision={undefined}
-				previouslyDiscarded={false}
 				onAccept={fn()}
 				onDiscard={fn()}
 				onRevert={fn()}
@@ -248,18 +243,7 @@
 			item={entryAddedItem}
 			{masterCv}
 			{tailoredCv}
-			decision={undefined}
-			previouslyDiscarded={true}
-			onAccept={fn()}
-			onDiscard={fn()}
-			onRevert={fn()}
-		/>
-		<DiffItemRow
-			item={entryAddedItem}
-			{masterCv}
-			{tailoredCv}
 			decision="accepted"
-			previouslyDiscarded={false}
 			onAccept={fn()}
 			onDiscard={fn()}
 			onRevert={fn()}
@@ -269,7 +253,6 @@
 			{masterCv}
 			{tailoredCv}
 			decision="discarded"
-			previouslyDiscarded={false}
 			onAccept={fn()}
 			onDiscard={fn()}
 			onRevert={fn()}

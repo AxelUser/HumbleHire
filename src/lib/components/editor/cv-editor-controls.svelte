@@ -17,7 +17,7 @@
 	let { cv = $bindable() }: Props = $props();
 </script>
 
-<div class="mx-auto max-w-[520px] space-y-4 px-6 py-8">
+<div class="mx-auto space-y-4 py-8 pr-6">
 	<TextBlock
 		bind:block={cv.blocks.fullName}
 		bind:hiddenBlockIds={cv.hiddenBlockIds}

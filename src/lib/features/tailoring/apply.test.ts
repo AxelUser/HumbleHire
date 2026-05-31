@@ -1,82 +1,19 @@
 import { describe, expect, it } from 'vitest';
-import { createObjectId } from '$lib/types/cv';
-import type { CV, CVBlocks, JobEntry, Achievement, Tag, ObjectId } from '$lib/types/cv';
+import type { ObjectId } from '$lib/types/cv';
 import { diffCVs } from './diff';
 import { applySyncDecisions } from './apply';
+import { computeBlockHashes } from './hash';
+import {
+	listBlock,
+	makeAchievement,
+	makeJob,
+	makeMaster,
+	makeTag,
+	makeTailored
+} from './_fixtures';
 
-function id(): ObjectId {
-	return createObjectId();
-}
-
-function textBlock(value: string) {
-	return { objectId: id(), value };
-}
-
-function listBlock<T>(value: T) {
-	return { objectId: id(), value };
-}
-
-function makeAchievement(text: string): Achievement {
-	return { objectId: id(), text };
-}
-
-function makeTag(value: string): Tag {
-	return { objectId: id(), value };
-}
-
-function makeJob(company: string, role: string): JobEntry {
-	return {
-		objectId: id(),
-		company,
-		role,
-		startDate: undefined,
-		endDate: undefined,
-		achievements: [],
-		skills: []
-	};
-}
-
-function emptyBlocks(): CVBlocks {
-	return {
-		fullName: textBlock('John Doe'),
-		position: textBlock('Engineer'),
-		location: textBlock('NYC'),
-		contacts: listBlock([]),
-		highlights: listBlock([]),
-		skills: listBlock([]),
-		jobHistory: listBlock([]),
-		projects: listBlock([]),
-		education: listBlock([])
-	};
-}
-
-function makeMaster(overrides?: Partial<CVBlocks>): CV {
-	return {
-		id: 'master-1',
-		name: 'Master CV',
-		notes: '',
-		createdAt: 1000,
-		updatedAt: 1000,
-		version: 5,
-		blocks: { ...emptyBlocks(), ...overrides },
-		hiddenBlockIds: []
-	};
-}
-
-function makeTailored(master: CV): CV {
-	return {
-		id: 'tailored-1',
-		name: 'Tailored CV',
-		notes: '',
-		createdAt: 2000,
-		updatedAt: 2000,
-		version: 1,
-		blocks: structuredClone(master.blocks),
-		hiddenBlockIds: [],
-		sourceId: master.id,
-		syncBaseline: structuredClone(master.blocks),
-		syncDecisions: { sourceSyncedVersion: master.version, discarded: {} }
-	};
+function refreshMasterHashes(master: { blocks: Parameters<typeof computeBlockHashes>[0]; blockHashes: ReturnType<typeof computeBlockHashes> }) {
+	master.blockHashes = computeBlockHashes(master.blocks);
 }
 
 describe('applySyncDecisions', () => {
@@ -84,7 +21,7 @@ describe('applySyncDecisions', () => {
 		const master = makeMaster();
 		const tailored = makeTailored(master);
 		master.blocks.fullName.value = 'New Master Name';
-		master.version = 6;
+		refreshMasterHashes(master);
 
 		const items = diffCVs(master, tailored);
 		expect(items).toHaveLength(1);
@@ -95,11 +32,11 @@ describe('applySyncDecisions', () => {
 		expect(diffCVs(master, tailored)).toEqual([]);
 	});
 
-	it('baseline and version advance when all items resolved', () => {
+	it('baseline advances and accepted content lands in tailored when all items resolved', () => {
 		const master = makeMaster();
 		const tailored = makeTailored(master);
 		master.blocks.fullName.value = 'New Name';
-		master.version = 6;
+		refreshMasterHashes(master);
 
 		const items = diffCVs(master, tailored);
 		const decisions = new Map<ObjectId, 'accepted' | 'discarded'>([
@@ -107,15 +44,98 @@ describe('applySyncDecisions', () => {
 		]);
 		applySyncDecisions(tailored, master, decisions);
 
-		expect(tailored.syncDecisions?.sourceSyncedVersion).toBe(6);
 		expect(tailored.syncBaseline?.fullName.value).toBe('New Name');
+		expect(tailored.blocks.fullName.value).toBe('New Name');
+		expect(tailored.syncBaselineHashes?.fullName).toBe(master.blockHashes.fullName);
+	});
+
+	it('discard leaves tailored content alone but advances baseline (so next diff is empty)', () => {
+		const master = makeMaster();
+		const tailored = makeTailored(master);
+		const tailoredOriginal = tailored.blocks.position.value;
+		master.blocks.position.value = 'Staff Engineer';
+		refreshMasterHashes(master);
+
+		const items = diffCVs(master, tailored);
+		expect(items).toHaveLength(1);
+		const decisions = new Map<ObjectId, 'accepted' | 'discarded'>([
+			[items[0].objectId, 'discarded']
+		]);
+		applySyncDecisions(tailored, master, decisions);
+
+		expect(tailored.blocks.position.value).toBe(tailoredOriginal);
+		expect(tailored.syncBaseline?.position.value).toBe('Staff Engineer');
+		expect(diffCVs(master, tailored)).toEqual([]);
+	});
+
+	it('a discarded change reappears only if master moves to a different value', () => {
+		const master = makeMaster();
+		const tailored = makeTailored(master);
+		master.blocks.position.value = 'Staff Engineer';
+		refreshMasterHashes(master);
+
+		applySyncDecisions(
+			tailored,
+			master,
+			new Map<ObjectId, 'accepted' | 'discarded'>([
+				[diffCVs(master, tailored)[0].objectId, 'discarded']
+			])
+		);
+
+		master.blocks.position.value = 'Principal Engineer';
+		refreshMasterHashes(master);
+
+		const items = diffCVs(master, tailored);
+		expect(items).toHaveLength(1);
+	});
+
+	it('a discarded change stays discarded if master reverts to match tailored', () => {
+		const master = makeMaster();
+		const tailored = makeTailored(master);
+		const originalPosition = tailored.blocks.position.value;
+		master.blocks.position.value = 'Staff Engineer';
+		refreshMasterHashes(master);
+
+		applySyncDecisions(
+			tailored,
+			master,
+			new Map<ObjectId, 'accepted' | 'discarded'>([
+				[diffCVs(master, tailored)[0].objectId, 'discarded']
+			])
+		);
+
+		master.blocks.position.value = originalPosition;
+		refreshMasterHashes(master);
+
+		expect(diffCVs(master, tailored)).toEqual([]);
+	});
+
+	it('baseline does NOT advance while any item is unresolved', () => {
+		const job1 = makeJob('Acme', 'Engineer');
+		const job2 = makeJob('Beta', 'Dev');
+		const master = makeMaster({ jobHistory: listBlock([job1, job2]) });
+		const tailored = makeTailored(master);
+		master.blocks.jobHistory.value[0].role = 'Staff Engineer';
+		master.blocks.jobHistory.value[1].role = 'Senior Dev';
+		refreshMasterHashes(master);
+
+		const items = diffCVs(master, tailored);
+		expect(items).toHaveLength(2);
+
+		const decisions = new Map<ObjectId, 'accepted' | 'discarded'>([
+			[items[0].objectId, 'accepted']
+		]);
+		applySyncDecisions(tailored, master, decisions);
+
+		expect(tailored.syncBaseline?.jobHistory.value[0].role).toBe('Engineer');
+		expect(tailored.syncBaselineHashes?.jobHistory).not.toBe(master.blockHashes.jobHistory);
 	});
 
 	it('syncBaseline is a deep clone, not a reference to master.blocks', () => {
 		const master = makeMaster();
 		const tailored = makeTailored(master);
 		master.blocks.fullName.value = 'New Name';
-		master.version = 6;
+		refreshMasterHashes(master);
 
 		const items = diffCVs(master, tailored);
 		const decisions = new Map<ObjectId, 'accepted' | 'discarded'>([
@@ -128,68 +148,22 @@ describe('applySyncDecisions', () => {
 		expect(tailored.syncBaseline?.fullName.value).toBe(baselineNameAfter);
 	});
 
-	it('baseline stays frozen while any item is unresolved', () => {
-		const job1 = makeJob('Acme', 'Engineer');
-		const job2 = makeJob('Beta', 'Dev');
-		const master = makeMaster({ jobHistory: listBlock([job1, job2]) });
-		const tailored = makeTailored(master);
-		master.blocks.jobHistory.value[0].role = 'Staff Engineer';
-		master.blocks.jobHistory.value[1].role = 'Senior Dev';
-		master.version = 6;
-
-		const items = diffCVs(master, tailored);
-		expect(items).toHaveLength(2);
-
-		const decisions = new Map<ObjectId, 'accepted' | 'discarded'>([
-			[items[0].objectId, 'accepted']
-		]);
-		applySyncDecisions(tailored, master, decisions);
-
-		expect(tailored.syncDecisions?.sourceSyncedVersion).toBe(5);
-		expect(tailored.syncBaseline?.jobHistory.value[0].role).toBe('Engineer');
-	});
-
-	it('each discard records the master version', () => {
+	it('tailored.blockHashes is recomputed after Apply', () => {
 		const master = makeMaster();
 		const tailored = makeTailored(master);
-		master.blocks.position.value = 'Staff Engineer';
-		master.version = 6;
+		const hashBefore = tailored.blockHashes.fullName;
+		master.blocks.fullName.value = 'New Name';
+		refreshMasterHashes(master);
 
 		const items = diffCVs(master, tailored);
-		const decisions = new Map<ObjectId, 'accepted' | 'discarded'>([
-			[items[0].objectId, 'discarded']
-		]);
-		applySyncDecisions(tailored, master, decisions);
-
-		expect(tailored.syncDecisions?.discarded[items[0].objectId]).toBe(6);
-	});
-
-	it('stale discard clears when the field changes again', () => {
-		const master = makeMaster();
-		const tailored = makeTailored(master);
-		master.blocks.position.value = 'Staff Engineer';
-		master.version = 6;
-
-		const items = diffCVs(master, tailored);
-		const discardedId = items[0].objectId;
-		const decisions = new Map<ObjectId, 'accepted' | 'discarded'>([[discardedId, 'discarded']]);
-		applySyncDecisions(tailored, master, decisions);
-
-		expect(tailored.syncDecisions?.discarded[discardedId]).toBe(6);
-
-		master.blocks.position.value = 'Principal Engineer';
-		master.version = 7;
-
-		const items2 = diffCVs(master, tailored);
-		expect(items2).toHaveLength(1);
-
 		applySyncDecisions(
 			tailored,
 			master,
-			new Map<ObjectId, 'accepted' | 'discarded'>([[items2[0].objectId, 'accepted']])
+			new Map<ObjectId, 'accepted' | 'discarded'>([[items[0].objectId, 'accepted']])
 		);
 
-		expect(Object.keys(tailored.syncDecisions?.discarded ?? {})).toHaveLength(0);
+		expect(tailored.blockHashes.fullName).not.toBe(hashBefore);
+		expect(tailored.blockHashes.fullName).toBe(master.blockHashes.fullName);
 	});
 });
 
@@ -201,7 +175,7 @@ describe('applySyncDecisions — nested lists', () => {
 
 		const newAch = makeAchievement('Built the thing');
 		master.blocks.jobHistory.value[0].achievements.push(newAch);
-		master.version = 6;
+		refreshMasterHashes(master);
 
 		const items = diffCVs(master, tailored);
 		const addedItem = items.find((i) => i.objectId === newAch.objectId);
@@ -222,7 +196,7 @@ describe('applySyncDecisions — nested lists', () => {
 
 		const newSkill = makeTag('TypeScript');
 		master.blocks.jobHistory.value[0].skills.push(newSkill);
-		master.version = 6;
+		refreshMasterHashes(master);
 
 		const items = diffCVs(master, tailored);
 		const addedItem = items.find((i) => i.objectId === newSkill.objectId);
@@ -247,7 +221,7 @@ describe('applySyncDecisions — nested lists', () => {
 		const tailored = makeTailored(master);
 
 		master.blocks.jobHistory.value[0].achievements = [];
-		master.version = 6;
+		refreshMasterHashes(master);
 
 		const items = diffCVs(master, tailored);
 		const removedItem = items.find((i) => i.objectId === ach.objectId);
@@ -269,7 +243,7 @@ describe('applySyncDecisions — nested lists', () => {
 		const tailored = makeTailored(master);
 
 		master.blocks.jobHistory.value[0].achievements[0].text = 'New text';
-		master.version = 6;
+		refreshMasterHashes(master);
 
 		const items = diffCVs(master, tailored);
 		const modifiedItem = items.find((i) => i.objectId === ach.objectId);

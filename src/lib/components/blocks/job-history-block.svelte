@@ -5,10 +5,10 @@
 	import { TagInput } from '$lib/components/ui/tag-input';
 	import { BlockWrapper } from '$lib/components/ui/block-wrapper';
 	import { Button } from '$lib/components/ui/button';
-	import { Trash2, Plus, GripVertical } from '@lucide/svelte';
+	import { SegmentedControl, SegmentedControlItem } from '$lib/components/ui/segmented-control';
+	import { SortableItem, createSortableDragHandlers } from '$lib/components/ui/sortable';
 	import { DragDropProvider, DragOverlay } from '@dnd-kit/svelte';
-	import { createSortable } from '@dnd-kit/svelte/sortable';
-	import { move } from '@dnd-kit/helpers';
+	import { Trash2, Plus, GripVertical } from '@lucide/svelte';
 	import type { JobEntry, ObjectId } from '$lib/types/cv';
 	import { createObjectId } from '$lib/types/cv';
 
@@ -20,6 +20,13 @@
 
 	let { jobs = $bindable(), blockId, hiddenBlockIds = $bindable() }: Props = $props();
 
+	const drag = createSortableDragHandlers(
+		() => jobs,
+		(items) => {
+			jobs = items;
+		}
+	);
+
 	function addJob() {
 		jobs = [
 			...jobs,
@@ -29,6 +36,7 @@
 				role: '',
 				startDate: undefined,
 				endDate: undefined,
+				current: false,
 				achievements: [],
 				skills: []
 			}
@@ -38,62 +46,72 @@
 	function removeJob(objectId: ObjectId) {
 		jobs = jobs.filter((j) => j.objectId !== objectId);
 	}
-
-	function onDragOver(event: any) {
-		jobs = move(jobs as any, event) as JobEntry[];
-	}
-
-	function onDragEnd(event: any) {
-		jobs = move(jobs as any, event) as JobEntry[];
-	}
 </script>
 
 <BlockWrapper title="Job History" {blockId} bind:hiddenBlockIds>
-	<DragDropProvider {onDragEnd} {onDragOver}>
+	<DragDropProvider {...drag}>
 		<div class="flex flex-col gap-4">
 			{#each jobs as job, index (job.objectId)}
-				{@const sortable = createSortable({ id: job.objectId, index: (() => index) as any })}
-				<div
-					class="rounded-lg p-4 {sortable.isDragging
-						? 'border-muted border-2 border-dashed'
-						: 'border'}"
-					{@attach sortable.attach}
+				<SortableItem
+					id={job.objectId}
+					{index}
+					class="relative rounded-lg p-4"
+					idleClass={job.current ? 'pl-[18px] shadow-[inset_4px_0_0_0_var(--accent)]' : undefined}
+					data-testid="job-entry"
 				>
-					<div class="flex flex-col gap-2 {sortable.isDragging ? 'invisible' : ''}">
-						<div class="flex items-start justify-between gap-2">
-							<span
-								{@attach sortable.attachHandle}
-								class="text-muted-foreground mt-1 shrink-0 cursor-grab"
-							>
-								<GripVertical class="h-4 w-4" />
-							</span>
-							<div class="flex flex-1 flex-wrap items-baseline gap-2">
-								<InlineField bind:value={job.company} placeholder="Company" class="font-semibold" />
-								<span class="text-muted-foreground">—</span>
-								<InlineField bind:value={job.role} placeholder="Role" class="flex-1" />
+					{#snippet children({ attachHandle, isDragging })}
+						<div class="flex flex-col gap-2 {isDragging ? 'invisible' : ''}">
+							<div class="flex items-center justify-between gap-2">
+								<span
+									{@attach attachHandle}
+									class="text-muted-foreground shrink-0 cursor-grab"
+									data-testid="drag-handle"
+								>
+									<GripVertical class="h-4 w-4" />
+								</span>
+								<div class="flex flex-1 flex-wrap items-baseline gap-2">
+									<InlineField bind:value={job.company} placeholder="Company" class="font-semibold" />
+									<span class="text-muted-foreground">—</span>
+									<InlineField bind:value={job.role} placeholder="Role" class="flex-1" />
+								</div>
+								<Button
+									variant="ghost"
+									size="icon"
+									class="text-muted-foreground hover:text-destructive shrink-0"
+									aria-label="Remove job"
+									onclick={() => removeJob(job.objectId)}
+								>
+									<Trash2 class="h-4 w-4" />
+								</Button>
 							</div>
-							<Button
-								variant="ghost"
-								size="icon"
-								class="text-muted-foreground hover:text-destructive shrink-0"
-								onclick={() => removeJob(job.objectId)}
-							>
-								<Trash2 class="h-4 w-4" />
-							</Button>
+							<div class="flex flex-wrap items-center gap-2">
+								<DatePickerField bind:value={job.startDate} placeholder="Start date" />
+								<span class="text-muted-foreground">—</span>
+								{#if job.current}
+									<span class="text-muted-foreground font-mono font-bold tracking-wider uppercase">
+										Present
+									</span>
+								{:else}
+									<DatePickerField bind:value={job.endDate} placeholder="End date" />
+								{/if}
+								<SegmentedControl
+									bind:value={job.current}
+									aria-label="Occupation status"
+									class="ml-auto font-mono tracking-wider uppercase"
+								>
+									<SegmentedControlItem value={false} aria-label="Past role">Past</SegmentedControlItem>
+									<SegmentedControlItem value={true} aria-label="Current role">Current</SegmentedControlItem>
+								</SegmentedControl>
+							</div>
+							<EditableList
+								bind:items={job.achievements}
+								placeholder="Describe an achievement..."
+								addLabel="Add Achievement"
+							/>
+							<TagInput bind:tags={job.skills} placeholder="Add skill (e.g. React, AWS)" />
 						</div>
-						<div class="flex items-center gap-2">
-							<DatePickerField bind:value={job.startDate} placeholder="Start date" />
-							<span class="text-muted-foreground">–</span>
-							<DatePickerField bind:value={job.endDate} placeholder="End date" />
-						</div>
-						<EditableList
-							bind:items={job.achievements}
-							placeholder="Describe an achievement..."
-							addLabel="Add Achievement"
-						/>
-						<TagInput bind:tags={job.skills} placeholder="Add skill (e.g. React, AWS)" />
-					</div>
-				</div>
+					{/snippet}
+				</SortableItem>
 			{/each}
 			<Button variant="outline" size="sm" class="self-start" onclick={addJob}>
 				<Plus class="mr-1 h-4 w-4" />

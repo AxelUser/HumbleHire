@@ -8,6 +8,7 @@
 	const now = Date.now();
 
 	import type { CV, ObjectId } from '$lib/types/cv';
+	import { computeBlockHashes } from '$lib/features/tailoring/hash';
 
 	function oid(s: string): ObjectId {
 		return s as unknown as ObjectId;
@@ -27,35 +28,36 @@
 		};
 	}
 
+	const cv1Blocks = mkBlocks('Aleksey Maltsev', 'Senior Software Engineer', 'San Francisco, CA');
+	const cv2Blocks = mkBlocks('Aleksey Maltsev', 'Frontend Lead', 'Remote');
+	const cv3Blocks = mkBlocks('Aleksey Maltsev', 'Open Source Contributor', 'Edinburgh, UK');
+
 	const mockCVs: CV[] = [
 		{
 			id: 'cv-1',
 			name: 'Senior Developer — Stripe',
-			notes: '',
-			version: 5,
 			createdAt: now - 86400000 * 5,
 			updatedAt: now - 3600000,
-			blocks: mkBlocks('Aleksey Maltsev', 'Senior Software Engineer', 'San Francisco, CA'),
+			blocks: cv1Blocks,
+			blockHashes: computeBlockHashes(cv1Blocks),
 			hiddenBlockIds: []
 		},
 		{
 			id: 'cv-2',
 			name: 'Frontend Lead — Vercel',
-			notes: '',
-			version: 2,
 			createdAt: now - 86400000 * 2,
 			updatedAt: now - 7200000,
-			blocks: mkBlocks('Aleksey Maltsev', 'Frontend Lead', 'Remote'),
+			blocks: cv2Blocks,
+			blockHashes: computeBlockHashes(cv2Blocks),
 			hiddenBlockIds: []
 		},
 		{
 			id: 'cv-3',
 			name: 'Open Source Contributor',
-			notes: '',
-			version: 3,
 			createdAt: now - 86400000,
 			updatedAt: now - 900000,
-			blocks: mkBlocks('Aleksey Maltsev', 'Open Source Contributor', 'Edinburgh, UK'),
+			blocks: cv3Blocks,
+			blockHashes: computeBlockHashes(cv3Blocks),
 			hiddenBlockIds: []
 		}
 	];

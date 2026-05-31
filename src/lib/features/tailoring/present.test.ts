@@ -3,6 +3,7 @@ import { createObjectId } from '$lib/types/cv';
 import type { CV, CVBlocks, JobEntry, ObjectId, SkillCategory, Tag } from '$lib/types/cv';
 import type { DiffItem } from './types';
 import { entryTitle, formatPeriod, formatValue, entryKind, describeDiff } from './present';
+import { computeBlockHashes } from './hash';
 
 function id(): ObjectId {
 	return createObjectId();
@@ -27,6 +28,7 @@ function makeJob(): JobEntry {
 		role: 'Engineer',
 		startDate: new Date(2021, 0, 1),
 		endDate: undefined,
+		current: true,
 		achievements: [
 			{ objectId: id(), text: 'Built the thing' },
 			{ objectId: id(), text: 'Built another thing' }
@@ -50,14 +52,14 @@ function emptyBlocks(): CVBlocks {
 }
 
 function makeCV(overrides?: Partial<CVBlocks>): CV {
+	const blocks = { ...emptyBlocks(), ...overrides };
 	return {
 		id: 'cv-1',
 		name: 'CV',
-		notes: '',
 		createdAt: 1000,
 		updatedAt: 1000,
-		version: 1,
-		blocks: { ...emptyBlocks(), ...overrides },
+		blocks,
+		blockHashes: computeBlockHashes(blocks),
 		hiddenBlockIds: []
 	};
 }
@@ -78,12 +80,16 @@ describe('formatValue', () => {
 });
 
 describe('formatPeriod', () => {
-	it('returns undefined when both dates are missing', () => {
+	it('returns undefined when both dates are missing and not current', () => {
 		expect(formatPeriod(undefined, undefined)).toBeUndefined();
 	});
 
-	it('uses "Present" when the end date is missing', () => {
-		expect(formatPeriod(new Date(2021, 0, 1), undefined)).toBe('Jan 2021 – Present');
+	it('uses "Present" when current is true', () => {
+		expect(formatPeriod(new Date(2021, 0, 1), undefined, true)).toBe('Jan 2021 – Present');
+	});
+
+	it('collapses to start only when end is missing and not current', () => {
+		expect(formatPeriod(new Date(2021, 0, 1), undefined)).toBe('Jan 2021');
 	});
 
 	it('renders a full range', () => {
@@ -134,6 +140,7 @@ describe('entryTitle', () => {
 			role: '',
 			startDate: undefined,
 			endDate: undefined,
+			current: false,
 			achievements: [],
 			skills: []
 		};

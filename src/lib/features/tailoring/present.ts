@@ -22,11 +22,12 @@ export function formatValue(value: unknown): string {
 	return String(value);
 }
 
-export function formatPeriod(start?: Date, end?: Date): string | undefined {
-	if (!start && !end) return undefined;
+export function formatPeriod(start?: Date, end?: Date, current = false): string | undefined {
+	if (!start && !end && !current) return undefined;
 	const from = start ? monthYear.format(start) : '?';
-	const to = end ? monthYear.format(end) : 'Present';
-	return `${from} – ${to}`;
+	if (current) return `${from} – Present`;
+	if (!end) return from;
+	return `${from} – ${monthYear.format(end)}`;
 }
 
 export function joinParts(...parts: Array<string | undefined>): string | undefined {

@@ -1,78 +1,44 @@
-# HumbleHire - Project Overview
+# HumbleHire — Project Overview
 
-## What Is It
+## Problem
 
-HumbleHire is a resume builder that keeps your CVs organised: one master CV, tailored copies for each opportunity, and a clear record of what you sent where.
+Job seekers keep one comprehensive CV and tailor it per application. The usual workflow is copy the file, edit the copy, export, apply, repeat. A few applications in, the folder fills with `cv_v3_backend_FINAL2.pdf` files and there is no record of which copy came from which master, or what changed when the master was updated.
 
----
+HumbleHire replaces that ad-hoc process with one master CV that holds the full record, tailored copies that branch off it for specific roles and stay linked back, and a way to selectively pull master changes into each tailored copy without losing the intentional differences.
 
-## Why It Exists
+## What it is
 
-This project is a free (and open-source) alternative to my own Google Docs workflow, which required copy-pasting entire documents to create job-specific variants.
-You end up with a bunch of `cv_v3_backend.pdf` files and no clear lineage, making it really chaotic to manage, especially when you have to update your master CV with new information.
-HumbleHire aims to replace that manual process with a structured workflow where every change is visual and traceable.
+A free, open-source CV builder. Everything runs on your own machine. No account, no cloud sync. You write CVs, organise tailored copies, and export PDFs from the same surface.
 
----
+## Approach
 
-## Goals
+A few decisions shape how the rest of the tool feels:
 
-- **Interactive block-based editor** - CV is composed of discrete, editable blocks (name, position, contacts, highlights, job history, projects, education).
-- **Tailoring** - create a tailored copy from any CV for a specific company or role, with sync back from the master CV.
-- **Local-first** - all data is stored locally on your machine, no need to sync with the cloud.
-- **Diff and merge** - compare versions side-by-side and selectively merge changes across tailored copies.
-- **Export** - produce clean, formatted PDF/HTML output from any version.
+- **One master, many tailored copies.** The master is your full record; tailored copies are how you adapt that record per application. The relationship is always one master to many tailored copies. Tailored copies do not chain.
+- **Selective, one-way sync.** When the master changes, each tailored copy can decide change-by-change what to absorb and what to ignore. Discarded changes are remembered, so the same suggestion does not reappear every time. The point is to preserve intentional divergence, not to over-write it.
+- **Fixed block structure.** Every CV is composed of the same nine blocks in the same order. The shape is opinionated on purpose: consistent output, predictable parsing by applicant tracking systems, and one less thing for you to fiddle with.
+- **Local-first.** Your CVs live on your machine. There is no sign-up and no sync server. Backups are on you, which is what export is for.
 
-## Non-Goals
+## Features
 
-- Not a SaaS application.
-- Not a job board or application tracker.
-- Not an AI-powered CV writer or optimizer.
-- Not a collaborative/multi-user tool.
-- Not a general document editor - structure is fixed to CV blocks.
+### [Editor](features/cv-editor/OVERVIEW.md)
 
----
+Build a CV by clicking on the preview itself. The editor and the rendered CV are the same surface, so every change is visible immediately and saved automatically. Blocks can be hidden without losing their content, which is what makes one master CV usable as the source of many tailored copies.
 
-## CV Blocks
+### [Tailoring](features/tailoring/OVERVIEW.md)
 
-I've tried to keep the blocks as minimal as possible, while still being able to express the most common CV content. This list may be opinionated, but it's what I've found to be the most common and useful.
+Create a tailored copy of any CV for a specific role or company. The copy stays linked to its master, so when the master changes later, you can review each incoming change and either pull it in or set it aside. Sync is always one-way and always selective.
 
-| Block       | Description                                                |
-| ----------- | ---------------------------------------------------------- |
-| Full Name   | Applicant's legal or preferred name                        |
-| Position    | Target job title                                           |
-| Location    | City, country, or remote preference                        |
-| Contacts    | Email, phone, LinkedIn, GitHub, etc.                       |
-| Highlights  | 3-5 bullet points of professional summary                  |
-| Job History | Per-company: name, dates, role, achievements (bullet list) |
-| Projects    | Name, description, stack, link                             |
-| Education   | Institution, degree, dates                                 |
+### [Dashboard](features/dashboard/OVERVIEW.md)
 
----
+All your CVs in one view, with tailored copies nested under the master they came from. Fuzzy search filters and highlights matches in place. The grouping filter keeps results in context instead of leaving tailored copies orphaned.
 
-## User Stories
+### [Export](features/export/OVERVIEW.md)
 
-### Versioning
+Turn any CV into a clean PDF in one click. The editor has a live preview so what you see is what the file will be. Hidden and empty blocks drop out of the export automatically.
 
-- As a user, I can create a new CV from scratch by filling in structured blocks.
-- As a user, I can create a tailored copy of my CV for a specific job posting.
-- As a user, I can view the full version history of any CV.
-- As a user, I can compare two CV versions and see what changed.
+## See also
 
-### Editing
-
-- As a user, I can edit any block inline and see a live preview of the CV.
-- As a user, I can reorder, hide, or show blocks without deleting content.
-- As a user, I can add multiple entries within repeatable blocks (jobs, projects).
-
-### Export
-
-- As a user, I can export any CV version to PDF.
-- As a user, I can share a CV version as a static HTML page.
-
----
-
-## Out of Scope (v1)
-
-- Import from LinkedIn or existing PDF
-- ATS score analysis
-- MCP server for building CV using AI Agents
+- [SCOPE.md](SCOPE.md) — what HumbleHire covers and what it deliberately does not
+- [decisions/](decisions/) — architecture decisions
+- [../CONTEXT.md](../CONTEXT.md) — the shared vocabulary for this project

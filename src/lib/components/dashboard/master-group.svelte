@@ -1,33 +1,37 @@
 <script lang="ts">
 	import type { CV } from '$lib/types/cv';
+	import type { CVHighlights } from '$lib/features/dashboard/search.svelte';
 	import { formatRelativeTime } from '$lib/utils';
 	import { Button } from '$lib/components/ui/button';
 	import { TailorDialog } from '$lib/components/tailoring';
 	import TailoredRow from './tailored-row.svelte';
+	import HighlightedText from './highlighted-text.svelte';
 	import { ExportButton } from '$lib/components/editor';
 	import { Eye, Trash2, ChevronDown } from '@lucide/svelte';
 
 	interface Props {
 		master: CV;
 		tailored: CV[];
+		highlights?: Map<string, CVHighlights>;
 		onDelete: (id: string) => void;
 		onTailor: (id: string) => void;
 		onSync: (updated: CV) => void;
 	}
 
-	let { master, tailored, onDelete, onTailor, onSync }: Props = $props();
+	let { master, tailored, highlights, onDelete, onTailor, onSync }: Props = $props();
 
 	let collapsed = $state(false);
 	let tailorOpen = $state(false);
 
 	const editedRelative = $derived(formatRelativeTime(master.updatedAt));
+	const myHighlights = $derived(highlights?.get(master.id));
 	const hasTailored = $derived(tailored.length > 0);
 	const childrenLabel = $derived(
 		`${tailored.length} tailored ${tailored.length === 1 ? 'copy' : 'copies'}`
 	);
 </script>
 
-<div class="border-foreground bg-card shadow-brutal border-2">
+<div class="border-foreground bg-card shadow-brutal border-2" data-testid="master-group">
 	<!-- Master row -->
 	<div
 		class="flex items-center gap-4 px-[18px] py-4 {hasTailored
@@ -43,7 +47,9 @@
 
 		<!-- Title block -->
 		<div class="flex min-w-0 flex-1 flex-col gap-1">
-			<span class="text-lg font-extrabold tracking-tight">{master.name}</span>
+			<span class="text-lg font-extrabold tracking-tight">
+				<HighlightedText text={master.name} ranges={myHighlights?.name} />
+			</span>
 			<span class="text-muted-foreground text-xs font-medium">
 				Edited {editedRelative}
 			</span>
@@ -66,6 +72,7 @@
 				variant="ghost"
 				size="sm"
 				class="text-muted-foreground hover:text-foreground px-2"
+				aria-label="Delete CV"
 				onclick={() => onDelete(master.id)}
 			>
 				<Trash2 class="h-3.5 w-3.5" />
@@ -87,6 +94,7 @@
 						<TailoredRow
 							cv={child}
 							{master}
+							highlights={highlights?.get(child.id)}
 							isLast={i === tailored.length - 1}
 							{onDelete}
 							{onSync}

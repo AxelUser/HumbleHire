@@ -26,6 +26,7 @@ export interface JobEntry extends WithId {
 	role: string;
 	startDate: Date | undefined;
 	endDate: Date | undefined;
+	current: boolean;
 	achievements: Achievement[];
 	skills: Tag[];
 }
@@ -55,11 +56,7 @@ export interface EducationEntry extends WithId {
 	degree: string;
 	startDate: Date | undefined;
 	endDate: Date | undefined;
-}
-
-export interface SyncDecisions {
-	sourceSyncedVersion: number;
-	discarded: Record<string, number>;
+	current: boolean;
 }
 
 export interface CVBlocks {
@@ -90,18 +87,19 @@ export type ListBlockKey = {
 	[K in keyof CVBlocks]: CVBlocks[K] extends Block<Array<WithId>> ? K : never;
 }[keyof CVBlocks];
 
+export type BlockHashes = Record<CVBlockKey, string>;
+
 export interface CV {
 	id: string;
 	name: string;
-	notes: string;
 	company?: string;
 	createdAt: number;
 	updatedAt: number;
-	version: number;
 	blocks: CVBlocks;
+	blockHashes: BlockHashes;
 	hiddenBlockIds: ObjectId[];
 
 	sourceId?: string;
-	syncDecisions?: SyncDecisions;
 	syncBaseline?: CVBlocks;
+	syncBaselineHashes?: BlockHashes;
 }

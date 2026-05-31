@@ -22,6 +22,7 @@
 						role: 'Senior Software Engineer',
 						startDate: new Date(Date.UTC(2021, 0, 1)),
 						endDate: undefined,
+						current: true,
 						achievements: [
 							{
 								objectId: createObjectId(),
@@ -44,6 +45,7 @@
 						role: 'Software Engineer',
 						startDate: new Date(Date.UTC(2019, 5, 1)),
 						endDate: new Date(Date.UTC(2020, 11, 1)),
+						current: false,
 						achievements: [
 							{
 								objectId: createObjectId(),

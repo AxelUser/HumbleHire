@@ -32,7 +32,6 @@
 		masterCv: CV;
 		tailoredCv: CV;
 		decision: 'accepted' | 'discarded' | undefined;
-		previouslyDiscarded: boolean;
 		onAccept: () => void;
 		onDiscard: () => void;
 		onRevert: () => void;
@@ -43,7 +42,6 @@
 		masterCv,
 		tailoredCv,
 		decision,
-		previouslyDiscarded,
 		onAccept,
 		onDiscard,
 		onRevert
@@ -113,11 +111,8 @@
 		</div>
 
 		<div class="min-w-0 flex-1">
-			{#if previouslyDiscarded || decision !== undefined}
+			{#if decision !== undefined}
 				<div class="mb-1 flex flex-wrap items-center gap-2">
-					{#if previouslyDiscarded}
-						<Badge variant="outline" class="text-xs">Previously dismissed</Badge>
-					{/if}
 					{#if decision === 'accepted'}
 						<Badge variant="secondary" class="text-accent text-xs">Accepted</Badge>
 					{:else if decision === 'discarded'}

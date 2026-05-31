@@ -9,10 +9,21 @@ describe('formatDateRange', () => {
 		expect(result).toContain(' – ');
 	});
 
-	it('uses Present when end date is missing', () => {
-		const result = formatDateRange(new Date('2022-03-01'), undefined);
+	it('uses Present when current is true', () => {
+		const result = formatDateRange(new Date('2022-03-01'), undefined, true);
 		expect(result).toMatch(/Mar 2022/);
 		expect(result).toContain('Present');
+	});
+
+	it('uses Present when current is true even if end date is set', () => {
+		const result = formatDateRange(new Date('2022-03-01'), new Date('2023-01-01'), true);
+		expect(result).toContain('Present');
+		expect(result).not.toContain('Jan 2023');
+	});
+
+	it('collapses to just the start when end is missing and not current', () => {
+		const result = formatDateRange(new Date('2022-03-01'), undefined, false);
+		expect(result).toBe('Mar 2022');
 	});
 
 	it('returns undefined when start date is missing', () => {

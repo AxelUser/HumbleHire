@@ -1,13 +1,15 @@
 const monthYear = new Intl.DateTimeFormat('en', { month: 'short', year: 'numeric' });
 
 /**
- * Formats a date range as "Month Year – Month Year" or "Month Year – Present".
+ * Formats a date range. "Present" only when `current` is explicitly true —
+ * an absent end date with `current=false` collapses to just the start.
  */
-export function formatDateRange(start?: Date, end?: Date): string | undefined {
+export function formatDateRange(start?: Date, end?: Date, current = false): string | undefined {
 	if (!start) return undefined;
 	const from = monthYear.format(start);
-	const to = end ? monthYear.format(end) : 'Present';
-	return `${from} – ${to}`;
+	if (current) return `${from} – Present`;
+	if (end) return `${from} – ${monthYear.format(end)}`;
+	return from;
 }
 
 /** Strips protocol and www, removes trailing slash. e.g. github.com/user/repo */

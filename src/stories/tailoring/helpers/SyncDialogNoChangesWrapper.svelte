@@ -1,6 +1,7 @@
 <script lang="ts">
 	import SyncDrawer from '$lib/components/tailoring/sync-drawer.svelte';
 	import type { CV, ObjectId } from '$lib/types/cv';
+	import { computeBlockHashes } from '$lib/features/tailoring/hash';
 
 	const IDS = {
 		fn: 'mock-fn' as unknown as ObjectId,
@@ -28,27 +29,30 @@
 		};
 	}
 
+	const masterBlocks = mkBlocks('Senior Software Engineer');
+	const masterHashes = computeBlockHashes(masterBlocks);
 	const masterCv: CV = {
 		id: 'master-2',
 		name: 'Master CV',
-		notes: '',
-		version: 2,
 		createdAt: Date.now() - 86400000 * 7,
 		updatedAt: Date.now() - 3600000,
-		blocks: mkBlocks('Senior Software Engineer'),
+		blocks: masterBlocks,
+		blockHashes: masterHashes,
 		hiddenBlockIds: []
 	};
 
+	const tailoredBlocks = mkBlocks('Senior Software Engineer');
 	const tailoredCv: CV = {
 		id: 'tailored-2',
 		name: 'Google — Engineer',
-		notes: '',
-		version: 1,
 		createdAt: Date.now() - 86400000 * 3,
 		updatedAt: Date.now() - 86400000,
-		blocks: mkBlocks('Senior Software Engineer'),
+		blocks: tailoredBlocks,
+		blockHashes: computeBlockHashes(tailoredBlocks),
 		hiddenBlockIds: [],
-		sourceId: 'master-2'
+		sourceId: 'master-2',
+		syncBaseline: tailoredBlocks,
+		syncBaselineHashes: computeBlockHashes(tailoredBlocks)
 	};
 
 	let open = $state(false);

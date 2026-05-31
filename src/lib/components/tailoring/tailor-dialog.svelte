@@ -10,9 +10,9 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
-	import { Textarea } from '$lib/components/ui/textarea';
 	import { Scissors } from '@lucide/svelte';
 	import { createTailoredCV } from '$lib/features/tailoring/create-tailored';
+	import { capture } from '$lib/analytics';
 	import type { CV } from '$lib/types/cv';
 
 	interface Props {
@@ -24,14 +24,13 @@
 	let { sourceCv, onCreate, open = $bindable(false) }: Props = $props();
 
 	let company = $state('');
-	let name = $state('');
-	let notes = $state('');
+	// svelte-ignore state_referenced_locally
+	let name = $state(sourceCv.name);
 	let loading = $state(false);
 
 	function reset() {
 		company = '';
 		name = '';
-		notes = '';
 		loading = false;
 	}
 
@@ -42,9 +41,9 @@
 			const id = await createTailoredCV(
 				$state.snapshot(sourceCv),
 				name.trim(),
-				notes.trim(),
 				company.trim() || undefined
 			);
+			capture('cv_tailored', { has_company: !!company.trim() });
 			open = false;
 			reset();
 			onCreate(id);
@@ -90,19 +89,6 @@
 						id="tailored-name"
 						bind:value={name}
 						placeholder="e.g. Senior Frontend Engineer"
-						disabled={loading}
-					/>
-				</div>
-
-				<div class="flex flex-col gap-1.5">
-					<Label for="tailored-notes">
-						Notes <span class="text-muted-foreground">(optional)</span>
-					</Label>
-					<Textarea
-						id="tailored-notes"
-						bind:value={notes}
-						placeholder="e.g. Tailored for their ML team"
-						rows={3}
 						disabled={loading}
 					/>
 				</div>

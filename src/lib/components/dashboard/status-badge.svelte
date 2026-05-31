@@ -8,6 +8,7 @@
 
 <span
 	class="inline-flex cursor-help items-center gap-1.5"
+	data-testid="sync-indicator"
 	title={updatesAvailable
 		? 'Master has changed since tailoring'
 		: 'Tailored copy is in sync with master'}

@@ -9,6 +9,8 @@
 	import type { CV } from '$lib/types/cv';
 	import type { SaveStatus } from '$lib/types/save-status';
 	import { toast } from 'svelte-sonner';
+	import { computeBlockHashes } from '$lib/features/tailoring/hash';
+	import { orphanTailored } from '$lib/features/tailoring/orphan';
 
 	let cv = $state<CV | null>(null);
 	let masterCv = $state<CV | undefined>(undefined);
@@ -26,8 +28,10 @@
 		if (loaded.sourceId) {
 			const source = await db.cvs.get(loaded.sourceId);
 			if (!source) {
-				await db.cvs.update(id, { sourceId: undefined, syncDecisions: undefined });
-				cv = { ...loaded, sourceId: undefined, syncDecisions: undefined };
+				const orphaned = orphanTailored(loaded);
+				await db.cvs.put(orphaned);
+				cv = orphaned;
+				toast.info('The master for this CV was deleted. It is now a standalone CV.');
 			} else {
 				masterCv = source;
 			}
@@ -44,7 +48,7 @@
 				await db.cvs.put({
 					...snapshot,
 					updatedAt: Date.now(),
-					version: (snapshot.version ?? 0) + 1
+					blockHashes: computeBlockHashes(snapshot.blocks)
 				});
 				saveStatus = { status: 'saved', savedAt: Date.now() };
 			} catch (err) {

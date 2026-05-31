@@ -31,3 +31,4 @@ vite.config.ts.timestamp-*
 storybook-static
 .playwright-cli
 .playwright-mcp
+playwright-report

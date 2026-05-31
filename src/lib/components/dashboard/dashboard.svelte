@@ -3,7 +3,6 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { db } from '$lib/db/index';
-	import { createCVFromTemplate } from '$lib/services/cv/create';
 	import CvList from './cv-list.svelte';
 	import NewCvButton from './new-cv-button.svelte';
 	import { Skeleton } from '$lib/components/ui/skeleton';
@@ -18,8 +17,10 @@
 		AlertDialogCancel,
 		AlertDialogAction
 	} from '$lib/components/ui/alert-dialog';
-	import { Plus } from '@lucide/svelte';
 	import type { CV } from '$lib/types/cv';
+	import * as Empty from '$lib/components/ui/empty';
+	import { FileQuestionMark } from '@lucide/svelte';
+	import { orphanTailored } from '$lib/features/tailoring/orphan';
 
 	let cvs = $state<CV[]>([]);
 	let loading = $state(true);
@@ -51,16 +52,15 @@
 			await db.cvs.bulkDelete(ids);
 			cvs = cvs.filter((cv) => !ids.includes(cv.id));
 		} else {
-			for (const dep of deleteTargetDependents) {
-				await db.cvs.update(dep.id, { sourceId: undefined, syncDecisions: undefined });
+			const orphanedDeps = deleteTargetDependents.map((d) =>
+				orphanTailored($state.snapshot(d) as CV)
+			);
+			for (const dep of orphanedDeps) {
+				await db.cvs.put(dep);
 			}
 			await db.cvs.delete(deleteTargetId);
 			cvs = cvs.filter((cv) => cv.id !== deleteTargetId);
-			cvs = cvs.map((cv) =>
-				deleteTargetDependents.some((d) => d.id === cv.id)
-					? { ...cv, sourceId: undefined, syncDecisions: undefined }
-					: cv
-			);
+			cvs = cvs.map((cv) => orphanedDeps.find((o) => o.id === cv.id) ?? cv);
 		}
 		deleteDialogOpen = false;
 		deleteTargetId = null;
@@ -76,16 +76,9 @@
 	}
 
 	async function handleSync(updated: CV) {
-		const persisted = { ...updated, updatedAt: Date.now(), version: (updated.version ?? 0) + 1 };
+		const persisted = { ...($state.snapshot(updated) as CV), updatedAt: Date.now() };
 		await db.cvs.put(persisted);
 		cvs = cvs.map((cv) => (cv.id === persisted.id ? persisted : cv));
-	}
-
-	async function handleCreateFirstCv() {
-		const id = crypto.randomUUID();
-		const cv = createCVFromTemplate(id, 'Untitled CV');
-		await db.cvs.add(cv);
-		goto(resolve(`/cv/${id}`));
 	}
 </script>
 
@@ -113,17 +106,21 @@
 					<Skeleton class="h-24 w-full rounded-none" />
 				{/each}
 			</div>
-		{:else if cvs.length === 0}
-			<div
-				class="border-foreground flex flex-col items-center gap-4 border-2 border-dashed px-8 py-16 text-center"
-			>
-				<p class="text-muted-foreground text-sm font-medium">No CVs yet.</p>
-				<Button variant="accent" onclick={handleCreateFirstCv}>
-					<Plus class="h-4 w-4" /> Create your first CV
-				</Button>
-			</div>
-		{:else}
+		{:else if cvs.length > 0}
 			<CvList {cvs} onDelete={handleDelete} onTailor={handleTailor} onSync={handleSync} />
+		{:else}
+			<Empty.Root>
+				<Empty.Header>
+					<Empty.Media>
+						<FileQuestionMark class="size-10" />
+					</Empty.Media>
+					<Empty.Title>You don't have any CVs yet</Empty.Title>
+					<Empty.Description>Why not create one?</Empty.Description>
+				</Empty.Header>
+				<Empty.Content>
+					<NewCvButton onCreate={handleCreate} />
+				</Empty.Content>
+			</Empty.Root>
 		{/if}
 	</div>
 </div>

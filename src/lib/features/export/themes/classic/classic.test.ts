@@ -51,6 +51,7 @@ describe('classicTheme.build', () => {
 						role: 'Engineer',
 						startDate: new Date('2020-01-01'),
 						endDate: undefined,
+						current: true,
 						achievements: [{ objectId: id(), text: 'Shipped features.' }],
 						skills: []
 					}
@@ -76,7 +77,8 @@ describe('classicTheme.build', () => {
 						institution: 'University',
 						degree: 'BSc',
 						startDate: new Date('2015-01-01'),
-						endDate: new Date('2019-01-01')
+						endDate: new Date('2019-01-01'),
+						current: false
 					}
 				]
 			}
@@ -102,6 +104,7 @@ describe('classicTheme.build', () => {
 						role: 'Dev',
 						startDate: undefined,
 						endDate: undefined,
+						current: false,
 						achievements: [],
 						skills: []
 					}
@@ -137,7 +140,7 @@ describe('classicTheme.build', () => {
 		expect(contentStr).not.toContain(': Docker');
 	});
 
-	it('uses Present for a job with no end date', () => {
+	it('uses Present for a job marked as current', () => {
 		const blocks: Partial<CVBlocks> = {
 			jobHistory: {
 				objectId: id(),
@@ -148,6 +151,7 @@ describe('classicTheme.build', () => {
 						role: 'Lead',
 						startDate: new Date('2022-06-01'),
 						endDate: undefined,
+						current: true,
 						achievements: [],
 						skills: []
 					}
@@ -156,6 +160,28 @@ describe('classicTheme.build', () => {
 		};
 		const doc = classicTheme.build(blocks);
 		expect(JSON.stringify(doc.content)).toContain('Present');
+	});
+
+	it('does not say Present when a job has no end date and is not current', () => {
+		const blocks: Partial<CVBlocks> = {
+			jobHistory: {
+				objectId: id(),
+				value: [
+					{
+						objectId: id(),
+						company: 'Past Co',
+						role: 'Eng',
+						startDate: new Date('2022-06-01'),
+						endDate: undefined,
+						current: false,
+						achievements: [],
+						skills: []
+					}
+				]
+			}
+		};
+		const doc = classicTheme.build(blocks);
+		expect(JSON.stringify(doc.content)).not.toContain('Present');
 	});
 
 	it('trims project link URLs', () => {
@@ -188,6 +214,7 @@ describe('classicTheme.build', () => {
 						role: 'Dev',
 						startDate: undefined,
 						endDate: undefined,
+						current: false,
 						achievements: [],
 						skills: []
 					}

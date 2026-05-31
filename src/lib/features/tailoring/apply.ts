@@ -1,5 +1,6 @@
 import type { CV, ObjectId, WithId } from '$lib/types/cv';
 import { diffCVs } from './diff';
+import { computeBlockHashes } from './hash';
 import type { AnyEntry, DiffItem, EntryDiffItem, NestedDiffItem } from './types';
 import { findEntry, findNestedEntry, findParentEntry } from './locate';
 
@@ -127,32 +128,10 @@ export function applySyncDecisions(
 		}
 	}
 
-	const syncDecisions = tailoredCv.syncDecisions ?? {
-		sourceSyncedVersion: 0,
-		discarded: {}
-	};
-
-	for (const item of items) {
-		const decision = decisions.get(item.objectId);
-		if (decision === 'discarded') {
-			syncDecisions.discarded[item.objectId] = masterCv.version;
-		} else if (decision === 'accepted') {
-			delete syncDecisions.discarded[item.objectId];
-		}
-	}
-
-	// Prune stale discards
-	for (const [id, version] of Object.entries(syncDecisions.discarded)) {
-		if (version < masterCv.version) {
-			delete syncDecisions.discarded[id];
-		}
-	}
-
 	const allResolved = items.every((item) => decisions.has(item.objectId));
 	if (allResolved) {
-		syncDecisions.sourceSyncedVersion = masterCv.version;
 		tailoredCv.syncBaseline = structuredClone(masterCv.blocks);
+		tailoredCv.syncBaselineHashes = { ...masterCv.blockHashes };
+		tailoredCv.blockHashes = computeBlockHashes(tailoredCv.blocks);
 	}
-
-	tailoredCv.syncDecisions = syncDecisions;
 }
