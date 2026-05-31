@@ -6,9 +6,7 @@ export default defineConfig({
 	reporter: process.env.CI ? 'github' : 'html',
 	retries: process.env.CI ? 2 : 0,
 	webServer: {
-		command: useDevServer
-			? 'pnpm dev --port 4777'
-			: 'pnpm build && pnpm preview --port 4777',
+		command: useDevServer ? 'pnpm dev --port 4777' : 'pnpm build && pnpm preview --port 4777',
 		env: { VITE_E2E: 'true' },
 		port: 4777,
 		timeout: 120_000,

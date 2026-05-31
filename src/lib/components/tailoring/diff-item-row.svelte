@@ -37,15 +37,7 @@
 		onRevert: () => void;
 	}
 
-	let {
-		item,
-		masterCv,
-		tailoredCv,
-		decision,
-		onAccept,
-		onDiscard,
-		onRevert
-	}: Props = $props();
+	let { item, masterCv, tailoredCv, decision, onAccept, onDiscard, onRevert }: Props = $props();
 
 	const meta = $derived(describeDiff(item, masterCv, tailoredCv));
 

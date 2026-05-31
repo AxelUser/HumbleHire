@@ -271,8 +271,8 @@
 			</h2>
 			<p class="text-muted-foreground mb-4 text-base leading-relaxed">
 				HumbleHire is free to use and fully client-side. Everything you write is stored in your
-				browser — no account required, no server in the loop. Every save is instant because
-				nothing leaves your device.
+				browser — no account required, no server in the loop. Every save is instant because nothing
+				leaves your device.
 			</p>
 		</div>
 

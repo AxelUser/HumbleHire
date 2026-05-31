@@ -35,7 +35,7 @@
 
 <div
 	bind:this={ref}
-	class={cn('inline-flex border-2 border-foreground bg-card shadow-brutal-sm', className)}
+	class={cn('border-foreground bg-card shadow-brutal-sm inline-flex border-2', className)}
 	{...restProps}
 >
 	{@render children?.()}

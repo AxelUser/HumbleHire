@@ -12,7 +12,10 @@ import {
 	makeTailored
 } from './_fixtures';
 
-function refreshMasterHashes(master: { blocks: Parameters<typeof computeBlockHashes>[0]; blockHashes: ReturnType<typeof computeBlockHashes> }) {
+function refreshMasterHashes(master: {
+	blocks: Parameters<typeof computeBlockHashes>[0];
+	blockHashes: ReturnType<typeof computeBlockHashes>;
+}) {
 	master.blockHashes = computeBlockHashes(master.blocks);
 }
 

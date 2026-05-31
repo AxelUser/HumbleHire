@@ -20,51 +20,51 @@ function makeCV(overrides: Partial<CV> = {}): CV {
 	const educationId = id();
 
 	const blocks: CVBlocks = {
-			fullName: { objectId: fullNameId, value: 'Jane Doe' },
-			position: { objectId: positionId, value: 'Software Engineer' },
-			location: { objectId: locationId, value: 'London, UK' },
-			contacts: {
-				objectId: contactsId,
-				value: [{ objectId: id(), label: 'Email', value: 'jane@example.com' }]
-			},
-			highlights: { objectId: highlightsId, value: [{ objectId: id(), text: 'Built things.' }] },
-			skills: {
-				objectId: skillsId,
-				value: [{ objectId: id(), name: 'Frontend', skills: [{ objectId: id(), value: 'React' }] }]
-			},
-			jobHistory: {
-				objectId: jobHistoryId,
-				value: [
-					{
-						objectId: id(),
-						company: 'Acme',
-						role: 'Engineer',
-						startDate: new Date('2020-01-01'),
-						endDate: undefined,
-						current: true,
-						achievements: [{ objectId: id(), text: 'Did stuff.' }],
-						skills: []
-					}
-				]
-			},
-			projects: {
-				objectId: projectsId,
-				value: [{ objectId: id(), name: 'MyApp', description: 'A cool app.', stack: [], link: '' }]
-			},
-			education: {
-				objectId: educationId,
-				value: [
-					{
-						objectId: id(),
-						institution: 'Uni',
-						degree: 'BSc',
-						startDate: new Date('2015-01-01'),
-						endDate: new Date('2019-01-01'),
-						current: false
-					}
-				]
-			}
-		};
+		fullName: { objectId: fullNameId, value: 'Jane Doe' },
+		position: { objectId: positionId, value: 'Software Engineer' },
+		location: { objectId: locationId, value: 'London, UK' },
+		contacts: {
+			objectId: contactsId,
+			value: [{ objectId: id(), label: 'Email', value: 'jane@example.com' }]
+		},
+		highlights: { objectId: highlightsId, value: [{ objectId: id(), text: 'Built things.' }] },
+		skills: {
+			objectId: skillsId,
+			value: [{ objectId: id(), name: 'Frontend', skills: [{ objectId: id(), value: 'React' }] }]
+		},
+		jobHistory: {
+			objectId: jobHistoryId,
+			value: [
+				{
+					objectId: id(),
+					company: 'Acme',
+					role: 'Engineer',
+					startDate: new Date('2020-01-01'),
+					endDate: undefined,
+					current: true,
+					achievements: [{ objectId: id(), text: 'Did stuff.' }],
+					skills: []
+				}
+			]
+		},
+		projects: {
+			objectId: projectsId,
+			value: [{ objectId: id(), name: 'MyApp', description: 'A cool app.', stack: [], link: '' }]
+		},
+		education: {
+			objectId: educationId,
+			value: [
+				{
+					objectId: id(),
+					institution: 'Uni',
+					degree: 'BSc',
+					startDate: new Date('2015-01-01'),
+					endDate: new Date('2019-01-01'),
+					current: false
+				}
+			]
+		}
+	};
 
 	return {
 		id: 'test-cv',

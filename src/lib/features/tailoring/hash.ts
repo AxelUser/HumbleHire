@@ -22,11 +22,7 @@ export function canonicalJson(value: unknown): string {
 	if (typeof value === 'object') {
 		const obj = value as Record<string, unknown>;
 		const keys = Object.keys(obj).sort();
-		return (
-			'{' +
-			keys.map((k) => JSON.stringify(k) + ':' + canonicalJson(obj[k])).join(',') +
-			'}'
-		);
+		return '{' + keys.map((k) => JSON.stringify(k) + ':' + canonicalJson(obj[k])).join(',') + '}';
 	}
 	return JSON.stringify(value);
 }

@@ -70,7 +70,11 @@
 									<GripVertical class="h-4 w-4" />
 								</span>
 								<div class="flex flex-1 flex-wrap items-baseline gap-2">
-									<InlineField bind:value={job.company} placeholder="Company" class="font-semibold" />
+									<InlineField
+										bind:value={job.company}
+										placeholder="Company"
+										class="font-semibold"
+									/>
 									<span class="text-muted-foreground">—</span>
 									<InlineField bind:value={job.role} placeholder="Role" class="flex-1" />
 								</div>
@@ -99,8 +103,12 @@
 									aria-label="Occupation status"
 									class="ml-auto font-mono tracking-wider uppercase"
 								>
-									<SegmentedControlItem value={false} aria-label="Past role">Past</SegmentedControlItem>
-									<SegmentedControlItem value={true} aria-label="Current role">Current</SegmentedControlItem>
+									<SegmentedControlItem value={false} aria-label="Past role"
+										>Past</SegmentedControlItem
+									>
+									<SegmentedControlItem value={true} aria-label="Current role"
+										>Current</SegmentedControlItem
+									>
 								</SegmentedControl>
 							</div>
 							<EditableList

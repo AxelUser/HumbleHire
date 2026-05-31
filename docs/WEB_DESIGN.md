@@ -70,15 +70,15 @@ Apply `.hover-brutal` to: all bordered/filled buttons, cards, CV rows, stat pane
 
 ### Inset press — segmented selection (`SegmentedControl`)
 
-`SegmentedControl` is the inverse pair to `.hover-brutal`. The hovered (inactive) item gets an *inset* hard-offset shadow, like a mechanical key half-depressed. The body (container) never translates.
+`SegmentedControl` is the inverse pair to `.hover-brutal`. The hovered (inactive) item gets an _inset_ hard-offset shadow, like a mechanical key half-depressed. The body (container) never translates.
 
-| State | Effect |
-|---|---|
-| Container (always) | `shadow-brutal-sm` — the unit sits on the page |
-| Inactive rest | `bg-transparent text-muted-foreground` |
-| Inactive hover | 7% foreground wash + `inset 3px 3px 0 0` near-black at 22% |
-| Inactive active | 12% foreground wash + `inset 4px 4px 0 0` near-black at 32% |
-| Selected | `bg-primary text-primary-foreground`, no hover/active state |
+| State              | Effect                                                      |
+| ------------------ | ----------------------------------------------------------- |
+| Container (always) | `shadow-brutal-sm` — the unit sits on the page              |
+| Inactive rest      | `bg-transparent text-muted-foreground`                      |
+| Inactive hover     | 7% foreground wash + `inset 3px 3px 0 0` near-black at 22%  |
+| Inactive active    | 12% foreground wash + `inset 4px 4px 0 0` near-black at 32% |
+| Selected           | `bg-primary text-primary-foreground`, no hover/active state |
 
 The semantic split: **outset lift** = "discrete control, commit by clicking." **Inset press** = "one half of a unit — hovering previews swapping to it."
 

@@ -45,10 +45,7 @@
 					>
 						{#snippet children({ attachHandle, isDragging })}
 							<div class="flex flex-1 items-center gap-2 {isDragging ? 'invisible' : ''}">
-								<span
-									{@attach attachHandle}
-									class="text-muted-foreground shrink-0 cursor-grab"
-								>
+								<span {@attach attachHandle} class="text-muted-foreground shrink-0 cursor-grab">
 									<GripVertical class="h-4 w-4" />
 								</span>
 								<InlineField bind:value={contact.label} placeholder="Label" class="w-32 shrink-0" />

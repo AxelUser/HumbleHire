@@ -11,18 +11,24 @@
 	</div>
 
 	<!-- Branch children -->
-	<div class="border-foreground ml-2 flex flex-col gap-1.5 border-l-2 pl-3 pt-1">
-		<div class="node child-1 border-foreground bg-card flex items-center gap-3 border-2 px-2.5 py-2">
+	<div class="border-foreground ml-2 flex flex-col gap-1.5 border-l-2 pt-1 pl-3">
+		<div
+			class="node child-1 border-foreground bg-card flex items-center gap-3 border-2 px-2.5 py-2"
+		>
 			<span>○</span>
 			<span>Backend</span>
 			<span class="text-muted-foreground ml-auto border-2 px-1.5 py-0.5 text-[10px] tracking-wider">
 				in sync
 			</span>
 		</div>
-		<div class="node child-2 border-foreground bg-card flex items-center gap-3 border-2 px-2.5 py-2">
+		<div
+			class="node child-2 border-foreground bg-card flex items-center gap-3 border-2 px-2.5 py-2"
+		>
 			<span>○</span>
 			<span>Stripe · SWE</span>
-			<span class="updated-tag text-accent border-accent ml-auto border-2 px-1.5 py-0.5 text-[10px] tracking-wider">
+			<span
+				class="updated-tag text-accent border-accent ml-auto border-2 px-1.5 py-0.5 text-[10px] tracking-wider"
+			>
 				updated
 			</span>
 		</div>

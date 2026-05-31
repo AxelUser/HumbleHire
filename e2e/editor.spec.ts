@@ -21,9 +21,9 @@ test.describe('Editor', () => {
 		const cvId = page.url().split('/cv/')[1];
 		const b = await useBridge(page);
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		await expect.poll(async () => ((await b.getCv(cvId)) as any)?.blocks?.fullName?.value).toBe(
-			'Jane Smith'
-		);
+		await expect
+			.poll(async () => ((await b.getCv(cvId)) as any)?.blocks?.fullName?.value)
+			.toBe('Jane Smith');
 
 		await page.reload();
 		await expect(page.getByText('Jane Smith')).toBeVisible();

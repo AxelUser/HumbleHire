@@ -55,13 +55,15 @@
 				>
 					{#snippet children({ attachHandle, isDragging })}
 						<div class="flex flex-1 items-center gap-2 {isDragging ? 'invisible' : ''}">
-							<span
-								class="text-muted-foreground cursor-grab select-none"
-								{@attach attachHandle}
-							>
+							<span class="text-muted-foreground cursor-grab select-none" {@attach attachHandle}>
 								<GripVertical class="size-4" />
 							</span>
-							<InlineTextarea bind:value={items[index].text} {placeholder} class="flex-1" rows={2} />
+							<InlineTextarea
+								bind:value={items[index].text}
+								{placeholder}
+								class="flex-1"
+								rows={2}
+							/>
 							<Button
 								variant="ghost"
 								size="icon"

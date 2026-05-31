@@ -23,7 +23,9 @@
 	onclick={() => ctx.select(value)}
 	class={cn(
 		'item inline-flex h-8 cursor-pointer items-center border-0 px-2.5 text-xs font-bold',
-		selected ? 'item--on bg-primary text-primary-foreground' : 'bg-transparent text-muted-foreground',
+		selected
+			? 'item--on bg-primary text-primary-foreground'
+			: 'text-muted-foreground bg-transparent',
 		className
 	)}
 	{...restProps}

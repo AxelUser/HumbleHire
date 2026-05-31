@@ -53,7 +53,7 @@ The pdfmake (~1 MB) and pdf.js (~1.2 MB worker) chunks are lazy-loaded per ADR-0
 
 A hand-rolled service worker can cache cross-origin opaque responses, but it cannot validate them (no status code, no headers), cannot set appropriate cache expiry, and cannot detect failures — the cache grows blind. Self-hosting removes the complexity entirely: woff2 files land in `static/fonts/` and flow through `files` into the precache exactly like any other static asset, available offline on first visit with no special-casing in the SW.
 
-This is consistent with the `CONTEXT.md` definition of local-first: stopping the per-visit request to the Google Fonts CDN is an improvement, not a requirement. The existing "Local-first" glossary entry already lists web fonts as a *legitimate* non-content request; removing them simply reduces the app's external footprint.
+This is consistent with the `CONTEXT.md` definition of local-first: stopping the per-visit request to the Google Fonts CDN is an improvement, not a requirement. The existing "Local-first" glossary entry already lists web fonts as a _legitimate_ non-content request; removing them simply reduces the app's external footprint.
 
 ### Why the manual waiting-worker flow over `updated` + auto-`skipWaiting`
 

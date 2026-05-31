@@ -51,9 +51,7 @@
 					{#snippet children({ attachHandle, isDragging })}
 						<div class="flex flex-col gap-2 {isDragging ? 'invisible' : ''}">
 							<div class="flex items-center justify-between gap-2">
-								<span
-									{@attach attachHandle}
-									class="text-muted-foreground shrink-0 cursor-grab"
+								<span {@attach attachHandle} class="text-muted-foreground shrink-0 cursor-grab"
 									><GripVertical class="h-4 w-4" /></span
 								>
 								<InlineField
@@ -76,7 +74,10 @@
 								class="w-full"
 								rows={3}
 							/>
-							<TagInput bind:tags={project.stack} placeholder="Add tech (e.g. TypeScript, Svelte)" />
+							<TagInput
+								bind:tags={project.stack}
+								placeholder="Add tech (e.g. TypeScript, Svelte)"
+							/>
 							<InlineField
 								bind:value={project.link}
 								placeholder="Link (optional)"

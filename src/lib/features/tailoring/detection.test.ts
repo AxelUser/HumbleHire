@@ -4,15 +4,12 @@ import { hasUpdatesAvailable } from './detection';
 import { diffCVs } from './diff';
 import { applySyncDecisions } from './apply';
 import { computeBlockHashes } from './hash';
-import {
-	listBlock,
-	makeAchievement,
-	makeJob,
-	makeMaster,
-	makeTailored
-} from './_fixtures';
+import { listBlock, makeAchievement, makeJob, makeMaster, makeTailored } from './_fixtures';
 
-function refreshMasterHashes(master: { blocks: Parameters<typeof computeBlockHashes>[0]; blockHashes: ReturnType<typeof computeBlockHashes> }) {
+function refreshMasterHashes(master: {
+	blocks: Parameters<typeof computeBlockHashes>[0];
+	blockHashes: ReturnType<typeof computeBlockHashes>;
+}) {
 	master.blockHashes = computeBlockHashes(master.blocks);
 }
 
