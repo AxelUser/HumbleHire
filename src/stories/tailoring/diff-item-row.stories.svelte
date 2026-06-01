@@ -95,7 +95,7 @@
 		syncBaselineHashes: masterHashes
 	};
 
-	// --- diff items ---
+	// diff items
 
 	const textItem: DiffItem = {
 		kind: 'text',

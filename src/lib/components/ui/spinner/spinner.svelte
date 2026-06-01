@@ -6,7 +6,7 @@
 	let {
 		class: className,
 		role = 'status',
-		// we add name, color, and stroke for compatibility with different icon libraries props
+		// name/color/stroke pass through so callers can swap in another icon library
 		name,
 		color,
 		stroke,

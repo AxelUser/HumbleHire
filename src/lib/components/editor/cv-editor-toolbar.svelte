@@ -41,7 +41,6 @@
 	<div
 		class="border-foreground bg-card shadow-brutal flex w-full items-center gap-4 border-2 px-6 py-3"
 	>
-		<!-- Left: save status -->
 		<div class="flex shrink-0 items-center">
 			{#if saveStatus.status === 'saving'}
 				<Badge variant="secondary">Saving…</Badge>
@@ -52,12 +51,10 @@
 			{/if}
 		</div>
 
-		<!-- Center: CV name -->
 		<div class="min-w-0 flex-1">
 			<InlineField bind:value={cvName} class="text-lg font-bold" />
 		</div>
 
-		<!-- Right: actions -->
 		<div class="flex shrink-0 items-center gap-2">
 			{#if isTailored && masterCv}
 				<a

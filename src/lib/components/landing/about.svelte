@@ -106,7 +106,7 @@
 	];
 </script>
 
-<!-- ===== Problem ===== -->
+<!-- Problem -->
 <section id="about" class="border-foreground border-b-2 px-6 py-20">
 	<div class="mx-auto max-w-5xl">
 		<div class="mb-10 flex flex-wrap items-end justify-between gap-6">
@@ -183,7 +183,7 @@
 	</div>
 </section>
 
-<!-- ===== Features ===== -->
+<!-- Features -->
 <section class="border-foreground bg-card border-b-2 px-6 py-20">
 	<div class="mx-auto max-w-5xl">
 		<div class="mb-10 flex flex-col justify-between gap-6">
@@ -220,7 +220,7 @@
 	</div>
 </section>
 
-<!-- ===== How it works ===== -->
+<!-- How it works -->
 <section id="how" class="border-foreground border-b-2 px-6 py-20">
 	<div class="mx-auto max-w-5xl">
 		<div class="mb-10">
@@ -259,7 +259,7 @@
 	</div>
 </section>
 
-<!-- ===== Local-first ===== -->
+<!-- Local-first -->
 <section class="border-foreground bg-card border-b-2 px-6 py-20">
 	<div class="mx-auto grid max-w-5xl items-center gap-16 md:grid-cols-2">
 		<div>
@@ -310,7 +310,7 @@
 	</div>
 </section>
 
-<!-- ===== FAQ ===== -->
+<!-- FAQ -->
 <section id="faq" class="border-foreground border-b-2 px-6 py-20">
 	<div class="mx-auto max-w-5xl">
 		<div class="mb-10">

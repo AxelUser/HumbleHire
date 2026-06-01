@@ -45,18 +45,15 @@
 		{isLast ? '└──' : '├──'}
 	</span>
 
-	<!-- Row card -->
 	<div
 		class="border-foreground bg-card shadow-brutal-sm flex flex-1 items-center gap-3.5 border-2 px-3.5 py-2.5"
 	>
-		<!-- T glyph -->
 		<span
 			class="bg-accent flex h-[26px] w-[26px] shrink-0 items-center justify-center font-mono text-xs font-bold text-white"
 		>
 			T
 		</span>
 
-		<!-- Title stack -->
 		<div class="flex min-w-0 flex-col gap-0.5">
 			<div class="flex flex-wrap items-baseline gap-x-1 text-sm">
 				<strong class="font-bold">
@@ -79,10 +76,8 @@
 
 		<span class="flex-1"></span>
 
-		<!-- Status badge -->
 		<StatusBadge {updatesAvailable} />
 
-		<!-- Actions -->
 		<div class="flex shrink-0 items-center gap-1.5">
 			{#if updatesAvailable}
 				<SyncDrawer masterCv={master} tailoredCv={cv} {onSync} />

@@ -38,14 +38,12 @@
 			? 'border-foreground border-b-2'
 			: ''}"
 	>
-		<!-- M glyph -->
 		<span
 			class="bg-foreground text-card flex h-9 w-9 shrink-0 items-center justify-center font-mono text-sm font-bold"
 		>
 			M
 		</span>
 
-		<!-- Title block -->
 		<div class="flex min-w-0 flex-1 flex-col gap-1">
 			<span class="text-lg font-extrabold tracking-tight">
 				<HighlightedText text={master.name} ranges={myHighlights?.name} />
@@ -55,7 +53,6 @@
 			</span>
 		</div>
 
-		<!-- Actions -->
 		<div class="flex shrink-0 items-center gap-1.5">
 			<Button variant="outline" size="sm" href="/cv/{master.id}">
 				<Eye class="h-3.5 w-3.5" /> Open
