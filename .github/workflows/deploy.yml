@@ -8,42 +8,25 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
+  issues: write
 
 jobs:
   release:
-    name: Tag and release on version bump
+    name: Release
     runs-on: ubuntu-latest
     outputs:
-      released: ${{ steps.tag.outputs.released }}
+      release_created: ${{ steps.release.outputs.release_created }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+      - uses: googleapis/release-please-action@v4
+        id: release
         with:
-          fetch-depth: 0
-
-      - name: Create release if package.json version is new
-        id: tag
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          VERSION=$(node -p "require('./package.json').version")
-          TAG="v$VERSION"
-          if gh release view "$TAG" >/dev/null 2>&1; then
-            echo "Release $TAG already exists — nothing to do."
-            echo "released=false" >> $GITHUB_OUTPUT
-          else
-            echo "Cutting release $TAG."
-            gh release create "$TAG" \
-              --target "$GITHUB_SHA" \
-              --title "$TAG" \
-              --generate-notes
-            echo "released=true" >> $GITHUB_OUTPUT
-          fi
+          token: ${{ secrets.GITHUB_TOKEN }}
 
   deploy:
     name: Deploy to GitHub Pages
     needs: release
-    if: needs.release.outputs.released == 'true' || github.event_name == 'workflow_dispatch'
+    if: needs.release.outputs.release_created == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
