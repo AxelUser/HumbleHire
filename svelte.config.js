@@ -2,9 +2,9 @@ import adapter from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 import { execSync } from 'node:child_process';
 
-function gitSha() {
+function gitVersion() {
 	try {
-		return execSync('git rev-parse HEAD').toString().trim();
+		return execSync('git describe --tags --always --dirty').toString().trim();
 	} catch {
 		return 'dev';
 	}
@@ -22,7 +22,7 @@ const config = {
 			register: false
 		},
 		version: {
-			name: gitSha()
+			name: gitVersion()
 		}
 	}
 };
