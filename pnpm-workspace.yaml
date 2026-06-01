@@ -1,2 +1,4 @@
 publicHoistPattern:
   - '@dnd-kit/*'
+packages:
+  - .
