@@ -4,6 +4,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { SortableItem, createSortableDragHandlers } from '$lib/components/ui/sortable';
 	import { DragDropProvider, DragOverlay } from '@dnd-kit/svelte';
+	import type { Draggable } from '@dnd-kit/dom';
 	import { Trash2, Plus, GripVertical } from '@lucide/svelte';
 	import type { ContactEntry, ObjectId } from '$lib/types/cv';
 	import { createObjectId } from '$lib/types/cv';
@@ -69,7 +70,7 @@
 			</Button>
 		</div>
 		<DragOverlay>
-			{#snippet children(source: any)}
+			{#snippet children(source: Draggable)}
 				{@const contact = contacts.find((c) => c.objectId === source.id)}
 				{#if contact}
 					<div class="bg-background flex items-center gap-2 rounded px-2 py-1 shadow-lg">

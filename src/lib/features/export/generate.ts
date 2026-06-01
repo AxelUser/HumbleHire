@@ -30,6 +30,7 @@ export function buildDocDef(cv: CV, themeKey = DEFAULT_THEME_KEY) {
 }
 
 export function sanitizeFilename(name: string): string {
+	// eslint-disable-next-line no-control-regex
 	return name.replace(/[<>:"/\\|?*\x00-\x1f]/g, '').trim() || 'cv';
 }
 

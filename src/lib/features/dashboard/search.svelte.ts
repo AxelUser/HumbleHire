@@ -1,4 +1,5 @@
 import Fuse, { type IFuseOptions, type FuseResult } from 'fuse.js';
+import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import type { CV } from '$lib/types/cv';
 
 export type CVHighlights = {
@@ -23,7 +24,7 @@ const SEARCH_OPTIONS = {
 } satisfies IFuseOptions<CVIndexEntry>;
 
 export function buildAllGroups(cvs: CV[]): CVGroup[] {
-	const allIds = new Set(cvs.map((c) => c.id));
+	const allIds = new SvelteSet(cvs.map((c) => c.id));
 	const masters = cvs.filter((c) => !c.sourceId || !allIds.has(c.sourceId));
 	return masters.map((master) => ({
 		master,
@@ -35,8 +36,8 @@ function buildIndex(cvs: CV[]): Fuse<CVIndexEntry> {
 	return new Fuse(cvs.map(toCVIndexEntry), SEARCH_OPTIONS);
 }
 
-function buildHighlightsMap(results: FuseResult<CVIndexEntry>[]): Map<string, CVHighlights> {
-	const map = new Map<string, CVHighlights>();
+function buildHighlightsMap(results: FuseResult<CVIndexEntry>[]): SvelteMap<string, CVHighlights> {
+	const map = new SvelteMap<string, CVHighlights>();
 	for (const result of results) {
 		if (!result.matches?.length) continue;
 		const h: CVHighlights = {};
@@ -53,9 +54,9 @@ export function runSearch(
 	index: Fuse<CVIndexEntry>,
 	cvs: CV[],
 	query: string
-): { filteredGroups: CVGroup[]; highlights: Map<string, CVHighlights>; matchCount: number } {
+): { filteredGroups: CVGroup[]; highlights: SvelteMap<string, CVHighlights>; matchCount: number } {
 	const fuseResults = index.search(query);
-	const matchedIds = new Set(fuseResults.map((r) => r.item.id));
+	const matchedIds = new SvelteSet(fuseResults.map((r) => r.item.id));
 	const highlights = buildHighlightsMap(fuseResults);
 
 	const filteredGroups = buildAllGroups(cvs)
@@ -77,7 +78,7 @@ export class CVSearch {
 	#index = $state<Fuse<CVIndexEntry>>(new Fuse<CVIndexEntry>([], SEARCH_OPTIONS));
 	#result = $state<{
 		filteredGroups: CVGroup[];
-		highlights: Map<string, CVHighlights>;
+		highlights: SvelteMap<string, CVHighlights>;
 		matchCount: number;
 	} | null>(null);
 
@@ -99,7 +100,7 @@ export class CVSearch {
 	}
 
 	get highlights(): Map<string, CVHighlights> {
-		return this.#result?.highlights ?? new Map();
+		return this.#result?.highlights ?? new SvelteMap();
 	}
 
 	get matchCount(): number | null {

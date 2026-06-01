@@ -12,6 +12,7 @@
 	import DiffItemRow from './diff-item-row.svelte';
 	import { diffCVs } from '$lib/features/tailoring/diff';
 	import { applySyncDecisions } from '$lib/features/tailoring/apply';
+	import { SvelteMap } from 'svelte/reactivity';
 	import { describeDiff } from '$lib/features/tailoring/present';
 	import type { DiffItem } from '$lib/features/tailoring/types';
 	import type { CV, ObjectId } from '$lib/types/cv';
@@ -26,7 +27,7 @@
 
 	let { masterCv, tailoredCv, onSync, open = $bindable(false) }: Props = $props();
 
-	let decisions = $state(new Map<ObjectId, 'accepted' | 'discarded'>());
+	let decisions = new SvelteMap<ObjectId, 'accepted' | 'discarded'>();
 
 	const diffItems = $derived.by((): DiffItem[] =>
 		diffCVs($state.snapshot(masterCv), $state.snapshot(tailoredCv))
@@ -49,35 +50,30 @@
 
 	function accept(objectId: ObjectId) {
 		decisions.set(objectId, 'accepted');
-		decisions = new Map(decisions);
 	}
 
 	function discard(objectId: ObjectId) {
 		decisions.set(objectId, 'discarded');
-		decisions = new Map(decisions);
 	}
 
 	function revert(objectId: ObjectId) {
 		decisions.delete(objectId);
-		decisions = new Map(decisions);
 	}
 
 	function acceptAll() {
 		for (const item of diffItems) {
 			decisions.set(item.objectId, 'accepted');
 		}
-		decisions = new Map(decisions);
 	}
 
 	function discardAll() {
 		for (const item of diffItems) {
 			decisions.set(item.objectId, 'discarded');
 		}
-		decisions = new Map(decisions);
 	}
 
 	function openDrawer() {
-		decisions = new Map();
+		decisions.clear();
 		open = true;
 		if (dev) {
 			console.log('Diff items:', diffItems);
@@ -88,12 +84,12 @@
 		const snapshot = $state.snapshot(tailoredCv) as CV;
 		applySyncDecisions(snapshot, $state.snapshot(masterCv) as CV, decisions);
 		onSync(snapshot);
-		decisions = new Map();
+		decisions.clear();
 		open = false;
 	}
 
 	function handleClose() {
-		decisions = new Map();
+		decisions.clear();
 		open = false;
 	}
 
@@ -101,7 +97,7 @@
 
 	$effect(() => {
 		if (!open) {
-			decisions = new Map();
+			decisions.clear();
 		}
 	});
 </script>

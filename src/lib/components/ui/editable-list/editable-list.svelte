@@ -5,6 +5,7 @@
 	import { Trash2, Plus, GripVertical } from '@lucide/svelte';
 	import { cn } from '$lib/utils';
 	import { DragDropProvider, DragOverlay } from '@dnd-kit/svelte';
+	import type { Draggable } from '@dnd-kit/dom';
 	import { createObjectId } from '$lib/types/cv';
 	import type { ObjectId } from '$lib/types/cv';
 
@@ -83,7 +84,7 @@
 		</Button>
 	</div>
 	<DragOverlay>
-		{#snippet children(source: any)}
+		{#snippet children(source: Draggable)}
 			{@const item = items.find((i) => i.objectId === source.id)}
 			{#if item}
 				<div class="bg-background flex items-center gap-2 rounded px-1 py-1 shadow-lg">

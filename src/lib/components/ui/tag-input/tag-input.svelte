@@ -4,6 +4,7 @@
 	import { cn } from '$lib/utils';
 	import { SortableItem, createSortableDragHandlers } from '$lib/components/ui/sortable';
 	import { DragDropProvider, DragOverlay } from '@dnd-kit/svelte';
+	import type { Draggable } from '@dnd-kit/dom';
 	import { createObjectId } from '$lib/types/cv';
 	import type { Tag } from '$lib/types/cv';
 
@@ -89,7 +90,7 @@
 		/>
 	</div>
 	<DragOverlay>
-		{#snippet children(source: any)}
+		{#snippet children(source: Draggable)}
 			{@const tag = tags.find((t) => t.objectId === source.id)}
 			{#if tag}
 				<Badge variant="secondary" class="gap-1 shadow-lg">

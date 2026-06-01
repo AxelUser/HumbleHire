@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { resolve } from '$app/paths';
 	import { Logo } from '$lib/components/ui/logo';
 	import { ExternalLink } from '@lucide/svelte';
 	import { pwaInstall } from '$lib/pwa/install.svelte';
@@ -21,7 +22,7 @@
 
 <header class="border-foreground bg-card sticky top-0 z-20 border-b-2">
 	<div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
-		<a href="/" class="flex items-center gap-1.5 text-lg font-extrabold tracking-tight">
+		<a href={resolve('/')} class="flex items-center gap-1.5 text-lg font-extrabold tracking-tight">
 			<Logo class="h-10 w-auto" />
 			<span>Humble<span class="text-accent">Hire</span></span>
 		</a>
@@ -49,7 +50,7 @@
 				</nav>
 			{:else}
 				<a
-					href="/"
+					href={resolve('/')}
 					class="border-foreground bg-background shadow-brutal-sm hover-brutal inline-flex items-center gap-1.5 border-2 px-3 py-1.5 text-sm font-bold"
 				>
 					← Dashboard

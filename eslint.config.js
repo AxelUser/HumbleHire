@@ -39,5 +39,22 @@ export default ts.config(
 			}
 		}
 	},
-	storybook.configs['flat/recommended']
+	storybook.configs['flat/recommended'],
+	{
+		rules: {
+			'@typescript-eslint/no-unused-vars': [
+				'error',
+				{
+					argsIgnorePattern: '^_',
+					varsIgnorePattern: '^_'
+				}
+			]
+		}
+	},
+	{
+		files: ['**/ui/button/button.svelte'],
+		rules: {
+			'svelte/no-navigation-without-resolve': 'off'
+		}
+	}
 );

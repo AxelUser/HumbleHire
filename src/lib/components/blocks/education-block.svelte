@@ -6,6 +6,7 @@
 	import { SegmentedControl, SegmentedControlItem } from '$lib/components/ui/segmented-control';
 	import { SortableItem, createSortableDragHandlers } from '$lib/components/ui/sortable';
 	import { DragDropProvider, DragOverlay } from '@dnd-kit/svelte';
+	import type { Draggable } from '@dnd-kit/dom';
 	import { Trash2, Plus, GripVertical } from '@lucide/svelte';
 	import type { EducationEntry, ObjectId } from '$lib/types/cv';
 	import { createObjectId } from '$lib/types/cv';
@@ -112,7 +113,7 @@
 			</Button>
 		</div>
 		<DragOverlay>
-			{#snippet children(source: any)}
+			{#snippet children(source: Draggable)}
 				{@const entry = education.find((e) => e.objectId === source.id)}
 				{#if entry}
 					<div class="bg-background rounded-lg border p-4 shadow-lg">

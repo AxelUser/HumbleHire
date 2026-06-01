@@ -6,6 +6,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { SortableItem, createSortableDragHandlers } from '$lib/components/ui/sortable';
 	import { DragDropProvider, DragOverlay } from '@dnd-kit/svelte';
+	import type { Draggable } from '@dnd-kit/dom';
 	import { Trash2, Plus, GripVertical } from '@lucide/svelte';
 	import type { ProjectEntry, ObjectId } from '$lib/types/cv';
 	import { createObjectId } from '$lib/types/cv';
@@ -93,7 +94,7 @@
 			</Button>
 		</div>
 		<DragOverlay>
-			{#snippet children(source: any)}
+			{#snippet children(source: Draggable)}
 				{@const project = projects.find((p) => p.objectId === source.id)}
 				{#if project}
 					<div class="bg-background rounded-lg border p-4 shadow-lg">

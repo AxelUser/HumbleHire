@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { useBridge } from './helpers/bridge';
 import { fillInlineField, gotoHome, waitForAutosave, reorder } from './helpers/ui';
+import type { CV } from '$lib/types/cv';
 
 test.describe('Editor', () => {
 	test('creates a blank CV and opens the editor', async ({ page }) => {
@@ -20,9 +21,8 @@ test.describe('Editor', () => {
 
 		const cvId = page.url().split('/cv/')[1];
 		const b = await useBridge(page);
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		await expect
-			.poll(async () => ((await b.getCv(cvId)) as any)?.blocks?.fullName?.value)
+			.poll(async () => ((await b.getCv(cvId)) as CV | undefined)?.blocks?.fullName?.value)
 			.toBe('Jane Smith');
 
 		await page.reload();
