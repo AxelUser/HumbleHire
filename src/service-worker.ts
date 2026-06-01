@@ -4,6 +4,7 @@
 /// <reference types="@sveltejs/kit" />
 
 import { build, files, version } from '$service-worker';
+import { routeRequest } from '$lib/pwa/sw-router';
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -11,6 +12,7 @@ const CACHE = `app-${version}`;
 
 // '/' must be cached explicitly — adapter-static's index.html isn't in build or files
 const ASSETS = ['/', ...build, ...files];
+const ASSET_PATHS = new Set(ASSETS);
 
 self.addEventListener('install', (event) => {
 	event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(ASSETS)));
@@ -34,29 +36,25 @@ self.addEventListener('message', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-	if (event.request.method !== 'GET') return;
+	const route = routeRequest(event.request, self.location.origin, ASSET_PATHS);
+	if (route === 'passthrough') return;
 
-	const url = new URL(event.request.url);
-	if (url.origin !== self.location.origin) return;
-
-	event.respondWith(
-		(async () => {
-			const cache = await caches.open(CACHE);
-			const cached = await cache.match(event.request);
-			if (cached) return cached;
-
-			try {
-				const response = await fetch(event.request);
-				if (response.status === 200) {
-					cache.put(event.request, response.clone());
-				}
-				return response;
-			} catch {
-				if (event.request.mode === 'navigate') {
-					return (await cache.match('/')) as Response;
-				}
-				throw new Error(`Fetch failed and no cache entry: ${url.href}`);
-			}
-		})()
-	);
+	event.respondWith(serve(event.request, route));
 });
+
+async function serve(request: Request, route: 'asset' | 'navigate'): Promise<Response> {
+	const cache = await caches.open(CACHE);
+
+	// A precached build/static file. After a successful install it's always here;
+	// the network fetch is only a guard against an interrupted install.
+	if (route === 'asset') {
+		const cached = await cache.match(request);
+		return cached ?? fetch(request);
+	}
+
+	// A page load for any other route: hand back the cached app shell so deep
+	// links and refreshes work offline. The shell only changes when a new build's
+	// service worker activates, which is what the reload prompt is for.
+	const shell = await cache.match('/');
+	return shell ?? fetch(request);
+}
