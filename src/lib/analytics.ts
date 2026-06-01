@@ -5,12 +5,17 @@ import * as env from '$env/static/public';
 export function initAnalytics(): void {
 	if (dev) return;
 	if (import.meta.env.VITE_E2E) return;
-	const key = env.PUBLIC_POSTHOG_API_KEY;
-	const host = env.PUBLIC_POSTHOG_HOST;
-	if (!key || !host) return;
+	if (
+		!('PUBLIC_POSTHOG_API_KEY' in env) ||
+		!('PUBLIC_POSTHOG_HOST' in env) ||
+		typeof env.PUBLIC_POSTHOG_API_KEY !== 'string' ||
+		typeof env.PUBLIC_POSTHOG_HOST !== 'string'
+	) {
+		return;
+	}
 
-	posthog.init(key, {
-		api_host: host,
+	posthog.init(env.PUBLIC_POSTHOG_API_KEY, {
+		api_host: env.PUBLIC_POSTHOG_HOST,
 		persistence: 'localStorage',
 		autocapture: false,
 		disable_session_recording: true,
