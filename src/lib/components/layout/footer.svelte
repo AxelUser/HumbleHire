@@ -1,3 +1,8 @@
+<script>
+	import { version } from '$app/environment';
+	const displayVersion = `ver:${version.replace(/^v/, '')}`;
+</script>
+
 <footer class="border-foreground bg-card border-t-2 px-6 py-3">
 	<div class="mx-auto flex max-w-5xl flex-col items-center gap-1.5">
 		<p class="text-muted-foreground text-sm font-bold tracking-wide">
@@ -12,6 +17,8 @@
 			</a>
 			<span class="text-accent mx-1.5">·</span>
 			{new Date().getFullYear()}
+			<span class="text-accent mx-1.5">·</span>
+			<span class="font-mono font-normal">{displayVersion}</span>
 		</p>
 	</div>
 </footer>
