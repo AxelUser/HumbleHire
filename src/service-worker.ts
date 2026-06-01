@@ -4,7 +4,7 @@
 /// <reference types="@sveltejs/kit" />
 
 import { build, files, version } from '$service-worker';
-import { routeRequest } from '$lib/pwa/sw-router';
+import { routeRequest } from './lib/pwa/sw-router';
 
 declare const self: ServiceWorkerGlobalScope;
 
