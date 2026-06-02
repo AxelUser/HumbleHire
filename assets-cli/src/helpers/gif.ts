@@ -4,19 +4,13 @@ import { mkdirSync, unlinkSync, existsSync } from 'fs';
 import { dirname } from 'path';
 import ffmpegPath from 'ffmpeg-static';
 import { VIDEO_DIR } from '../paths';
+import type { TrimWindow } from './recorder';
 
 const exec = promisify(execFile);
 
 export function getVideoDir(): string {
 	mkdirSync(VIDEO_DIR, { recursive: true });
 	return VIDEO_DIR;
-}
-
-export interface TrimWindow {
-	// Seconds from the start of the recorded video — everything outside the
-	// [startSec, endSec] window is dropped during encoding.
-	startSec?: number;
-	endSec?: number;
 }
 
 // `bayer` is ordered dithering: blockier than error diffusion in flat gradients,
