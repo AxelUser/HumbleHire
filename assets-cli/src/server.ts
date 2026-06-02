@@ -75,7 +75,8 @@ async function killTree(child: ChildProcess): Promise<void> {
 		// The child is a shell wrapping pnpm → vite preview; /T reaches the tree.
 		spawn('taskkill', ['/pid', String(child.pid), '/T'], { stdio: 'ignore' });
 	} else {
-		child.kill('SIGTERM');
+		// Preview is spawned detached so pnpm leads its own group; -pid reaches vite too.
+		process.kill(-child.pid, 'SIGTERM');
 	}
 
 	await waitForExit(child, GRACEFUL_SHUTDOWN_MS);
@@ -90,7 +91,7 @@ async function killTree(child: ChildProcess): Promise<void> {
 			});
 			await waitForExit(child);
 		} else {
-			child.kill('SIGKILL');
+			process.kill(-child.pid, 'SIGKILL');
 			await waitForExit(child);
 		}
 	}
@@ -107,7 +108,9 @@ export async function startPreview({ port, baseUrl }: HarnessConfig): Promise<Pr
 		cwd: ROOT_DIR,
 		env: SERVE_ENV,
 		stdio: 'inherit',
-		shell: isWindows
+		shell: isWindows,
+		// Own process group on POSIX so killTree can signal pnpm and vite together.
+		detached: !isWindows
 	});
 
 	try {
