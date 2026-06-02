@@ -73,7 +73,7 @@ export interface HhTestBridge {
 // calls hop into the page. Every method is a thin `page.evaluate` round-trip so
 // the seeding runs through the app's real constructors, not hand-rolled fixtures.
 export async function useBridge(page: BridgePage): Promise<HhTestBridge> {
-	await page.waitForFunction(() => !!(window as any).__hhTest, { timeout: 5000 });
+	await page.waitForFunction(() => !!(window as any).__hhTest, undefined, { timeout: 5000 });
 	return {
 		reset: () => page.evaluate(() => (window as any).__hhTest.reset()),
 		seedMaster: (o) => page.evaluate((o) => (window as any).__hhTest.seedMaster(o), o),
