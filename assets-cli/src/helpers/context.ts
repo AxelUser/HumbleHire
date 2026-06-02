@@ -3,13 +3,23 @@ import { dirname } from 'path';
 import type { Browser, BrowserContext, Page } from 'playwright';
 import { injectCursor, activateCursor } from './mouse';
 import { getVideoDir } from './gif';
-import { BASE_URL } from '../paths';
 
 export { createRecorder } from './recorder';
 export { zoomTo, zoomToPoint, resetZoom } from './zoom';
 export { moveTo, moveCursor, hoverAndClick } from './mouse';
 
 export type Theme = 'light' | 'dark';
+
+// What the context factories need from the run config. `RecipeContext` is a
+// superset, so a recipe passes itself straight through.
+export interface CaptureOptions {
+	browser: Browser;
+	theme: Theme;
+	// Base URL of the running app preview (port comes from config).
+	baseUrl: string;
+	// Pixel density for stills; ignored for video capture.
+	deviceScaleFactor: number;
+}
 
 // tsx transpiles this harness with esbuild's keepNames on, which rewrites a named
 // inner function inside a page.evaluate body (e.g. the `clamp` helper in zoom.ts)
@@ -23,22 +33,31 @@ async function injectNameShim(context: BrowserContext): Promise<void> {
 	await context.addInitScript({ content: ESBUILD_NAME_SHIM });
 }
 
-export async function makePngContext(browser: Browser, theme: Theme): Promise<BrowserContext> {
+export async function makePngContext({
+	browser,
+	theme,
+	baseUrl,
+	deviceScaleFactor
+}: CaptureOptions): Promise<BrowserContext> {
 	const context = await browser.newContext({
 		colorScheme: theme,
 		viewport: { width: 1440, height: 900 },
-		deviceScaleFactor: 2,
-		baseURL: BASE_URL
+		deviceScaleFactor,
+		baseURL: baseUrl
 	});
 	await injectNameShim(context);
 	return context;
 }
 
-export async function makeGifContext(browser: Browser, theme: Theme): Promise<BrowserContext> {
+export async function makeGifContext({
+	browser,
+	theme,
+	baseUrl
+}: CaptureOptions): Promise<BrowserContext> {
 	const context = await browser.newContext({
 		colorScheme: theme,
 		viewport: { width: 1440, height: 900 },
-		baseURL: BASE_URL,
+		baseURL: baseUrl,
 		// 960×600 matches the 1440×900 viewport ratio (16:10) exactly
 		recordVideo: {
 			dir: getVideoDir(),

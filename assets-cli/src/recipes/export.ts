@@ -16,8 +16,9 @@ import { videoToGif } from '../helpers/gif';
 
 export const exportGif: Recipe = {
 	name: 'export.gif',
-	async run({ browser, theme, outDir }) {
-		const context = await makeGifContext(browser, theme);
+	async run(ctx) {
+		const { theme, outDir } = ctx;
+		const context = await makeGifContext(ctx);
 		const page = await openPage(context);
 		const rec = createRecorder(page);
 
@@ -50,7 +51,7 @@ export const exportGif: Recipe = {
 			const video = page.video()!;
 			await context.close();
 			const videoPath = await video.path();
-			await videoToGif(videoPath, join(outDir, `export.${theme}.gif`), rec.window());
+			await videoToGif(videoPath, join(outDir, `export.${theme}.gif`), rec.window(), ctx.gif);
 		}
 	}
 };

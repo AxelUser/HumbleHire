@@ -106,22 +106,6 @@ _Avoid_: Backup, save.
 A single downloadable file containing every CV, re-importable to restore them. The only copy that survives cleared site data, a different browser, or a dead disk. Distinct from [[export]].
 _Avoid_: Export, dump, save.
 
-### Tooling
-
-These name the test and documentation machinery, not product surfaces. They appear in code, ADRs, and commit messages — never in product copy.
-
-**Test bridge**:
-The `window.__hhTest` seam the app exposes when built with `VITE_E2E`, used to seed CV state through the real constructors instead of hand-rolled fixtures. Its contract — the interface plus the `useBridge` adapter — lives in the `@humblehire/test-bridge` package, shared by the e2e suite and the docs-asset harness. See ADR-004 (rationale) and ADR-006 (why it is its own package).
-_Avoid_: Test API, seed API, mock bridge.
-
-**Docs-asset harness**:
-The `@humblehire/docs-assets` package: a CLI that builds the app, drives it in a headless browser, and writes the documentation screenshots and GIFs to `docs/assets`. It produces artifacts; it does not assert. Run with `pnpm assets:generate`.
-_Avoid_: Asset tests, screenshot tests, the asset suite.
-
-**Recipe**:
-One documentation artifact within the harness — a plain capture function for a single screenshot or GIF, listed in the harness registry. Adding a capture means adding a recipe.
-_Avoid_: Asset test, scenario, spec.
-
 ## Flagged ambiguities
 
 **"Version"** has no place in HumbleHire language.

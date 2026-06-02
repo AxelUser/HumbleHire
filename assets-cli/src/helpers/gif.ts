@@ -19,6 +19,32 @@ export interface TrimWindow {
 	endSec?: number;
 }
 
+// `bayer` is ordered dithering: blockier than error diffusion in flat gradients,
+// but it adds no per-pixel noise, so GIF's LZW compression stays effective —
+// the main lever on file size for screen recordings. `sierra2` is the full
+// error-diffusion dither (ffmpeg's default, prettiest, largest). `none` is
+// flat — smallest, with visible banding.
+export type Dither = 'bayer' | 'sierra2' | 'none';
+
+export interface GifEncodeOptions {
+	fps: number;
+	// palettegen max_colors — fewer colours, smaller file, more banding.
+	colors: number;
+	// Output width in px; height follows the aspect ratio.
+	width: number;
+	dither: Dither;
+	// bayer matrix size (0–5); higher is finer-grained but slightly larger. Only
+	// used when dither is `bayer`.
+	bayerScale: number;
+}
+
+// Translate the dither choice into the `paletteuse` dither expression.
+function ditherExpr({ dither, bayerScale }: GifEncodeOptions): string {
+	if (dither === 'bayer') return `dither=bayer:bayer_scale=${bayerScale}`;
+	if (dither === 'none') return 'dither=none';
+	return 'dither=sierra2_4a';
+}
+
 // Input-seek args (placed before `-i`) that trim the source to the kept window.
 // `-ss` does a fast seek; `-t` caps the duration read from that point, so it is
 // expressed relative to the seek and stays unambiguous across ffmpeg versions.
@@ -36,7 +62,8 @@ function trimArgs({ startSec, endSec }: TrimWindow): string[] {
 export async function videoToGif(
 	videoPath: string,
 	outputPath: string,
-	trim: TrimWindow = {}
+	trim: TrimWindow,
+	opts: GifEncodeOptions
 ): Promise<void> {
 	mkdirSync(dirname(outputPath), { recursive: true });
 
@@ -44,12 +71,16 @@ export async function videoToGif(
 	const bin = ffmpegPath!;
 	const seek = trimArgs(trim);
 
+	// Shared frame-rate + downscale applied identically to both passes so the
+	// palette is generated from the same frames the GIF is built from.
+	const scale = `fps=${opts.fps},scale=${opts.width}:-1:flags=lanczos`;
+
 	await exec(bin, [
 		...seek,
 		'-i',
 		videoPath,
 		'-vf',
-		'fps=12,scale=960:-1:flags=lanczos,palettegen',
+		`${scale},palettegen=max_colors=${opts.colors}`,
 		'-y',
 		palettePath
 	]);
@@ -61,7 +92,7 @@ export async function videoToGif(
 		'-i',
 		palettePath,
 		'-filter_complex',
-		'[0:v]fps=12,scale=960:-1:flags=lanczos[x];[x][1:v]paletteuse',
+		`[0:v]${scale}[x];[x][1:v]paletteuse=${ditherExpr(opts)}`,
 		'-loop',
 		'0',
 		'-y',

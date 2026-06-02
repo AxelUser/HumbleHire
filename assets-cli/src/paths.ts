@@ -9,12 +9,13 @@ const here = dirname(fileURLToPath(import.meta.url));
 export const PACKAGE_DIR = resolve(here, '..');
 export const ROOT_DIR = resolve(PACKAGE_DIR, '..');
 
-// The app preview the harness drives. VITE_E2E is set when building it so the
-// window.__hhTest seam is present.
-export const PORT = 4888;
-export const BASE_URL = `http://localhost:${PORT}`;
+// Fallbacks for the CLI config (see config.ts). These apply only when a flag is
+// omitted; the canonical values are spelled out in the `generate` pnpm script.
+export const DEFAULT_PORT = 4888;
+// Relative `--out` is resolved against the repo root, so the default reads as
+// `docs/assets` at the invocation site even though the CLI runs from the package.
+export const DEFAULT_OUT_DIR = resolve(ROOT_DIR, 'docs', 'assets');
 
-// Committed artifacts land in the repo's docs/assets; the intermediate Playwright
-// videos go to a gitignored scratch dir inside this package.
-export const OUT_DIR = resolve(ROOT_DIR, 'docs', 'assets');
+// The intermediate Playwright videos go to a gitignored scratch dir inside this
+// package; not user-facing, so it stays a fixed path.
 export const VIDEO_DIR = resolve(PACKAGE_DIR, 'assets-output', 'videos');

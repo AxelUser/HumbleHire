@@ -5,8 +5,7 @@
 // the shape of that bridge plus the `useBridge` adapter that drives it over a
 // page handle. Both the e2e suite and the docs-asset harness import from here,
 // and the app's own `initE2eBridge` implements against these same types — so the
-// contract lives in exactly one place. See ADR-004 (bridge rationale) and
-// ADR-006 (why this is its own package).
+// contract lives in exactly one place.
 
 // What `useBridge` needs from a Playwright Page — only `evaluate` and
 // `waitForFunction`. Typed structurally so the contract carries no dependency on

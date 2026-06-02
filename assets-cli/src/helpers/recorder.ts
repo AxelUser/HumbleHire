@@ -1,5 +1,4 @@
 import type { Page } from 'playwright';
-import { videoToGif } from './gif';
 
 // Playwright starts recording the moment the page is created and gives no way to
 // pause or restart mid-session, so every capture inevitably opens on the blank
@@ -53,11 +52,6 @@ export class Recorder {
 
 	window(): TrimWindow {
 		return { startSec: this.startSec, endSec: this.endSec };
-	}
-
-	// Convenience wrapper: encode the recorded video, trimmed to the marked window.
-	async toGif(videoPath: string, outputPath: string): Promise<void> {
-		await videoToGif(videoPath, outputPath, this.window());
 	}
 }
 

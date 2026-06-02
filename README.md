@@ -20,10 +20,34 @@ HumbleHire keeps the master as your single source of truth. Tailored copies bran
 ## What you can do with it
 
 - **Keep one master, branch many copies.** The master holds your full record. A tailored copy is a job-specific cut of it that remembers where it came from.
+
 - **Pull master changes in, on your terms.** When the master changes, each tailored copy shows you what is different. Accept the changes that fit the role and discard the rest. Sync only ever runs from master to copy, and a discarded change stays discarded until the master moves again.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/tailoring.dark.gif">
+  <img alt="Reviewing and applying sync changes from a master CV" src="docs/assets/tailoring.light.gif">
+</picture>
+
 - **Edit and preview in one place.** The editor and the rendered CV sit side by side, so every change shows up immediately and saves on its own. Any block can be hidden without throwing away its content, so a single master can back copies that read very differently from one another.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/editor.dark.gif">
+  <img alt="Adding a highlight in the editor and watching the PDF preview update" src="docs/assets/editor.light.gif">
+</picture>
+
 - **Find a CV fast.** Everything lives in one dashboard, with tailored copies nested under the master they branched from. A copy is never stranded away from its source.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/dashboard-search.dark.gif">
+  <img alt="Searching and clearing the CV list on the dashboard" src="docs/assets/dashboard-search.light.gif">
+</picture>
+
 - **Export a PDF in one click.** The preview you edit against is the file you send. Hidden and empty blocks are left out of the export automatically.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/export.dark.gif">
+  <img alt="Exporting a CV to PDF from the dashboard" src="docs/assets/export.light.gif">
+</picture>
 
 The CV structure is deliberately fixed: nine blocks, in a set order. That keeps the output consistent and easy for applicant tracking systems to parse, and it is one less thing to fiddle with when you should be applying.
 

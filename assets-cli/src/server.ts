@@ -1,5 +1,6 @@
 import { spawn, type ChildProcess } from 'node:child_process';
-import { ROOT_DIR, PORT, BASE_URL } from './paths';
+import { ROOT_DIR } from './paths';
+import type { HarnessConfig } from './config';
 
 // The runner that @playwright/test's `webServer` used to provide. We replicate
 // only the slice the harness needs: build the app with the e2e bridge compiled
@@ -63,14 +64,14 @@ function killTree(child: ChildProcess): Promise<void> {
 	});
 }
 
-// Build the app and start a preview the harness can drive. Resolves once the port
-// is answering; the returned handle tears the preview down.
-export async function startPreview(): Promise<PreviewServer> {
+// Build the app and start a preview the harness can drive on the configured port.
+// Resolves once the port is answering; the returned handle tears the preview down.
+export async function startPreview({ port, baseUrl }: HarnessConfig): Promise<PreviewServer> {
 	process.stdout.write('• building app (VITE_E2E)…\n');
 	await run('pnpm', ['build']);
 
-	process.stdout.write(`• starting preview on :${PORT}…\n`);
-	const preview = spawn('pnpm', ['preview', '--port', String(PORT)], {
+	process.stdout.write(`• starting preview on :${port}…\n`);
+	const preview = spawn('pnpm', ['preview', '--port', String(port)], {
 		cwd: ROOT_DIR,
 		env: SERVE_ENV,
 		stdio: 'inherit',
@@ -78,7 +79,7 @@ export async function startPreview(): Promise<PreviewServer> {
 	});
 
 	try {
-		await waitForPort(BASE_URL);
+		await waitForPort(baseUrl);
 	} catch (err) {
 		await killTree(preview);
 		throw err;

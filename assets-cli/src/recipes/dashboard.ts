@@ -6,8 +6,9 @@ import { makePngContext, openPage, gotoHome, captureScreenshot } from '../helper
 
 export const dashboard: Recipe = {
 	name: 'dashboard.png',
-	async run({ browser, theme, outDir }) {
-		const context = await makePngContext(browser, theme);
+	async run(ctx) {
+		const { theme, outDir } = ctx;
+		const context = await makePngContext(ctx);
 		const page = await openPage(context);
 
 		try {

@@ -8,7 +8,7 @@
 		"docs-assets": "./bin/docs-assets.mjs"
 	},
 	"scripts": {
-		"generate": "tsx src/cli.ts generate",
+		"generate": "tsx src/cli.ts generate --out docs/assets --fps 10 --colors 96 --width 900 --dither bayer --bayer-scale 3 --port 4888 --themes light,dark --scale 2 --timeout 120000",
 		"check": "tsc --noEmit"
 	},
 	"dependencies": {
