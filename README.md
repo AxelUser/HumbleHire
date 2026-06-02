@@ -6,7 +6,10 @@ HumbleHire is a free, open-source CV builder that runs entirely in your browser.
 
 **[Try it at humblehire.cv →](https://humblehire.cv)**
 
-![The HumbleHire editor: a block editor on the left, a live PDF preview on the right](docs/assets/editor.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/editor.dark.png">
+  <img alt="The HumbleHire editor: a block editor on the left, a live PDF preview on the right" src="docs/assets/editor.light.png">
+</picture>
 
 ## Why it exists
 
