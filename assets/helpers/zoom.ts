@@ -1,4 +1,4 @@
-import type { Locator, Page } from '@playwright/test';
+import type { ElementHandle, Locator, Page } from '@playwright/test';
 
 // Cinematic, lossless zoom for the captures. We scale <body> with a CSS
 // transform and slide the point of interest to the centre of the viewport,
@@ -12,12 +12,16 @@ import type { Locator, Page } from '@playwright/test';
 // in the left editor column). Centring + clamping keeps the whole region framed
 // with room around it and never reveals blank space past the page edges.
 //
+// Re-centring (zooming from an already-zoomed state to a new target) glides from
+// where the camera was. To make that smooth we measure the target in the
+// *untransformed* layout — but inside the same evaluate that re-applies the
+// transform, so the page is never painted unzoomed and there is no flash. The
+// target is measured via its live element so the centring maths matches what the
+// element's real layout position is, not where the current zoom happens to put it.
+//
 // The cursor lives on <html> (see mouse.ts), so it stays sharp and correctly
 // positioned while <body> scales underneath it, and Playwright still clicks the
 // real, post-transform element boxes.
-//
-// zoomTo/zoomToPoint measure the target in the untransformed layout, so call
-// them from an unzoomed state (the start of a capture, or after resetZoom).
 
 export interface ZoomOptions {
 	// How far to scale in. 1 = no zoom; ~1.5–2.2 reads well for most actions.
@@ -29,25 +33,39 @@ export interface ZoomOptions {
 
 const DEFAULT_EASING = 'cubic-bezier(0.4, 0, 0.2, 1)';
 
+// Drive the body transform so `target` (a live element) or `point` (an absolute
+// viewport coordinate, used when there is no element) ends up centred. Pass at
+// most one of them.
 async function applyZoom(
 	page: Page,
-	viewportX: number,
-	viewportY: number,
+	target: ElementHandle<Element> | null,
+	point: { x: number; y: number } | null,
 	{ scale = 1.6, durationMs = 650, easing = DEFAULT_EASING }: ZoomOptions
 ): Promise<void> {
 	await page.evaluate(
-		({ vx, vy, scale, durationMs, easing }) => {
+		({ el, px, py, scale, durationMs, easing }) => {
 			const body = document.body;
-			// Remember the current (possibly already-zoomed) transform so the
-			// animation can start from it — we only drop it to measure the real,
-			// untransformed layout, then restore it before transitioning.
+			// Snapshot the current transform so we can resume the animation from it.
 			const prev = getComputedStyle(body).transform;
+			// Drop to the untransformed layout to measure — no await between here and
+			// re-applying the transform below, so this state is never painted.
 			body.style.transition = 'none';
 			body.style.transform = 'none';
 			body.style.transformOrigin = '0 0';
 			const rect = body.getBoundingClientRect();
 			const vw = window.innerWidth;
 			const vh = window.innerHeight;
+
+			let vx: number;
+			let vy: number;
+			if (el) {
+				const r = (el as HTMLElement).getBoundingClientRect();
+				vx = r.left + r.width / 2;
+				vy = r.top + r.height / 2;
+			} else {
+				vx = px;
+				vy = py;
+			}
 
 			// With origin 0 0, a body-local point p renders at rect.origin + tx + p*scale.
 			// Solve tx/ty so the point of interest lands at the viewport centre.
@@ -74,17 +92,22 @@ async function applyZoom(
 			body.style.transition = `transform ${durationMs}ms ${easing}`;
 			body.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
 		},
-		{ vx: viewportX, vy: viewportY, scale, durationMs, easing }
+		{ el: target, px: point?.x ?? 0, py: point?.y ?? 0, scale, durationMs, easing }
 	);
 	await page.waitForTimeout(durationMs);
 }
 
-// Zoom in centred on a located element.
+// Zoom in centred on a located element. Safe to call while already zoomed — it
+// re-centres smoothly on the element's true layout position.
 export async function zoomTo(page: Page, locator: Locator, opts: ZoomOptions = {}): Promise<void> {
 	await locator.scrollIntoViewIfNeeded();
-	const box = await locator.boundingBox();
-	if (!box) return;
-	await applyZoom(page, box.x + box.width / 2, box.y + box.height / 2, opts);
+	const handle = await locator.elementHandle();
+	if (!handle) return;
+	try {
+		await applyZoom(page, handle, null, opts);
+	} finally {
+		await handle.dispose();
+	}
 }
 
 // Zoom in centred on an absolute viewport point.
@@ -94,7 +117,7 @@ export async function zoomToPoint(
 	y: number,
 	opts: ZoomOptions = {}
 ): Promise<void> {
-	await applyZoom(page, x, y, opts);
+	await applyZoom(page, null, { x, y }, opts);
 }
 
 // Glide back to the unzoomed view.
