@@ -1,4 +1,4 @@
-import { chromium } from 'playwright';
+import { chromium, type Browser } from 'playwright';
 import { startPreview } from './server';
 import { recipes } from './registry';
 import type { HarnessConfig } from './config';
@@ -17,10 +17,11 @@ function withTimeout<T>(work: Promise<T>, ms: number, label: string): Promise<T>
 // capture doesn't abandon the rest, then surfaced at the end.
 export async function generateAll(config: HarnessConfig): Promise<void> {
 	const server = await startPreview(config);
-	const browser = await chromium.launch();
+	let browser: Browser | undefined;
 	const failures: string[] = [];
 
 	try {
+		browser = await chromium.launch();
 		for (const theme of config.themes) {
 			for (const recipe of recipes) {
 				const label = `${recipe.name} [${theme}]`;
@@ -46,7 +47,7 @@ export async function generateAll(config: HarnessConfig): Promise<void> {
 			}
 		}
 	} finally {
-		await browser.close();
+		await browser?.close();
 		await server.stop();
 	}
 
