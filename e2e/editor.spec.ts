@@ -70,10 +70,10 @@ test.describe('Editor', () => {
 		const masterId = await b.seedMaster();
 		await page.goto(`/cv/${masterId}`);
 
-		// Dummy CV has 3 jobs: Nimbus Labs (0), Cobalt Financial (1), Bright Pixel Studio (2)
+		// Dummy CV has 3 jobs: Dunder Mifflin (0), Schrute Farms (1), Sheriff's Dept (2)
 		const entries = page.getByTestId('job-entry');
 		await expect(entries).toHaveCount(3);
-		await expect(entries.nth(0)).toContainText('Nimbus Labs');
+		await expect(entries.nth(0)).toContainText('Dunder Mifflin');
 
 		// Drag first entry to the position of the third
 		await reorder(page, entries.nth(0).getByTestId('drag-handle'), entries.nth(2));
@@ -81,9 +81,9 @@ test.describe('Editor', () => {
 		await waitForAutosave(page);
 		await page.reload();
 
-		// Nimbus Labs should now be at the end
+		// Dunder Mifflin should now be at the end
 		await expect(page.getByTestId('job-entry')).toHaveCount(3);
-		await expect(page.getByTestId('job-entry').nth(0)).not.toContainText('Nimbus Labs');
-		await expect(page.getByTestId('job-entry').nth(2)).toContainText('Nimbus Labs');
+		await expect(page.getByTestId('job-entry').nth(0)).not.toContainText('Dunder Mifflin');
+		await expect(page.getByTestId('job-entry').nth(2)).toContainText('Dunder Mifflin');
 	});
 });
