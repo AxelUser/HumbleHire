@@ -14,8 +14,32 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changes:
+    name: Detect code changes
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Filter paths
+        uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          # With the `every` quantifier a changed file counts as `code` only
+          # when it matches all patterns: `**` (any path) and not Markdown.
+          # A docs-only change leaves `code` false, skipping every heavy job.
+          predicate-quantifier: 'every'
+          filters: |
+            code:
+              - '**'
+              - '!**/*.md'
+
   quality:
     name: Lint, check, unit tests
+    needs: changes
+    if: ${{ needs.changes.outputs.code == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -49,6 +73,8 @@ jobs:
 
   build:
     name: Build
+    needs: changes
+    if: ${{ needs.changes.outputs.code == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -76,6 +102,8 @@ jobs:
 
   e2e:
     name: E2E tests
+    needs: changes
+    if: ${{ needs.changes.outputs.code == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -111,6 +139,8 @@ jobs:
 
   storybook:
     name: Storybook build
+    needs: changes
+    if: ${{ needs.changes.outputs.code == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
