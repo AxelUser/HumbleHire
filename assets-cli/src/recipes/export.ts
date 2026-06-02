@@ -39,10 +39,11 @@ export const exportGif: Recipe = {
 			// Push in on the card so the Export button is the clear focus.
 			const exportBtn = page.getByRole('button', { name: 'Export' }).first();
 			await zoomTo(page, exportBtn, { scale: 1.5, durationMs: 650 });
-			await hoverAndClick(page, exportBtn);
 
-			// Wait for the download to complete (PDF is generated in-browser).
-			await page.waitForEvent('download', { timeout: 30_000 });
+			// Register before click so a fast in-browser download cannot be missed.
+			const downloadPromise = page.waitForEvent('download', { timeout: 30_000 });
+			await hoverAndClick(page, exportBtn);
+			await downloadPromise;
 			await page.waitForTimeout(1000);
 			await resetZoom(page);
 
