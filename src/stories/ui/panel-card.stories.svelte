@@ -1,0 +1,27 @@
+<script module>
+	import { defineMeta } from '@storybook/addon-svelte-csf';
+	import PanelCard from '$lib/components/ui/panel-card/panel-card.svelte';
+	import PanelCardWithActionWrapper from './helpers/PanelCardWithActionWrapper.svelte';
+
+	const { Story } = defineMeta({
+		title: 'UI/PanelCard',
+		component: PanelCard,
+		tags: ['autodocs']
+	});
+</script>
+
+<Story name="WithTitle" asChild>
+	<PanelCard title="Work Experience" class="w-72">
+		<p class="text-muted-foreground text-sm">Panel body content.</p>
+	</PanelCard>
+</Story>
+
+<Story name="WithTitleAndAction" asChild>
+	<PanelCardWithActionWrapper />
+</Story>
+
+<Story name="NoHeader" asChild>
+	<PanelCard class="w-72">
+		<p class="text-muted-foreground text-sm">No header, just content.</p>
+	</PanelCard>
+</Story>

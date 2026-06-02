@@ -23,5 +23,12 @@ Thumbs.db
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
-# VSCode
-.vscode
+# AI
+.claude
+.cursor
+.agents
+*storybook.log
+storybook-static
+.playwright-cli
+.playwright-mcp
+playwright-report

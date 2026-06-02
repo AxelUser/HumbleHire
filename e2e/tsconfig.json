@@ -1,0 +1,9 @@
+{
+	"extends": "../.svelte-kit/tsconfig.json",
+	"include": [
+		"./**/*.ts",
+		"../.svelte-kit/ambient.d.ts",
+		// app.d.ts is needed for the Window.__hhTest.
+		"../src/app.d.ts"
+	]
+}

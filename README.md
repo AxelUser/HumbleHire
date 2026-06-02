@@ -1,39 +1,58 @@
-![HumbleHire logo](static/humble-hire-logo-128.png)
+# HumbleHire
 
-## HumbleHire — a friendly toolkit to make job seeking less stressful
+> One CV. Many targets.
 
-Welcome! If you are hunting for a new role, you know it can be overwhelming—even for seasoned pros. HumbleHire is a small, growing collection of helpers to make your profile look great and your application flow smoother.
+## What it is
 
-### Tools
+A free, open-source CV builder. Everything runs on your own machine. You write CVs, organise tailored copies for each application, and export PDFs to send.
 
-- [x] LinkedIn® banner generator you can configure to showcase your skills and experience
-- [ ] LinkedIn® profile image cover generator to help your profile stand out
-- [ ] Markdown‑powered resume builder to tailor your master resume to each job
+Full project overview: `[docs/OVERVIEW.md](docs/OVERVIEW.md)`.
 
-### Tech stack
+[Check it out](https://humblehire.cv)
 
-- [Svelte 5](https://svelte.dev)
-- [SvelteKit](https://kit.svelte.dev)
-- [Tailwind CSS](https://tailwindcss.com)
-- [shadcn-svelte](https://shadcn-svelte.com/)
+## Features
 
-### Development
+- **[Editor](docs/features/cv-editor/OVERVIEW.md)** — write all about yourself and see the resulted CV in a side-by-side preview. Changes save automatically. Any block can be hidden without losing its content.
+- **[Tailoring](docs/features/tailoring/OVERVIEW.md)** — branch off tailored copies from a master CV. When the master changes, decide change-by-change what gets pulled into each tailored copy.
+- **[Dashboard](docs/features/dashboard/OVERVIEW.md)** — all your CVs in one place, grouped by master with fuzzy search.
+- **[Export](docs/features/export/OVERVIEW.md)** — one click PDF download. The live preview in the editor shows exactly what the file will be.
 
-Prerequisites: Node.js LTS (>= 22.x) and pnpm.
+## Built with
+
+- [Svelte 5](https://svelte.dev/)
+- [SvelteKit](https://kit.svelte.dev/)
+- [TailwindCSS](https://tailwindcss.com/)
+- [Typescript](https://www.typescriptlang.org/)
+
+## Running locally
+
+The project uses [pnpm](https://pnpm.io/).
 
 ```bash
 pnpm install
-pnpm run dev
+pnpm dev           # start the dev server
+pnpm build         # production build (as a static site)
+pnpm test:unit     # unit tests
+pnpm test:e2e      # end-to-end tests
+pnpm storybook     # test components in isolation
 ```
 
-### Assets and attribution
+## Documentation
 
-Icons in `static/skills-icons/` are from the Skill Icons project by `tandpfun` and used under the MIT License. Explore their work and API:
+- `[docs/OVERVIEW.md](docs/OVERVIEW.md)` — project overview
+- `[docs/features/](docs/features/)` — per-feature explanations
 
-- Repository: [github.com/tandpfun/skill-icons](https://github.com/tandpfun/skill-icons)
-- API: [skillicons.dev](https://skillicons.dev)
+## Special thanks
 
-### Disclaimer
+To the libraries doing all the the heavy lifting:
 
-- This project is not affiliated with LinkedIn®.
-- All trademarks and logos are the property of their respective owners.
+- **[pdfmake](https://github.com/bpampuch/pdfmake)** — generates the exported PDF in the browser
+- **[PDF.js](https://github.com/mozilla/pdf.js)** — renders the live preview
+- **[Dexie.js](https://dexie.org/)** — local storage layer over IndexedDB
+- **[Fuse.js](https://fusejs.io/)** — fuzzy search
+- **[@dnd-kit/svelte](https://dndkit.com/)** — for all drag-and-drop interactions
+- **[Shadcn-Svelte](https://shadcn-svelte.com/)** and **[bits-ui](https://bits-ui.com/)** — main UI primitives
+
+## License
+
+[MIT](LICENSE) © Aleksey Maltsev

@@ -1,0 +1,161 @@
+import { createObjectId } from '$lib/types/cv';
+import type { CV, Tag } from '$lib/types/cv';
+import { createCVFromTemplate } from '$lib/services/cv/create';
+
+function tags(...values: string[]): Tag[] {
+	return values.map((value) => ({ objectId: createObjectId(), value }));
+}
+
+export function createDummyCV(): CV {
+	const cv = createCVFromTemplate(crypto.randomUUID(), 'Dummy — Full CV');
+
+	cv.blocks.fullName.value = 'Jordan Rivera';
+	cv.blocks.position.value = 'Senior Software Engineer';
+	cv.blocks.location.value = 'Berlin, Germany';
+
+	cv.blocks.contacts.value = [
+		{ objectId: createObjectId(), label: 'Email', value: 'jordan.rivera@example.com' },
+		{ objectId: createObjectId(), label: 'Phone', value: '+49 30 1234567' },
+		{ objectId: createObjectId(), label: 'LinkedIn', value: 'linkedin.com/in/jordanrivera' },
+		{ objectId: createObjectId(), label: 'GitHub', value: 'github.com/jordanrivera' },
+		{ objectId: createObjectId(), label: 'Website', value: 'jordanrivera.dev' }
+	];
+
+	cv.blocks.highlights.value = [
+		{
+			objectId: createObjectId(),
+			text: 'Eight years building and scaling web applications across fintech and developer tooling.'
+		},
+		{
+			objectId: createObjectId(),
+			text: 'Led a team of five engineers through a full migration to a TypeScript monorepo.'
+		},
+		{
+			objectId: createObjectId(),
+			text: 'Cut median API latency by 40% by reworking the data access layer.'
+		},
+		{
+			objectId: createObjectId(),
+			text: 'Regular speaker at local meetups on frontend performance.'
+		}
+	];
+
+	cv.blocks.skills.value = [
+		{
+			objectId: createObjectId(),
+			name: 'Languages',
+			skills: tags('TypeScript', 'JavaScript', 'Python', 'Go', 'SQL')
+		},
+		{
+			objectId: createObjectId(),
+			name: 'Frameworks',
+			skills: tags('Svelte', 'SvelteKit', 'React', 'Node.js', 'Express')
+		},
+		{
+			objectId: createObjectId(),
+			name: 'Tools',
+			skills: tags('Docker', 'PostgreSQL', 'Redis', 'GitHub Actions', 'AWS')
+		}
+	];
+
+	cv.blocks.jobHistory.value = [
+		{
+			objectId: createObjectId(),
+			company: 'Nimbus Labs',
+			role: 'Senior Software Engineer',
+			startDate: new Date('2021-03-01'),
+			endDate: undefined,
+			current: true,
+			achievements: [
+				{
+					objectId: createObjectId(),
+					text: 'Designed the event-sourcing pipeline powering the billing system.'
+				},
+				{
+					objectId: createObjectId(),
+					text: 'Mentored three junior engineers to mid-level promotions.'
+				},
+				{
+					objectId: createObjectId(),
+					text: 'Introduced end-to-end tests, dropping production regressions by half.'
+				},
+				{
+					objectId: createObjectId(),
+					text: 'Owned the design system adopted across four product teams.'
+				}
+			],
+			skills: tags('TypeScript', 'SvelteKit', 'PostgreSQL', 'AWS')
+		},
+		{
+			objectId: createObjectId(),
+			company: 'Cobalt Financial',
+			role: 'Software Engineer',
+			startDate: new Date('2018-06-01'),
+			endDate: new Date('2021-02-01'),
+			current: false,
+			achievements: [
+				{
+					objectId: createObjectId(),
+					text: 'Built the customer dashboard used by 200k monthly active users.'
+				},
+				{ objectId: createObjectId(), text: 'Reduced page load time from 4.2s to 1.1s.' },
+				{ objectId: createObjectId(), text: 'Integrated three third-party payment providers.' }
+			],
+			skills: tags('React', 'Node.js', 'Redis')
+		},
+		{
+			objectId: createObjectId(),
+			company: 'Bright Pixel Studio',
+			role: 'Junior Developer',
+			startDate: new Date('2016-09-01'),
+			endDate: new Date('2018-05-01'),
+			current: false,
+			achievements: [
+				{
+					objectId: createObjectId(),
+					text: 'Delivered marketing sites for a dozen agency clients.'
+				},
+				{ objectId: createObjectId(), text: 'Automated the deploy process with a CI pipeline.' }
+			],
+			skills: tags('JavaScript', 'CSS', 'Docker')
+		}
+	];
+
+	cv.blocks.projects.value = [
+		{
+			objectId: createObjectId(),
+			name: 'OpenLedger',
+			description: 'An open-source double-entry accounting library with a plugin system.',
+			stack: tags('TypeScript', 'Node.js', 'PostgreSQL'),
+			link: 'github.com/jordanrivera/openledger'
+		},
+		{
+			objectId: createObjectId(),
+			name: 'Pulse',
+			description: 'A real-time dashboard for monitoring self-hosted services.',
+			stack: tags('Svelte', 'Go', 'Redis'),
+			link: 'pulse.jordanrivera.dev'
+		}
+	];
+
+	cv.blocks.education.value = [
+		{
+			objectId: createObjectId(),
+			institution: 'Technical University of Munich',
+			degree: 'M.Sc. Computer Science',
+			startDate: new Date('2014-10-01'),
+			endDate: new Date('2016-07-01'),
+			current: false
+		},
+		{
+			objectId: createObjectId(),
+			institution: 'University of Vienna',
+			degree: 'B.Sc. Software Engineering',
+			startDate: new Date('2011-10-01'),
+			endDate: new Date('2014-07-01'),
+			current: false
+		}
+	];
+
+	return cv;
+}
