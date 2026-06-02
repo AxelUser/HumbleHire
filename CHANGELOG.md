@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/AxelUser/HumbleHire/compare/v0.1.0...v0.1.1) (2026-06-02)
+
+
+### Bug Fixes
+
+* take app version from package.json ([a6e5d62](https://github.com/AxelUser/HumbleHire/commit/a6e5d6236a245c49894cfa1fb6c4567fe18bfcfc))
+
 ## [0.1.0](https://github.com/AxelUser/HumbleHire/compare/humblehire-v0.0.1...humblehire-v0.1.0) (2026-06-02)
 
 
