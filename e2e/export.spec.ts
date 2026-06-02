@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { useBridge } from './helpers/bridge';
+import { useBridge } from '@humblehire/test-bridge';
 import { gotoHome } from './helpers/ui';
 
 test.describe('Export', () => {

@@ -1,27 +1,37 @@
 import { mkdirSync } from 'fs';
-import type { Browser, BrowserContext, Page, TestInfo } from '@playwright/test';
+import { dirname } from 'path';
+import type { Browser, BrowserContext, Page } from 'playwright';
 import { injectCursor, activateCursor } from './mouse';
 import { getVideoDir } from './gif';
+import { BASE_URL } from '../paths';
 
 export { createRecorder } from './recorder';
 export { zoomTo, zoomToPoint, resetZoom } from './zoom';
 export { moveTo, moveCursor, hoverAndClick } from './mouse';
 
-const BASE_URL = 'http://localhost:4888';
-
 export type Theme = 'light' | 'dark';
 
-export function themeOf(testInfo: TestInfo): Theme {
-	return testInfo.project.name as Theme;
+// tsx transpiles this harness with esbuild's keepNames on, which rewrites a named
+// inner function inside a page.evaluate body (e.g. the `clamp` helper in zoom.ts)
+// as `__name(fn, 'clamp')`. That helper lives in the bundled module scope, not in
+// the page, so the serialized function throws "__name is not defined" in the
+// browser. The @playwright/test runner used to absorb this; driving the library
+// directly, we define a no-op shim in every page instead.
+const ESBUILD_NAME_SHIM = 'globalThis.__name = globalThis.__name || ((fn) => fn);';
+
+async function injectNameShim(context: BrowserContext): Promise<void> {
+	await context.addInitScript({ content: ESBUILD_NAME_SHIM });
 }
 
 export async function makePngContext(browser: Browser, theme: Theme): Promise<BrowserContext> {
-	return browser.newContext({
+	const context = await browser.newContext({
 		colorScheme: theme,
 		viewport: { width: 1440, height: 900 },
 		deviceScaleFactor: 2,
 		baseURL: BASE_URL
 	});
+	await injectNameShim(context);
+	return context;
 }
 
 export async function makeGifContext(browser: Browser, theme: Theme): Promise<BrowserContext> {
@@ -36,6 +46,7 @@ export async function makeGifContext(browser: Browser, theme: Theme): Promise<Br
 		},
 		acceptDownloads: true
 	});
+	await injectNameShim(context);
 	await injectCursor(context);
 	return context;
 }
@@ -61,6 +72,6 @@ export async function waitForPdfPreview(page: Page): Promise<void> {
 }
 
 export async function captureScreenshot(page: Page, outputPath: string): Promise<void> {
-	mkdirSync('docs/assets', { recursive: true });
+	mkdirSync(dirname(outputPath), { recursive: true });
 	await page.screenshot({ path: outputPath, animations: 'disabled' });
 }

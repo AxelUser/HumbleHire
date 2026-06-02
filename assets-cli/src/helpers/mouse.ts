@@ -1,4 +1,4 @@
-import type { BrowserContext, Locator, Page } from '@playwright/test';
+import type { BrowserContext, Locator, Page } from 'playwright';
 
 // A bespoke Neo-Brutalism cursor for the documentation captures: a chunky
 // yellow pointer arrow with a thick black outline and a hard offset shadow,

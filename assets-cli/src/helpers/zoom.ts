@@ -1,4 +1,4 @@
-import type { ElementHandle, Locator, Page } from '@playwright/test';
+import type { ElementHandle, Locator, Page } from 'playwright';
 
 // Cinematic, lossless zoom for the captures. We scale <body> with a CSS
 // transform and slide the point of interest to the centre of the viewport,

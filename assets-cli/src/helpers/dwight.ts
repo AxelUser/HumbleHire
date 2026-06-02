@@ -1,4 +1,4 @@
-import type { MasterSeedContent } from '$lib/e2e-bridge';
+import type { MasterSeedContent } from '@humblehire/test-bridge';
 
 export const dwightContent: MasterSeedContent = {
 	fullName: 'Dwight K. Schrute',

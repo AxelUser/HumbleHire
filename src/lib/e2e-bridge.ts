@@ -4,49 +4,13 @@ import { createTailoredCV } from '$lib/features/tailoring/create-tailored';
 import { computeBlockHashes } from '$lib/features/tailoring/hash';
 import { setHasCvsHint } from '$lib/services/cv/has-cvs-hint';
 import { createObjectId } from '$lib/types/cv';
+import type { HhTestBridge, MasterSeedContent } from '@humblehire/test-bridge';
 
-export interface MasterSeedContent {
-	fullName?: string;
-	position?: string;
-	location?: string;
-	contacts?: Array<{ label: string; value: string }>;
-	highlights?: Array<{ text: string }>;
-	skills?: Array<{ name: string; skills: string[] }>;
-	jobHistory?: Array<{
-		company: string;
-		role: string;
-		startDate?: string;
-		endDate?: string;
-		current?: boolean;
-		achievements?: Array<{ text: string }>;
-		skills?: string[];
-	}>;
-	projects?: Array<{
-		name: string;
-		description: string;
-		stack?: string[];
-		link?: string;
-	}>;
-	education?: Array<{
-		institution: string;
-		degree: string;
-		startDate?: string;
-		endDate?: string;
-		current?: boolean;
-	}>;
-}
-
-export interface HhTestBridge {
-	reset(): Promise<void>;
-	seedMaster(overrides?: { name?: string; content?: MasterSeedContent }): Promise<string>;
-	seedTailored(masterId: string, opts?: { name?: string; company?: string }): Promise<string>;
-	patchMaster(
-		id: string,
-		textPatches: { fullName?: string; position?: string; location?: string }
-	): Promise<void>;
-	seedOrphanedTailored(opts?: { name?: string }): Promise<string>;
-	getCv(id: string): Promise<unknown>;
-}
+// The bridge contract lives in @humblehire/test-bridge so the app, the e2e suite,
+// and the docs-asset harness all share one definition. This module implements it;
+// the out-of-process consumers drive it via `useBridge`. Re-exported so existing
+// `$lib/e2e-bridge` importers (e.g. app.d.ts) keep resolving the types here.
+export type { HhTestBridge, MasterSeedContent };
 
 export function initE2eBridge(): void {
 	const bridge: HhTestBridge = {

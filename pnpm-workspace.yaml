@@ -2,3 +2,5 @@ publicHoistPattern:
   - '@dnd-kit/*'
 packages:
   - .
+  - test-bridge
+  - assets-cli

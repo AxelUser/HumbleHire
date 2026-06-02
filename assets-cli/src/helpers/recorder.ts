@@ -1,4 +1,4 @@
-import type { Page } from '@playwright/test';
+import type { Page } from 'playwright';
 import { videoToGif } from './gif';
 
 // Playwright starts recording the moment the page is created and gives no way to

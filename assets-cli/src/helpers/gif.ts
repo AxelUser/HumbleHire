@@ -1,16 +1,15 @@
 import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { mkdirSync, unlinkSync, existsSync } from 'fs';
-import { dirname, join } from 'path';
+import { dirname } from 'path';
 import ffmpegPath from 'ffmpeg-static';
+import { VIDEO_DIR } from '../paths';
 
 const exec = promisify(execFile);
 
-const TEMP_DIR = join(process.cwd(), 'assets-output', 'videos');
-
 export function getVideoDir(): string {
-	mkdirSync(TEMP_DIR, { recursive: true });
-	return TEMP_DIR;
+	mkdirSync(VIDEO_DIR, { recursive: true });
+	return VIDEO_DIR;
 }
 
 export interface TrimWindow {
