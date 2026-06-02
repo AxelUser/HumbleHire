@@ -1,6 +1,6 @@
 import { mkdirSync } from 'fs';
 import type { Browser, BrowserContext, Page, TestInfo } from '@playwright/test';
-import { injectMouseHelper, initMouseHelper } from './mouse';
+import { injectCursor, activateCursor } from './mouse';
 import { getVideoDir } from './gif';
 
 const BASE_URL = 'http://localhost:4888';
@@ -25,27 +25,29 @@ export async function makeGifContext(browser: Browser, theme: Theme): Promise<Br
 		colorScheme: theme,
 		viewport: { width: 1440, height: 900 },
 		baseURL: BASE_URL,
+		// 960×600 matches the 1440×900 viewport ratio (16:10) exactly
 		recordVideo: {
 			dir: getVideoDir(),
-			size: { width: 960, height: 540 }
+			size: { width: 960, height: 600 }
 		},
 		acceptDownloads: true
 	});
-	await injectMouseHelper(context);
+	await injectCursor(context);
 	return context;
 }
 
 export async function openPage(context: BrowserContext): Promise<Page> {
-	const page = await context.newPage();
-	return page;
+	return context.newPage();
 }
 
 export async function gotoHome(page: Page): Promise<void> {
 	await page.goto('/', { waitUntil: 'networkidle' });
 }
 
+// Park the cursor at a neutral position after each navigation so it is visible
+// before the first real interaction and subsequent moves start from a consistent spot.
 export async function activateMouseHelper(page: Page): Promise<void> {
-	await initMouseHelper(page);
+	await activateCursor(page);
 }
 
 export async function waitForPdfPreview(page: Page): Promise<void> {
