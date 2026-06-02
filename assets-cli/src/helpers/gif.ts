@@ -61,8 +61,12 @@ export async function videoToGif(
 ): Promise<void> {
 	mkdirSync(dirname(outputPath), { recursive: true });
 
+	if (!ffmpegPath) {
+		throw new Error('ffmpeg binary not found');
+	}
+	const bin = ffmpegPath;
+
 	const palettePath = videoPath + '.palette.png';
-	const bin = ffmpegPath!;
 	const seek = trimArgs(trim);
 
 	// Shared frame-rate + downscale applied identically to both passes so the
