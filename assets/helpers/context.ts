@@ -3,6 +3,10 @@ import type { Browser, BrowserContext, Page, TestInfo } from '@playwright/test';
 import { injectCursor, activateCursor } from './mouse';
 import { getVideoDir } from './gif';
 
+export { createRecorder } from './recorder';
+export { zoomTo, zoomToPoint, resetZoom } from './zoom';
+export { moveTo, moveCursor, hoverAndClick } from './mouse';
+
 const BASE_URL = 'http://localhost:4888';
 
 export type Theme = 'light' | 'dark';
