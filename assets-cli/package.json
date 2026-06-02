@@ -1,0 +1,23 @@
+{
+	"name": "@humblehire/docs-assets",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"description": "CLI harness that drives the HumbleHire app to regenerate documentation screenshots and GIFs.",
+	"bin": {
+		"docs-assets": "./bin/docs-assets.mjs"
+	},
+	"scripts": {
+		"generate": "tsx src/cli.ts generate --out docs/assets --fps 10 --colors 96 --width 900 --dither bayer --bayer-scale 3 --port 4888 --themes light,dark --scale 2 --timeout 120000",
+		"check": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@humblehire/test-bridge": "workspace:*",
+		"ffmpeg-static": "^5.3.0",
+		"playwright": "^1.58.2"
+	},
+	"devDependencies": {
+		"tsx": "^4.20.6",
+		"typescript": "^5.0.0"
+	}
+}

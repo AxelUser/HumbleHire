@@ -17,12 +17,14 @@
 		"test:e2e": "playwright test",
 		"storybook": "storybook dev -p 6006",
 		"build-storybook": "storybook build",
-		"generate-pwa-assets": "pwa-assets-generator"
+		"generate-pwa-assets": "pwa-assets-generator",
+		"assets:generate": "pnpm --filter @humblehire/docs-assets generate"
 	},
 	"devDependencies": {
 		"@chromatic-com/storybook": "^5.0.1",
 		"@eslint/compat": "^1.2.5",
 		"@eslint/js": "^9.18.0",
+		"@humblehire/test-bridge": "workspace:*",
 		"@internationalized/date": "^3.12.0",
 		"@lucide/svelte": "^1.16.0",
 		"@playwright/test": "^1.49.1",
@@ -83,7 +85,8 @@
 	},
 	"pnpm": {
 		"onlyBuiltDependencies": [
-			"esbuild"
+			"esbuild",
+			"ffmpeg-static"
 		]
 	},
 	"dependencies": {

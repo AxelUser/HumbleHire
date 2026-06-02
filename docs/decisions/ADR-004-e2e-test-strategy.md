@@ -16,13 +16,15 @@ So the e2e suite stays at the level of "does the button call the right thing, do
 
 ## Seeding splits by what's under test
 
-State lives entirely in IndexedDB (Dexie); there is no server to load fixtures from. Two ways to get a CV into that state, picked per test by what the test is actually checking.
+State lives entirely in IndexedDB (Dexie); there is no server to load fixtures from. Two ways to get a CV into that state, picked per automated consumer by what it is actually checking.
 
-Editor tests build their CV through the real UI, because the editor is the thing under test there. Dashboard, export, and tailoring tests seed through `window.__hhTest`, a bridge that runs the production constructors (`createCVFromTemplate`, `createDummyCV`, `createTailoredCV`, the `db`). Building a populated nine-block master by typing, only to set up a sync test, would be slow and would tie every tailoring and export test to editor stability — a change to a field input would break the setup of tests that have nothing to do with editing.
+Editor tests build their CV through the real UI, because the editor is the thing under test there. Dashboard, export, tailoring tests, and the asset-generation harness seed through `window.__hhTest`, a bridge that runs the production constructors (`createCVFromTemplate`, `createDummyCV`, `createTailoredCV`, the `db`). Building a populated nine-block master by typing, only to set up a sync test or a screenshot, would be slow and would tie every subsequent step to editor stability — a change to a field input would break setups that have nothing to do with editing.
 
 The bridge runs production code rather than hand-rolled fixtures on purpose. A CV carries derived state — `blockHashes`, `syncBaseline`, `syncBaselineHashes` — that a raw fixture would have to reproduce and keep in step as the schema moves. Going through the real constructors keeps seeded data valid for free while the app is still changing shape.
 
-The bridge exposes primitives (`reset`, `seedMaster`, `seedTailored`, `patchMaster`), not scenarios. Composite setups like "a master with one tailored copy that has a pending update" are assembled in Playwright helpers. Primitives are added one at a time as a failing test calls for one, so the surface never advertises a method no test uses.
+`seedMaster` accepts an optional `MasterSeedContent` patch: plain JSON values (ISO date strings, arrays of text) for any of the nine blocks. The in-page implementation applies the patch on top of a `createDummyCV()` skeleton, mints `objectId`s for each new entry, and recomputes `blockHashes`. Passing no content gives the Jordan Rivera default; the asset harness passes Dwight Schrute content. Either way the CV is a fully valid, hash-consistent document produced by the real constructors.
+
+The remaining primitives (`reset`, `seedTailored`, `patchMaster`) stay narrow. Composite setups — "a master with one tailored copy that has a pending update" — are assembled in Playwright helpers in the calling suite. No method is added until a consumer calls for one.
 
 ## The bridge is gated at build time, not by convention
 
