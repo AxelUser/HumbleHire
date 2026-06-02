@@ -1,6 +1,6 @@
 <script>
 	import { version } from '$app/environment';
-	const displayVersion = `ver:${version.replace(/^v/, '')}`;
+	const displayVersion = `ver:${version}`;
 </script>
 
 <footer class="border-foreground bg-card border-t-2 px-6 py-3">

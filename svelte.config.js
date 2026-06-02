@@ -1,14 +1,8 @@
 import adapter from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
-import { execSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 
-function gitVersion() {
-	try {
-		return execSync('git describe --tags --always --dirty').toString().trim();
-	} catch {
-		return 'dev';
-	}
-}
+const { version } = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf-8'));
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -22,7 +16,7 @@ const config = {
 			register: false
 		},
 		version: {
-			name: gitVersion()
+			name: version
 		}
 	}
 };
