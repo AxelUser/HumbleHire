@@ -1,13 +1,14 @@
 import { createObjectId } from '$lib/types/cv';
 import type { CV, Tag } from '$lib/types/cv';
 import { createCVFromTemplate } from '$lib/services/cv/create';
+import { randomUUID } from '$lib/utils.js';
 
 function tags(...values: string[]): Tag[] {
 	return values.map((value) => ({ objectId: createObjectId(), value }));
 }
 
 export function createDummyCV(): CV {
-	const cv = createCVFromTemplate(crypto.randomUUID(), 'Dummy — Full CV');
+	const cv = createCVFromTemplate(randomUUID(), 'Dummy — Full CV');
 
 	cv.blocks.fullName.value = 'Jordan Rivera';
 	cv.blocks.position.value = 'Senior Software Engineer';

@@ -8,6 +8,7 @@
 	import { Hero, About } from '$lib/components/landing';
 	import { Dashboard } from '$lib/components/dashboard';
 	import { capture } from '$lib/analytics';
+	import { randomUUID } from '$lib/utils.js';
 
 	let mode = $state<'hero' | 'dashboard'>(getHasCvsHint() ? 'dashboard' : 'hero');
 
@@ -18,7 +19,7 @@
 	});
 
 	async function handleCreateFirstCv() {
-		const id = crypto.randomUUID();
+		const id = randomUUID();
 		const cv = createCVFromTemplate(id, 'Untitled CV');
 		await db.cvs.add(cv);
 		capture('cv_created', { source: 'hero' });

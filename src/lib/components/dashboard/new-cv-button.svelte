@@ -4,6 +4,7 @@
 	import { db } from '$lib/db/index';
 	import { createCVFromTemplate } from '$lib/services/cv/create';
 	import { capture } from '$lib/analytics';
+	import { randomUUID } from '$lib/utils.js';
 
 	interface Props {
 		onCreate: (id: string) => void;
@@ -12,7 +13,7 @@
 	let { onCreate }: Props = $props();
 
 	async function handleClick() {
-		const id = crypto.randomUUID();
+		const id = randomUUID();
 		const cv = createCVFromTemplate(id, 'Untitled CV');
 		await db.cvs.add(cv);
 		capture('cv_created', { source: 'dashboard' });
