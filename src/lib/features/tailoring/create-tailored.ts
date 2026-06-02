@@ -1,13 +1,13 @@
 import { db } from '$lib/db/index';
 import type { CV } from '$lib/types/cv';
-import { randomUUID } from '$lib/utils.js';
+import { createId } from '$lib/id.js';
 
 export async function createTailoredCV(
 	master: CV,
 	name: string,
 	company?: string
 ): Promise<string> {
-	const id = randomUUID();
+	const id = createId();
 	const now = Date.now();
 
 	const tailored: CV = {

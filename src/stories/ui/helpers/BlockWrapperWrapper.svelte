@@ -1,6 +1,6 @@
 <script lang="ts">
 	import BlockWrapper from '$lib/components/ui/block-wrapper/block-wrapper.svelte';
-	import type { ObjectId } from '$lib/types/cv';
+	import { createObjectId, type ObjectId } from '$lib/types/cv';
 
 	interface Props {
 		startVisible?: boolean;
@@ -8,7 +8,7 @@
 
 	let { startVisible = true }: Props = $props();
 
-	const blockId = crypto.randomUUID() as ObjectId;
+	const blockId = createObjectId();
 	let hiddenBlockIds = $state<ObjectId[]>(startVisible ? [] : [blockId]);
 </script>
 

@@ -1,9 +1,9 @@
-import { randomUUID } from '$lib/utils.js';
+import { createId } from '$lib/id.js';
 
 export type ObjectId = string & { readonly __brand: 'ObjectId' };
 
 export function createObjectId(): ObjectId {
-	return randomUUID() as ObjectId;
+	return createId() as ObjectId;
 }
 
 export interface WithId {

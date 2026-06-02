@@ -18,7 +18,7 @@ So the e2e suite stays at the level of "does the button call the right thing, do
 
 State lives entirely in IndexedDB (Dexie); there is no server to load fixtures from. Two ways to get a CV into that state, picked per automated consumer by what it is actually checking.
 
-Editor tests build their CV through the real UI, because the editor is the thing under test there. Dashboard, export, tailoring tests, and the asset-generation harness seed through `window.__hhTest`, a bridge that runs the production constructors (`createCVFromTemplate`, `createDummyCV`, `createTailoredCV`, the `db`). Building a populated nine-block master by typing, only to set up a sync test or a screenshot, would be slow and would tie every subsequent step to editor stability — a change to a field input would break setups that have nothing to do with editing.
+Editor tests build their CV through the real UI, because the editor is the thing under test there. Dashboard, export, tailoring tests, and the asset-generation harness seed through `window.__hhTest`, a bridge that runs the production constructors (`createCV`, `createDummyCV`, `createTailoredCV`, the `db`). Building a populated nine-block master by typing, only to set up a sync test or a screenshot, would be slow and would tie every subsequent step to editor stability — a change to a field input would break setups that have nothing to do with editing.
 
 The bridge runs production code rather than hand-rolled fixtures on purpose. A CV carries derived state — `blockHashes`, `syncBaseline`, `syncBaselineHashes` — that a raw fixture would have to reproduce and keep in step as the schema moves. Going through the real constructors keeps seeded data valid for free while the app is still changing shape.
 

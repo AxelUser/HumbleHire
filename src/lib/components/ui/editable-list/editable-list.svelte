@@ -6,8 +6,7 @@
 	import { cn } from '$lib/utils';
 	import { DragDropProvider, DragOverlay } from '@dnd-kit/svelte';
 	import type { Draggable } from '@dnd-kit/dom';
-	import { createObjectId } from '$lib/types/cv';
-	import type { ObjectId } from '$lib/types/cv';
+	import { createObjectId, type ObjectId } from '$lib/types/cv';
 
 	interface ListItem {
 		objectId: ObjectId;

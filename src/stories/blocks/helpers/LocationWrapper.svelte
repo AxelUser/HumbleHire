@@ -1,7 +1,6 @@
 <script lang="ts">
 	import TextBlock from '$lib/components/blocks/text-block.svelte';
-	import { createObjectId } from '$lib/types/cv';
-	import type { ObjectId, Block } from '$lib/types/cv';
+	import { createObjectId, type ObjectId, type Block } from '$lib/types/cv';
 
 	interface Props {
 		startVisible?: boolean;

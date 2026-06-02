@@ -95,6 +95,7 @@
 		"@fontsource-variable/space-grotesk": "^5.2.10",
 		"dexie": "^4.3.0",
 		"fuse.js": "^7.3.0",
+		"nanoid": "^5.1.11",
 		"pdfjs-dist": "^5.7.284",
 		"pdfmake": "^0.3.8",
 		"posthog-js": "^1.376.5",

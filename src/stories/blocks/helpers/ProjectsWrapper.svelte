@@ -1,7 +1,6 @@
 <script lang="ts">
 	import ProjectsBlock from '$lib/components/blocks/projects-block.svelte';
-	import { createObjectId } from '$lib/types/cv';
-	import type { ObjectId, ProjectEntry } from '$lib/types/cv';
+	import { createObjectId, type ObjectId, type ProjectEntry } from '$lib/types/cv';
 
 	interface Props {
 		startVisible?: boolean;

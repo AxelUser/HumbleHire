@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createObjectId } from '$lib/types/cv';
-import type { CV, CVBlocks } from '$lib/types/cv';
+import { createObjectId, type CV, type CVBlocks } from '$lib/types/cv';
 import { buildDocDef, sanitizeFilename } from './generate';
 import { computeBlockHashes } from '$lib/features/tailoring/hash';
 
