@@ -29,7 +29,7 @@ The CV structure is deliberately fixed: nine blocks, in a set order. That keeps 
 Your CVs are stored in your browser. There is no account and no sync server, and the content of your CVs never leaves your device. Two things follow from that:
 
 - It is fast. Saves are instant because nothing travels over the network.
-- The backups are your job. Clearing your browser data wipes your CVs, so export the ones that matter. I recommend to install the PWA so your CVs won't be lost by automatic browser data clearing.
+- The backups are your job. Clearing your browser data wipes your CVs, so export the ones that matter. I recommend installing the PWA so your CVs won't be lost by automatic browser data clearing.
 
 The hosted site at [humblehire.cv](https://humblehire.cv) collects anonymous, cookieless usage metrics so I can see what gets used. That is the only network traffic tied to you, and it carries none of your CV content. If you run your own copy, that is off by default.
 
@@ -71,7 +71,7 @@ To the libraries doing the heavy lifting:
 - [pdfmake](https://github.com/bpampuch/pdfmake) generates the exported PDF in the browser
 - [PDF.js](https://github.com/mozilla/pdf.js) renders the live preview
 - [Dexie.js](https://dexie.org/) is the storage layer over IndexedDB
-- [@dnd-kit/svelte](https://github.com/dnd-kit/dnd-kit) handles drag and drop
+- [@dnd-kit/svelte](https://dndkit.com/svelte/quickstart/) handles drag and drop
 - [Shadcn-Svelte](https://shadcn-svelte.com/) and [bits-ui](https://bits-ui.com/) provide the UI primitives
 
 ## Documentation
