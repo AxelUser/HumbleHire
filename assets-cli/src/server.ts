@@ -48,20 +48,52 @@ async function waitForPort(url: string, timeoutMs = 180_000): Promise<void> {
 	throw new Error(`App preview never answered at ${url} within ${timeoutMs}ms`);
 }
 
-function killTree(child: ChildProcess): Promise<void> {
+const GRACEFUL_SHUTDOWN_MS = 3_000;
+
+function hasExited(child: ChildProcess): boolean {
+	return child.exitCode !== null || child.signalCode !== null;
+}
+
+function waitForExit(child: ChildProcess, timeoutMs?: number): Promise<void> {
+	if (hasExited(child)) return Promise.resolve();
 	return new Promise((resolve) => {
-		if (child.pid === undefined || child.exitCode !== null) return resolve();
-		if (isWindows) {
-			// The child is a shell wrapping pnpm → vite preview; /T kills the tree.
-			spawn('taskkill', ['/pid', String(child.pid), '/T', '/F'], { stdio: 'ignore' }).on(
-				'exit',
-				() => resolve()
-			);
-		} else {
-			child.kill('SIGTERM');
-			resolve();
+		let timer: ReturnType<typeof setTimeout> | undefined;
+		if (timeoutMs !== undefined) {
+			timer = setTimeout(resolve, timeoutMs);
 		}
+		child.once('exit', () => {
+			if (timer !== undefined) clearTimeout(timer);
+			resolve();
+		});
 	});
+}
+
+async function killTree(child: ChildProcess): Promise<void> {
+	if (child.pid === undefined || hasExited(child)) return;
+
+	if (isWindows) {
+		// The child is a shell wrapping pnpm → vite preview; /T reaches the tree.
+		spawn('taskkill', ['/pid', String(child.pid), '/T'], { stdio: 'ignore' });
+	} else {
+		child.kill('SIGTERM');
+	}
+
+	await waitForExit(child, GRACEFUL_SHUTDOWN_MS);
+
+	if (!hasExited(child)) {
+		if (isWindows) {
+			await new Promise<void>((resolve) => {
+				spawn('taskkill', ['/pid', String(child.pid), '/T', '/F'], { stdio: 'ignore' }).on(
+					'exit',
+					() => resolve()
+				);
+			});
+			await waitForExit(child);
+		} else {
+			child.kill('SIGKILL');
+			await waitForExit(child);
+		}
+	}
 }
 
 // Build the app and start a preview the harness can drive on the configured port.
