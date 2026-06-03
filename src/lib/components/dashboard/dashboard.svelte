@@ -5,6 +5,7 @@
 	import { db } from '$lib/db/index';
 	import CvList from './cv-list.svelte';
 	import NewCvButton from './new-cv-button.svelte';
+	import { ImportButton } from '$lib/components/import';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { Button } from '$lib/components/ui/button';
 	import {
@@ -93,7 +94,10 @@
 				and check back when the master changes.
 			</p>
 		</div>
-		<NewCvButton onCreate={handleCreate} />
+		<div class="flex gap-2">
+			<ImportButton onImport={handleCreate} />
+			<NewCvButton onCreate={handleCreate} />
+		</div>
 	</div>
 </div>
 
