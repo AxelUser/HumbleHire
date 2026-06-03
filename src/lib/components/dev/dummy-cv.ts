@@ -1,5 +1,6 @@
-import { createObjectId, type CV, type Tag } from '$lib/types/cv';
+import { computeBlockHashes } from '$lib/features/tailoring/hash';
 import { createCV } from '$lib/services/cv/create';
+import { createObjectId, type CV, type Tag } from '$lib/types/cv';
 
 function tags(...values: string[]): Tag[] {
 	return values.map((value) => ({ objectId: createObjectId(), value }));
@@ -166,5 +167,6 @@ export function createDummyCV(): CV {
 		}
 	];
 
+	cv.blockHashes = computeBlockHashes(cv.blocks);
 	return cv;
 }
