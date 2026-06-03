@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createObjectId } from '$lib/types/cv';
-import type { CVBlocks, ObjectId } from '$lib/types/cv';
+import { createObjectId, type CVBlocks, type ObjectId } from '$lib/types/cv';
 import { classicTheme } from './classic';
 
 function id(): ObjectId {

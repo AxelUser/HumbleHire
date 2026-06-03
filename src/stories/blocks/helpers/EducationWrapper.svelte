@@ -1,7 +1,6 @@
 <script lang="ts">
 	import EducationBlock from '$lib/components/blocks/education-block.svelte';
-	import { createObjectId } from '$lib/types/cv';
-	import type { ObjectId, EducationEntry } from '$lib/types/cv';
+	import { createObjectId, type ObjectId, type EducationEntry } from '$lib/types/cv';
 
 	interface Props {
 		startVisible?: boolean;

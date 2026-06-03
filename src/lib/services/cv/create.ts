@@ -1,15 +1,13 @@
-import { createObjectId } from '$lib/types/cv';
-import type { CV, CVBlocks } from '$lib/types/cv';
+import { createId } from '$lib/id.js';
+import { createObjectId, type CV, type CVBlocks } from '$lib/types/cv';
 import { computeBlockHashes } from '$lib/features/tailoring/hash';
-import { CLASSIC_TEMPLATE } from './templates';
-import type { CVTemplate } from './templates';
 
-export function createCVFromTemplate(
-	id: string,
-	name: string,
-	template: CVTemplate = CLASSIC_TEMPLATE
-): CV {
-	void template;
+export interface CreateCVOptions {
+	name: string;
+	id?: string;
+}
+
+export function createCV({ name, id = createId() }: CreateCVOptions): CV {
 	const now = Date.now();
 
 	const blocks: CVBlocks = {

@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { db } from '$lib/db/index';
-	import { createCVFromTemplate } from '$lib/services/cv/create';
+	import { createCV } from '$lib/services/cv/create';
 	import { getHasCvsHint } from '$lib/services/cv/has-cvs-hint';
 	import { Hero, About } from '$lib/components/landing';
 	import { Dashboard } from '$lib/components/dashboard';
@@ -18,11 +18,10 @@
 	});
 
 	async function handleCreateFirstCv() {
-		const id = crypto.randomUUID();
-		const cv = createCVFromTemplate(id, 'Untitled CV');
+		const cv = createCV({ name: 'Untitled CV' });
 		await db.cvs.add(cv);
 		capture('cv_created', { source: 'hero' });
-		await goto(resolve(`/cv/${id}`));
+		await goto(resolve(`/cv/${cv.id}`));
 	}
 </script>
 

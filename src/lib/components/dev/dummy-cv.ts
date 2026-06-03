@@ -1,161 +1,172 @@
-import { createObjectId } from '$lib/types/cv';
-import type { CV, Tag } from '$lib/types/cv';
-import { createCVFromTemplate } from '$lib/services/cv/create';
+import { computeBlockHashes } from '$lib/features/tailoring/hash';
+import { createCV } from '$lib/services/cv/create';
+import { createObjectId, type CV, type Tag } from '$lib/types/cv';
 
 function tags(...values: string[]): Tag[] {
 	return values.map((value) => ({ objectId: createObjectId(), value }));
 }
 
 export function createDummyCV(): CV {
-	const cv = createCVFromTemplate(crypto.randomUUID(), 'Dummy — Full CV');
+	const cv = createCV({ name: 'Dummy — Dwight Schrute' });
 
-	cv.blocks.fullName.value = 'Jordan Rivera';
-	cv.blocks.position.value = 'Senior Software Engineer';
-	cv.blocks.location.value = 'Berlin, Germany';
+	cv.blocks.fullName.value = 'Dwight K. Schrute';
+	cv.blocks.position.value = 'Assistant Regional Manager';
+	cv.blocks.location.value = 'Scranton, Pennsylvania';
 
 	cv.blocks.contacts.value = [
-		{ objectId: createObjectId(), label: 'Email', value: 'jordan.rivera@example.com' },
-		{ objectId: createObjectId(), label: 'Phone', value: '+49 30 1234567' },
-		{ objectId: createObjectId(), label: 'LinkedIn', value: 'linkedin.com/in/jordanrivera' },
-		{ objectId: createObjectId(), label: 'GitHub', value: 'github.com/jordanrivera' },
-		{ objectId: createObjectId(), label: 'Website', value: 'jordanrivera.dev' }
+		{ objectId: createObjectId(), label: 'Email', value: 'dwight@dundermifflin.com' },
+		{ objectId: createObjectId(), label: 'Phone', value: '+1 570 555 0198' },
+		{ objectId: createObjectId(), label: 'Website', value: 'schrutefarms.biz' },
+		{ objectId: createObjectId(), label: 'LinkedIn', value: 'linkedin.com/in/dwightschrute' }
 	];
 
 	cv.blocks.highlights.value = [
 		{
 			objectId: createObjectId(),
-			text: 'Eight years building and scaling web applications across fintech and developer tooling.'
+			text: 'Top-performing Dunder Mifflin salesman for six consecutive quarters.'
 		},
 		{
 			objectId: createObjectId(),
-			text: 'Led a team of five engineers through a full migration to a TypeScript monorepo.'
+			text: 'Owner and proprietor of Schrute Farms, a working beet farm and bed & breakfast.'
 		},
 		{
 			objectId: createObjectId(),
-			text: 'Cut median API latency by 40% by reworking the data access layer.'
+			text: "Volunteer sheriff's deputy with advanced training in hand-to-hand combat and surveillance."
 		},
 		{
 			objectId: createObjectId(),
-			text: 'Regular speaker at local meetups on frontend performance.'
+			text: 'Holds a black belt in Goju-Ryu karate and a brown belt in Judo.'
 		}
 	];
 
 	cv.blocks.skills.value = [
 		{
 			objectId: createObjectId(),
-			name: 'Languages',
-			skills: tags('TypeScript', 'JavaScript', 'Python', 'Go', 'SQL')
+			name: 'Sales',
+			skills: tags('Paper Sales', 'Cold Calling', 'Account Management', 'Client Retention')
 		},
 		{
 			objectId: createObjectId(),
-			name: 'Frameworks',
-			skills: tags('Svelte', 'SvelteKit', 'React', 'Node.js', 'Express')
+			name: 'Agriculture',
+			skills: tags('Beet Farming', 'Agritourism', 'Animal Husbandry', 'Beekeeping')
 		},
 		{
 			objectId: createObjectId(),
-			name: 'Tools',
-			skills: tags('Docker', 'PostgreSQL', 'Redis', 'GitHub Actions', 'AWS')
+			name: 'Security',
+			skills: tags('Surveillance', 'Brazilian Jiu-Jitsu', 'Nunchucks', 'Volunteer Deputy Work')
 		}
 	];
 
 	cv.blocks.jobHistory.value = [
 		{
 			objectId: createObjectId(),
-			company: 'Nimbus Labs',
-			role: 'Senior Software Engineer',
-			startDate: new Date('2021-03-01'),
+			company: 'Dunder Mifflin Paper Company',
+			role: 'Assistant Regional Manager',
+			startDate: new Date('2004-03-24'),
 			endDate: undefined,
 			current: true,
 			achievements: [
 				{
 					objectId: createObjectId(),
-					text: 'Designed the event-sourcing pipeline powering the billing system.'
+					text: 'Consistently led the Scranton branch in paper and office supply sales.'
 				},
 				{
 					objectId: createObjectId(),
-					text: 'Mentored three junior engineers to mid-level promotions.'
+					text: 'Managed the safety committee, reducing workplace incidents by 40%.'
 				},
 				{
 					objectId: createObjectId(),
-					text: 'Introduced end-to-end tests, dropping production regressions by half.'
+					text: 'Instituted a branch-wide volunteer militia programme, improving morale by 73%.'
 				},
 				{
 					objectId: createObjectId(),
-					text: 'Owned the design system adopted across four product teams.'
+					text: 'Served as Acting Regional Manager during three separate managerial vacancies.'
 				}
 			],
-			skills: tags('TypeScript', 'SvelteKit', 'PostgreSQL', 'AWS')
+			skills: tags('Paper Sales', 'Team Leadership', 'Safety Compliance')
 		},
 		{
 			objectId: createObjectId(),
-			company: 'Cobalt Financial',
-			role: 'Software Engineer',
-			startDate: new Date('2018-06-01'),
-			endDate: new Date('2021-02-01'),
-			current: false,
+			company: 'Schrute Farms',
+			role: 'Owner & Proprietor',
+			startDate: new Date('1998-05-01'),
+			endDate: undefined,
+			current: true,
 			achievements: [
 				{
 					objectId: createObjectId(),
-					text: 'Built the customer dashboard used by 200k monthly active users.'
+					text: 'Operates a 60-acre beet farm producing award-winning varieties of red and golden beets.'
 				},
-				{ objectId: createObjectId(), text: 'Reduced page load time from 4.2s to 1.1s.' },
-				{ objectId: createObjectId(), text: 'Integrated three third-party payment providers.' }
+				{
+					objectId: createObjectId(),
+					text: 'Converted the farmhouse into a bed & breakfast with five themed guest rooms.'
+				},
+				{
+					objectId: createObjectId(),
+					text: "Featured in TripAdvisor's top 10 most haunted B&Bs in Pennsylvania."
+				}
 			],
-			skills: tags('React', 'Node.js', 'Redis')
+			skills: tags('Farming', 'Hospitality', 'Business Operations')
 		},
 		{
 			objectId: createObjectId(),
-			company: 'Bright Pixel Studio',
-			role: 'Junior Developer',
-			startDate: new Date('2016-09-01'),
-			endDate: new Date('2018-05-01'),
-			current: false,
+			company: "Lackawanna County Sheriff's Department",
+			role: 'Volunteer Deputy',
+			startDate: new Date('2003-01-01'),
+			endDate: undefined,
+			current: true,
 			achievements: [
 				{
 					objectId: createObjectId(),
-					text: 'Delivered marketing sites for a dozen agency clients.'
+					text: 'Assisted with crowd control at three consecutive Steamtown Marathon events.'
 				},
-				{ objectId: createObjectId(), text: 'Automated the deploy process with a CI pipeline.' }
+				{
+					objectId: createObjectId(),
+					text: 'Trained in prisoner transport, evidence handling, and report writing.'
+				}
 			],
-			skills: tags('JavaScript', 'CSS', 'Docker')
+			skills: tags('Law Enforcement', 'Crowd Control')
 		}
 	];
 
 	cv.blocks.projects.value = [
 		{
 			objectId: createObjectId(),
-			name: 'OpenLedger',
-			description: 'An open-source double-entry accounting library with a plugin system.',
-			stack: tags('TypeScript', 'Node.js', 'PostgreSQL'),
-			link: 'github.com/jordanrivera/openledger'
+			name: 'Schrute Farms B&B',
+			description:
+				'An agritourism bed & breakfast with five themed rooms, farm tours, and seasonal beet harvest experiences.',
+			stack: tags('Hospitality', 'Agritourism', 'Marketing'),
+			link: 'schrutefarms.biz'
 		},
 		{
 			objectId: createObjectId(),
-			name: 'Pulse',
-			description: 'A real-time dashboard for monitoring self-hosted services.',
-			stack: tags('Svelte', 'Go', 'Redis'),
-			link: 'pulse.jordanrivera.dev'
+			name: 'Recyclops',
+			description:
+				'A grassroots office recycling programme that evolved into a full workplace environmental enforcement role.',
+			stack: tags('Sustainability', 'Waste Management', 'Community Outreach'),
+			link: ''
 		}
 	];
 
 	cv.blocks.education.value = [
 		{
 			objectId: createObjectId(),
-			institution: 'Technical University of Munich',
-			degree: 'M.Sc. Computer Science',
-			startDate: new Date('2014-10-01'),
-			endDate: new Date('2016-07-01'),
+			institution: 'Penn State University',
+			degree: 'B.A. Business Administration',
+			startDate: new Date('1992-09-01'),
+			endDate: new Date('1996-05-15'),
 			current: false
 		},
 		{
 			objectId: createObjectId(),
-			institution: 'University of Vienna',
-			degree: 'B.Sc. Software Engineering',
-			startDate: new Date('2011-10-01'),
-			endDate: new Date('2014-07-01'),
+			institution: 'Lackawanna County Community College',
+			degree: 'Certificate in Criminal Justice',
+			startDate: new Date('2001-01-15'),
+			endDate: new Date('2002-12-20'),
 			current: false
 		}
 	];
 
+	cv.blockHashes = computeBlockHashes(cv.blocks);
 	return cv;
 }

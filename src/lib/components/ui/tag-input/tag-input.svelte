@@ -5,8 +5,7 @@
 	import { SortableItem, createSortableDragHandlers } from '$lib/components/ui/sortable';
 	import { DragDropProvider, DragOverlay } from '@dnd-kit/svelte';
 	import type { Draggable } from '@dnd-kit/dom';
-	import { createObjectId } from '$lib/types/cv';
-	import type { Tag } from '$lib/types/cv';
+	import { createObjectId, type Tag } from '$lib/types/cv';
 
 	interface Props {
 		tags: Tag[];

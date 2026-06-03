@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { EditableList } from '$lib/components/ui/editable-list';
-	import { createObjectId } from '$lib/types/cv';
-	import type { ObjectId } from '$lib/types/cv';
+	import { createObjectId, type ObjectId } from '$lib/types/cv';
 
 	interface ListItem {
 		objectId: ObjectId;

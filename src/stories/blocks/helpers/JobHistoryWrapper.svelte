@@ -1,7 +1,6 @@
 <script lang="ts">
 	import JobHistoryBlock from '$lib/components/blocks/job-history-block.svelte';
-	import { createObjectId } from '$lib/types/cv';
-	import type { ObjectId, JobEntry } from '$lib/types/cv';
+	import { createObjectId, type ObjectId, type JobEntry } from '$lib/types/cv';
 
 	interface Props {
 		startVisible?: boolean;

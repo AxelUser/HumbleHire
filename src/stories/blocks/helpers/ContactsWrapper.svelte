@@ -1,7 +1,6 @@
 <script lang="ts">
 	import ContactsBlock from '$lib/components/blocks/contacts-block.svelte';
-	import { createObjectId } from '$lib/types/cv';
-	import type { ObjectId, ContactEntry } from '$lib/types/cv';
+	import { createObjectId, type ObjectId, type ContactEntry } from '$lib/types/cv';
 
 	interface Props {
 		startVisible?: boolean;

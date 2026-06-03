@@ -1,7 +1,6 @@
 <script lang="ts">
 	import BulletListBlock from '$lib/components/blocks/bullet-list-block.svelte';
-	import { createObjectId } from '$lib/types/cv';
-	import type { ObjectId, Highlight } from '$lib/types/cv';
+	import { createObjectId, type ObjectId, type Highlight } from '$lib/types/cv';
 
 	interface Props {
 		startVisible?: boolean;

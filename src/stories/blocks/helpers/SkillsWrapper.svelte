@@ -1,7 +1,6 @@
 <script lang="ts">
 	import SkillsBlock from '$lib/components/blocks/skills-block.svelte';
-	import { createObjectId } from '$lib/types/cv';
-	import type { ObjectId, SkillCategory } from '$lib/types/cv';
+	import { createObjectId, type ObjectId, type SkillCategory } from '$lib/types/cv';
 
 	interface Props {
 		startVisible?: boolean;

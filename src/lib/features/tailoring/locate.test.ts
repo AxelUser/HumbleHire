@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { createObjectId } from '$lib/types/cv';
-import type { CV, CVBlocks, JobEntry, ObjectId, SkillCategory } from '$lib/types/cv';
+import {
+	createObjectId,
+	type CV,
+	type CVBlocks,
+	type JobEntry,
+	type ObjectId,
+	type SkillCategory
+} from '$lib/types/cv';
 import type { DiffItem } from './types';
 import { computeBlockHashes } from './hash';
 import {

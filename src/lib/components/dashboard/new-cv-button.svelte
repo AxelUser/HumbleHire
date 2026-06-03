@@ -2,8 +2,9 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Plus } from '@lucide/svelte';
 	import { db } from '$lib/db/index';
-	import { createCVFromTemplate } from '$lib/services/cv/create';
+	import { createCV } from '$lib/services/cv/create';
 	import { capture } from '$lib/analytics';
+	import { createId } from '$lib/id.js';
 
 	interface Props {
 		onCreate: (id: string) => void;
@@ -12,8 +13,8 @@
 	let { onCreate }: Props = $props();
 
 	async function handleClick() {
-		const id = crypto.randomUUID();
-		const cv = createCVFromTemplate(id, 'Untitled CV');
+		const id = createId();
+		const cv = createCV({ id, name: 'Untitled CV' });
 		await db.cvs.add(cv);
 		capture('cv_created', { source: 'dashboard' });
 		onCreate(id);

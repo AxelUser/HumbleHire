@@ -1,16 +1,16 @@
-import { createObjectId } from '$lib/types/cv';
-import type {
-	Achievement,
-	CV,
-	CVBlocks,
-	JobEntry,
-	ObjectId,
-	Tag,
-	Highlight,
-	ProjectEntry,
-	SkillCategory,
-	ContactEntry,
-	EducationEntry
+import {
+	createObjectId,
+	type Achievement,
+	type CV,
+	type CVBlocks,
+	type JobEntry,
+	type ObjectId,
+	type Tag,
+	type Highlight,
+	type ProjectEntry,
+	type SkillCategory,
+	type ContactEntry,
+	type EducationEntry
 } from '$lib/types/cv';
 import { computeBlockHashes } from './hash';
 

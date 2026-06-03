@@ -6,8 +6,7 @@
 	import { DragDropProvider, DragOverlay } from '@dnd-kit/svelte';
 	import type { Draggable } from '@dnd-kit/dom';
 	import { Trash2, Plus, GripVertical } from '@lucide/svelte';
-	import type { ContactEntry, ObjectId } from '$lib/types/cv';
-	import { createObjectId } from '$lib/types/cv';
+	import { createObjectId, type ContactEntry, type ObjectId } from '$lib/types/cv';
 
 	interface Props {
 		contacts: ContactEntry[];

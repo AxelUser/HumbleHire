@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { TagInput } from '$lib/components/ui/tag-input';
-	import { createObjectId } from '$lib/types/cv';
-	import type { Tag } from '$lib/types/cv';
+	import { createObjectId, type Tag } from '$lib/types/cv';
 
 	interface Props {
 		startTags?: string[];
