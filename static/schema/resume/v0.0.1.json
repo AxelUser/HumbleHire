@@ -1,0 +1,78 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://humblehire.app/schema/resume/v0.0.1.json",
+	"title": "HumbleHire Resume v0.0.1",
+	"description": "A superset of JSON Resume (https://jsonresume.org). Any valid JSON Resume document is a valid HumbleHire resume. HumbleHire adds basics.highlights (bullet-point list alongside the standard summary string), work[].keywords (per-role skills), and meta.humblehire (schema version + lossless contacts round-trip).",
+	"allOf": [
+		{
+			"$ref": "https://raw.githubusercontent.com/jsonresume/resume-schema/master/schema.json"
+		},
+		{
+			"type": "object",
+			"properties": {
+				"basics": {
+					"type": "object",
+					"properties": {
+						"highlights": {
+							"type": "array",
+							"description": "Key highlights as a list of bullet points. HumbleHire-native alternative to the summary string — human-editable, LLM-friendly. Use instead of or alongside summary.",
+							"items": {
+								"type": "string"
+							}
+						}
+					}
+				},
+				"work": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"keywords": {
+								"type": "array",
+								"description": "Technologies and skills used in this role.",
+								"items": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"meta": {
+					"type": "object",
+					"properties": {
+						"humblehire": {
+							"type": "object",
+							"description": "HumbleHire-specific metadata. Ignored by standard JSON Resume tooling.",
+							"required": ["schemaVersion"],
+							"properties": {
+								"schemaVersion": {
+									"type": "string",
+									"description": "HumbleHire schema version of this document, e.g. \"0.0.1\". Importers refuse files with a version higher than they support."
+								},
+								"contacts": {
+									"type": "array",
+									"description": "Exact contact entries for lossless round-trip. Takes precedence over basics.email/phone/url/profiles on import.",
+									"items": {
+										"type": "object",
+										"required": ["label", "value"],
+										"additionalProperties": false,
+										"properties": {
+											"label": {
+												"type": "string",
+												"description": "Human-readable label, e.g. \"Email\", \"LinkedIn\", \"GitHub\"."
+											},
+											"value": {
+												"type": "string",
+												"description": "The contact value, e.g. an email address or URL."
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	]
+}
