@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/AxelUser/HumbleHire/compare/v0.1.1...v0.1.2) (2026-06-03)
+
+
+### Bug Fixes
+
+* crypto UUID substitution ([#13](https://github.com/AxelUser/HumbleHire/issues/13)) ([8f4d3b0](https://github.com/AxelUser/HumbleHire/commit/8f4d3b08aa6b4c2b28a3835fec34d81ecd2ac7ea))
+
 ## [0.1.1](https://github.com/AxelUser/HumbleHire/compare/v0.1.0...v0.1.1) (2026-06-02)
 
 
