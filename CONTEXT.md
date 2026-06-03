@@ -99,11 +99,15 @@ Browser storage exempt from automatic eviction, so CV content survives storage p
 _Avoid_: "Saved to cloud", "backed up" (durable is not the same as backed up), permanent.
 
 **Export**:
-Turning a single CV into a PDF for sending to an employer. It is the output, not a safety net: a PDF cannot be re-imported as editable CV content.
+Turning a single CV into a downloadable file: a PDF for an employer, or a structured format (JSON/YAML) for re-import or use in other tools. Structured exports can be re-imported into HumbleHire.
 _Avoid_: Backup, save.
 
+**Import**:
+Bringing a structured file into HumbleHire as a new CV — the inverse of a structured [[export]]. Accepts the same structured formats HumbleHire exports.
+_Avoid_: Upload, load, restore (restore belongs to [[backup]]).
+
 **Backup**:
-A single downloadable file containing every CV, re-importable to restore them. The only copy that survives cleared site data, a different browser, or a dead disk. Distinct from [[export]].
+A single downloadable file containing every CV at once, re-importable to restore them. The copy that survives cleared site data, a different browser, or a dead disk. Distinct from [[export]] and [[import]], which work one CV at a time.
 _Avoid_: Export, dump, save.
 
 ## Flagged ambiguities
