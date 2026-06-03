@@ -110,11 +110,42 @@ _Avoid_: Upload, load, restore (restore belongs to [[backup]]).
 A single downloadable file containing every CV at once, re-importable to restore them. The copy that survives cleared site data, a different browser, or a dead disk. Distinct from [[export]] and [[import]], which work one CV at a time.
 _Avoid_: Export, dump, save.
 
+### Serialization
+
+**Serialization**:
+The feature that owns structured [[export]] and [[import]] in both directions, plus the schema that validates incoming files. Lives at `src/lib/features/serialization/`. Names the whole bridge between the runtime [[cv]] and its file form, not just the export half.
+_Avoid_: Export (that is one direction only), mapping (too narrow).
+
+**CvDocument**:
+The wire-format DTO read and written as JSON — a JSON Resume superset. ID-less, human- and LLM-shaped, dates as `YYYY-MM` text, empty sections omitted. The only bridge to the runtime [[cv]] is `toDocument` / `fromDocument`. See ADR-006.
+_Avoid_: Payload, DTO (in product-facing text), JSON blob.
+
+**HumbleHire JSON**:
+The lossless structured [[export]] variant (`.humblehire.json`). Carries the HumbleHire extensions — `basics.highlights`, `work[].keywords`, `meta.humblehire` — for exact round-trip.
+_Avoid_: Native format, full export.
+
+**JSON Resume**:
+Both the external standard HumbleHire interoperates with and the lossy [[export]] variant (`.json`) projected onto it. Lacks HumbleHire's extended fields, so projection drops them. When the variant is meant, say "JSON Resume export."
+_Avoid_: Standard format, plain export (unqualified).
+
+**parseDocument**:
+The intake gate for structured [[import]]. Takes raw file text and returns a `ParseResult` — a proven [[cvdocument]] or a typed [[documenterror]]. Owns JSON parsing, schema validation, and the schema-version gate. No casting: the type is earned by the validator predicate.
+_Avoid_: Validate, deserialize (each names only a slice of what it owns).
+
+**DocumentError**:
+The failure value `parseDocument` returns, discriminated by `kind`: `not-json`, `schema`, or `unsupported-version`. Replaces the thrown `UnsupportedSchemaVersionError`.
+_Avoid_: ParseError, ValidationError.
+
+**Coercion**:
+A best-effort conversion between a HumbleHire model shape and a JSON Resume shape. Two kinds must stay distinguishable. **Temporal** coercions (location, degree, contacts + the `meta` stash, and the field renames) exist only because the runtime [[cv]] is shaped differently from the wire; the planned richer-[[cv]] refactor adopts JSON Resume's structures and erases them. They carry a grep-able `@temporal-coercion` marker. **Durable** conversions (`highlights[]`↔`summary`, the `keywords`/`stack` extensions, `Date`↔`YYYY-MM`, `current`↔absent `endDate`, and the strip-IDs / omit-empties / drop-hidden DTO boundary) are the permanent runtime↔wire gap and must outlive the refactor. See ADR-006.
+_Avoid_: Mapping (reserve for direct field-to-field correspondence), hack, workaround (applies only to the temporal kind).
+
 ## Flagged ambiguities
 
-**"Version"** has no place in HumbleHire language.
+**"Version"** has no place in HumbleHire language — with one carve-out.
 
 - _Not acceptable_: "CV version," "version history," "save a version," "master version." These imply a Git-style snapshot store that does not exist. Use "tailored CV" for a derived copy or "sync baseline" for the captured-at-tailoring snapshot. Sync detection works off per-block content hashes, not a version counter.
+- _Carve-out — schema version_: `meta.humblehire.schemaVersion` and the `unsupported-version` [[documenterror]] are legitimate. This is the **document format** version, not a CV history version. Keep the word attached to the wire format (`schemaVersion`, "schema version"), never to a CV.
 
 **"Block"** sometimes appears in code to mean the `Block<T>` wrapper object (a `{ objectId, value }` pair). That is an implementation detail. In product language, "block" always means one of the nine CV sections.
 

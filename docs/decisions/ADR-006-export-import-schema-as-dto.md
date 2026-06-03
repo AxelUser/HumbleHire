@@ -85,3 +85,16 @@ Three fields in the current model do not map cleanly onto JSON Resume shapes. Th
 **Degree** — the model holds a single string (e.g. "BSc Computer Science"); JSON Resume splits this into `studyType` and `area`. Export: string → `studyType`. Import: read `studyType`; if absent, read `area`; if both present, join with " " (foreign file path). Own files always have `studyType`, so round-trip is exact.
 
 **Contacts** — the model holds generic `{label, value}` pairs; JSON Resume exposes typed top-level fields (`email`, `phone`, `url`) and `profiles[]` objects. Export (HumbleHire JSON): emit standard fields via heuristic _and_ stash the exact array in `meta.humblehire.contacts`. Import: prefer `meta.humblehire.contacts` when present (own file, exact round-trip); fall back to reconstructing from standard fields when absent (foreign file, heuristic: `email`→`{label:"Email",value}`, `phone`→`{label:"Phone",value}`, `url`→`{label:"Website",value}`, each `profiles[]` entry → `{label: network, value: url}`). Export (JSON Resume): heuristic only, no stash; contacts labels are lost.
+
+### What is temporal vs durable (clarification, 2026-06-04)
+
+The three coercions above are genuinely **temporal**. The planned model refactor makes the runtime model adopt JSON Resume's structures: a structured `location` object, a split `studyType`/`area` for degree, and typed `email`/`phone`/`url`/`profiles` contacts (dropping the generic `{label, value}` list). When that lands, these three coercions — and the `meta.humblehire.contacts` stash that exists only because arbitrary labels can't round-trip through typed fields — collapse to identity and are removed.
+
+The rest of the mapper is **durable** and must survive that deletion. It is the runtime↔wire gap this ADR exists to keep, not legacy scaffolding:
+
+- `highlights[]` ↔ `summary` — JSON Resume has no bullet list; the highlights block stays. Lossy projection on JSON Resume export, summary-split on foreign import.
+- `work[].keywords` and project `stack` as extensions — absent from the JSON Resume standard.
+- `Date` ↔ `YYYY-MM` and `current` ↔ absent `endDate` — the engine keeps `Date` objects and the explicit `current` flag.
+- strip IDs, omit empty sections, drop hidden blocks — the DTO boundary itself.
+
+To keep the two sets separable in code, the temporal coercions carry a grep-able `@temporal-coercion` marker. A future reader removing them should follow the marker, not gut the mapper. Foreign sections HumbleHire has no block for (awards, languages, volunteer, references, certificates…) are dropped on import; a pure `unmappedSections(doc)` inspector names them so the import surface can warn.
