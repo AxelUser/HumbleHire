@@ -6,7 +6,7 @@
 	import { TailorDialog } from '$lib/components/tailoring';
 	import TailoredRow from './tailored-row.svelte';
 	import HighlightedText from './highlighted-text.svelte';
-	import { ExportButton } from '$lib/components/editor';
+	import { ExportButton } from '$lib/components/export';
 	import { Eye, Trash2, ChevronDown } from '@lucide/svelte';
 
 	interface Props {

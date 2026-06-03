@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { toDocument, toJsonResume, fromDocument, UnsupportedSchemaVersionError } from './serialize';
+import { toDocument, toJsonResume, fromDocument, unmappedSections } from './serialize';
 import { createObjectId, type CV, type CVBlocks } from '$lib/types/cv';
 import { computeBlockHashes } from '$lib/features/tailoring/hash';
 
@@ -251,24 +251,15 @@ describe('fromDocument round-trip (via toDocument)', () => {
 	});
 });
 
-describe('fromDocument', () => {
-	it('throws UnsupportedSchemaVersionError for a future schema version', () => {
-		const doc = { meta: { humblehire: { schemaVersion: '99.0.0' } } };
-		expect(() => fromDocument(doc)).toThrow(UnsupportedSchemaVersionError);
-	});
-
-	it('accepts documents without a humblehire version marker', () => {
-		expect(() => fromDocument({ basics: { name: 'Bob' } })).not.toThrow();
+describe('fromDocument — foreign JSON Resume paths (@temporal-coercion coverage)', () => {
+	it('defaults name to "Imported CV" when basics.name is absent', () => {
+		expect(fromDocument({}).name).toBe('Imported CV');
 	});
 
 	it('falls back to summary-split when highlights are absent', () => {
 		const doc = { basics: { summary: 'Line one\nLine two' } };
 		const cv = fromDocument(doc);
 		expect(cv.blocks.highlights.value.map((h) => h.text)).toEqual(['Line one', 'Line two']);
-	});
-
-	it('defaults name to "Imported CV" when basics.name is absent', () => {
-		expect(fromDocument({}).name).toBe('Imported CV');
 	});
 
 	it('reconstructs contacts from standard fields when meta stash is absent', () => {
@@ -285,7 +276,7 @@ describe('fromDocument', () => {
 		]);
 	});
 
-	it('joins location object fields when address is absent', () => {
+	it('joins location object fields when address is absent (foreign file)', () => {
 		const doc = { basics: { location: { city: 'Berlin', countryCode: 'DE' } } };
 		expect(fromDocument(doc).blocks.location.value).toBe('Berlin, DE');
 	});
@@ -295,8 +286,58 @@ describe('fromDocument', () => {
 		expect(fromDocument(doc).blocks.education.value[0].degree).toBe('Computer Science');
 	});
 
-	it('joins studyType and area when both are present', () => {
+	it('joins studyType and area when both are present (foreign file)', () => {
 		const doc = { education: [{ studyType: 'BSc', area: 'Computer Science' }] };
 		expect(fromDocument(doc).blocks.education.value[0].degree).toBe('BSc Computer Science');
+	});
+
+	it('maps foreign work using JSON Resume field names (name, position, highlights)', () => {
+		const doc = {
+			work: [
+				{
+					name: 'ACME Corp',
+					position: 'Dev',
+					startDate: '2019-03',
+					highlights: ['Built the thing']
+				}
+			]
+		};
+		const job = fromDocument(doc).blocks.jobHistory.value[0];
+		expect(job.company).toBe('ACME Corp');
+		expect(job.role).toBe('Dev');
+		expect(job.achievements[0].text).toBe('Built the thing');
+	});
+
+	it('treats absent endDate on a work item as current=true', () => {
+		const doc = { work: [{ startDate: '2020-01' }] };
+		expect(fromDocument(doc).blocks.jobHistory.value[0].current).toBe(true);
+	});
+
+	it('treats present endDate on a work item as current=false', () => {
+		const doc = { work: [{ startDate: '2019-01', endDate: '2021-06' }] };
+		expect(fromDocument(doc).blocks.jobHistory.value[0].current).toBe(false);
+	});
+});
+
+describe('unmappedSections', () => {
+	it('returns empty array for a document with only mapped sections', () => {
+		expect(
+			unmappedSections({ basics: { name: 'A' }, work: [], education: [], skills: [], projects: [] })
+		).toEqual([]);
+	});
+
+	it('reports foreign sections by name', () => {
+		const doc = { basics: {}, awards: [], languages: [], volunteer: [] } as Record<string, unknown>;
+		const dropped = unmappedSections(doc as Parameters<typeof unmappedSections>[0]);
+		expect(dropped.sort()).toEqual(['awards', 'languages', 'volunteer']);
+	});
+
+	it('does not flag $schema or meta as unmapped', () => {
+		const doc = {
+			$schema: 'https://jsonresume.org/schema',
+			basics: {},
+			meta: { humblehire: { schemaVersion: '0.0.1' } }
+		};
+		expect(unmappedSections(doc)).toEqual([]);
 	});
 });

@@ -10,11 +10,8 @@
 	} from '$lib/components/ui/dialog';
 	import { Button } from '$lib/components/ui/button';
 	import { Upload, FileJson } from '@lucide/svelte';
-	import { fromDocument, UnsupportedSchemaVersionError } from '$lib/features/export/serialize';
-	import type { CvDocument } from '$lib/features/export/document';
-	import { db } from '$lib/db/index';
+	import { importDocument } from '$lib/features/serialization/import';
 	import { capture } from '$lib/analytics';
-	import { computeBlockHashes } from '$lib/features/tailoring/hash';
 
 	interface Props {
 		open?: boolean;
@@ -24,15 +21,17 @@
 	let { open = $bindable(false), onImport }: Props = $props();
 
 	let fileInput = $state<HTMLInputElement | null>(null);
-	let parseError = $state<string | null>(null);
+	let errorMessage = $state<string | null>(null);
 	let importing = $state(false);
-	let pendingDoc = $state<CvDocument | null>(null);
+	let pendingText = $state<string | null>(null);
 	let pendingFileName = $state<string>('');
+	let pendingName = $state<string>('');
 
 	function reset() {
-		parseError = null;
-		pendingDoc = null;
+		errorMessage = null;
+		pendingText = null;
 		pendingFileName = '';
+		pendingName = '';
 		importing = false;
 		if (fileInput) fileInput.value = '';
 	}
@@ -46,51 +45,63 @@
 		const file = (e.currentTarget as HTMLInputElement).files?.[0];
 		if (!file) return;
 
-		parseError = null;
-		pendingDoc = null;
+		errorMessage = null;
+		pendingText = null;
 		pendingFileName = file.name;
+		pendingName = '';
 
 		const reader = new FileReader();
 		reader.onload = () => {
+			const text = reader.result as string;
+			// Peek at the name for display — a full parse happens on import
 			try {
-				const raw = JSON.parse(reader.result as string);
-				// Validate it has at least one expected JSON Resume field before accepting
-				if (typeof raw !== 'object' || raw === null) throw new Error('Not a valid JSON object.');
-				pendingDoc = raw as CvDocument;
+				const raw = JSON.parse(text);
+				pendingName = typeof raw?.basics?.name === 'string' ? raw.basics.name : '';
 			} catch {
-				parseError =
-					'Could not parse the file. Make sure it is a valid JSON Resume or HumbleHire JSON file.';
+				// ignore; parse errors surface on import
 			}
+			pendingText = text;
 		};
 		reader.onerror = () => {
-			parseError = 'Could not read the file.';
+			errorMessage = 'Could not read the file.';
 		};
 		reader.readAsText(file);
 	}
 
 	async function handleImport() {
-		if (!pendingDoc) return;
+		if (!pendingText) return;
 		importing = true;
-		parseError = null;
+		errorMessage = null;
 
-		try {
-			const cv = fromDocument(pendingDoc);
-			cv.blockHashes = computeBlockHashes(cv.blocks);
-			await db.cvs.add(cv);
-			capture('cv_imported', {
-				has_humblehire_meta: !!pendingDoc.meta?.humblehire
-			});
-			open = false;
-			onImport?.(cv.id);
-		} catch (err) {
-			if (err instanceof UnsupportedSchemaVersionError) {
-				parseError = err.message;
-			} else {
-				parseError = 'Import failed. The file may be corrupt or in an unsupported format.';
-			}
-		} finally {
+		const result = await importDocument(pendingText);
+
+		if (!result.ok) {
 			importing = false;
+			switch (result.error.kind) {
+				case 'not-json':
+					errorMessage =
+						'Could not parse the file. Make sure it is a valid JSON Resume or HumbleHire JSON file.';
+					break;
+				case 'schema':
+					errorMessage =
+						'Could not parse the file. Make sure it is a valid JSON Resume or HumbleHire JSON file.';
+					break;
+				case 'unsupported-version':
+					errorMessage = `This file was exported by a newer version of HumbleHire (schema v${result.error.version}). Update the app to import it.`;
+					break;
+			}
+			return;
 		}
+
+		if (result.dropped.length > 0) {
+			// Non-fatal: surface as informational after import succeeds
+			console.info(`Sections not imported (no matching block): ${result.dropped.join(', ')}`);
+		}
+
+		capture('cv_imported', { has_humblehire_meta: pendingText.includes('"humblehire"') });
+		open = false;
+		onImport?.(result.cv.id);
+		importing = false;
 	}
 </script>
 
@@ -104,7 +115,7 @@
 		</DialogHeader>
 
 		<div class="flex flex-col gap-4 py-2">
-			{#if !pendingDoc}
+			{#if !pendingText}
 				<label
 					class="border-foreground hover:bg-muted flex cursor-pointer flex-col items-center gap-3 border-2 border-dashed px-6 py-8 text-center transition-colors"
 				>
@@ -124,16 +135,14 @@
 					<FileJson class="text-accent h-5 w-5 shrink-0" />
 					<div class="min-w-0 flex-1">
 						<p class="truncate text-sm font-medium">{pendingFileName}</p>
-						<p class="text-muted-foreground text-xs">
-							{pendingDoc.basics?.name ?? 'Unnamed CV'}
-						</p>
+						<p class="text-muted-foreground text-xs">{pendingName || 'Unnamed CV'}</p>
 					</div>
 					<Button variant="ghost" size="sm" onclick={reset}>Change</Button>
 				</div>
 			{/if}
 
-			{#if parseError}
-				<p class="text-destructive text-sm">{parseError}</p>
+			{#if errorMessage}
+				<p class="text-destructive text-sm">{errorMessage}</p>
 			{/if}
 		</div>
 
@@ -141,7 +150,7 @@
 			<DialogClose>
 				<Button variant="outline">Cancel</Button>
 			</DialogClose>
-			<Button onclick={handleImport} disabled={!pendingDoc || importing}>
+			<Button onclick={handleImport} disabled={!pendingText || importing}>
 				{importing ? 'Importing…' : 'Import'}
 			</Button>
 		</DialogFooter>

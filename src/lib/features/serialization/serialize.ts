@@ -6,17 +6,16 @@ import type {
 	SkillCategory,
 	ProjectEntry
 } from '$lib/types/cv';
-import type { CvDocument, CvDocumentContact, CvDocumentWorkItem } from './document';
+import type {
+	CvDocument,
+	CvDocumentContact,
+	CvDocumentWorkItem,
+	CvDocumentBasics
+} from './document';
 import { createCV } from '$lib/services/cv/create';
 import { createObjectId } from '$lib/types/cv';
-import { sanitizeFilename } from './generate';
 
-const HUMBLEHIRE_SCHEMA = 'https://humblehire.app/schema/resume/v0.0.1.json';
-const JSON_RESUME_SCHEMA =
-	'https://raw.githubusercontent.com/jsonresume/resume-schema/master/schema.json';
-const SCHEMA_VERSION = '0.0.1';
-
-// --- Date helpers ---
+// --- Date helpers (durable: engine uses Date; wire uses YYYY-MM text) ---
 
 function formatDate(d: Date | undefined): string | undefined {
 	if (!d) return undefined;
@@ -35,21 +34,11 @@ function parseDate(s: string | undefined): Date | undefined {
 	return new Date(year, month, day);
 }
 
-// --- Version check ---
-
-function isVersionSupported(version: string): boolean {
-	const [ma, mi, pa] = version.split('.').map(Number);
-	const [sa, si, sp] = SCHEMA_VERSION.split('.').map(Number);
-	if (ma !== sa) return ma < sa;
-	if (mi !== si) return mi < si;
-	return pa <= sp;
-}
-
-// --- Contacts ---
+// --- Contacts @temporal-coercion — remove with model refactor (typed contacts) ---
 
 function contactsToStandardFields(
 	contacts: ContactEntry[]
-): Pick<CvDocument['basics'] & object, 'email' | 'phone' | 'url' | 'profiles'> {
+): Pick<CvDocumentBasics, 'email' | 'phone' | 'url' | 'profiles'> {
 	let email: string | undefined;
 	let phone: string | undefined;
 	let url: string | undefined;
@@ -94,9 +83,9 @@ function standardFieldsToContacts(doc: CvDocument): ContactEntry[] {
 	return contacts;
 }
 
-// --- Location ---
+// --- Location @temporal-coercion — remove with model refactor (structured location) ---
 
-function locationToAddress(loc: string): CvDocument['basics'] & object {
+function locationToAddress(loc: string): Pick<CvDocumentBasics, 'location'> {
 	return { location: { address: loc } };
 }
 
@@ -107,7 +96,7 @@ function addressToLocation(doc: CvDocument): string {
 	return [loc.city, loc.region, loc.countryCode].filter(Boolean).join(', ');
 }
 
-// --- Highlights ---
+// --- Highlights (durable: highlights block has no equivalent in JSON Resume) ---
 
 function highlightsToSummary(highlights: string[]): string {
 	return highlights.join('\n');
@@ -124,6 +113,22 @@ function summaryToHighlights(doc: CvDocument): string[] {
 		.filter(Boolean);
 }
 
+// --- Unmapped foreign sections ---
+
+const MAPPED_SECTIONS = new Set([
+	'$schema',
+	'basics',
+	'work',
+	'education',
+	'skills',
+	'projects',
+	'meta'
+]);
+
+export function unmappedSections(doc: CvDocument): string[] {
+	return Object.keys(doc as Record<string, unknown>).filter((k) => !MAPPED_SECTIONS.has(k));
+}
+
 // --- Export: HumbleHire JSON (lossless) ---
 
 export function toDocument(cv: CV): CvDocument {
@@ -136,7 +141,8 @@ export function toDocument(cv: CV): CvDocument {
 	const skills = b.skills.value;
 	const projects = b.projects.value;
 
-	const basics: CvDocument['basics'] = {};
+	const basics: CvDocumentBasics = {};
+	// @temporal-coercion field renames — remove with model refactor
 	if (b.fullName.value.trim()) basics.name = b.fullName.value.trim();
 	if (b.position.value.trim()) basics.label = b.position.value.trim();
 	if (highlights.length) basics.highlights = highlights;
@@ -149,12 +155,13 @@ export function toDocument(cv: CV): CvDocument {
 		if (std.profiles?.length) basics.profiles = std.profiles;
 	}
 
-	const doc: CvDocument = { $schema: HUMBLEHIRE_SCHEMA };
+	const doc: CvDocument = { $schema: 'https://humblehire.app/schema/resume/v0.0.1.json' };
 	if (Object.keys(basics).length) doc.basics = basics;
 
 	if (jobHistory.length) {
 		doc.work = jobHistory.map((j: JobEntry): CvDocumentWorkItem => {
 			const item: CvDocumentWorkItem = {
+				// @temporal-coercion field renames — remove with model refactor
 				name: j.company || undefined,
 				position: j.role || undefined,
 				startDate: formatDate(j.startDate),
@@ -170,6 +177,7 @@ export function toDocument(cv: CV): CvDocument {
 
 	if (education.length) {
 		doc.education = education.map((e: EducationEntry) => ({
+			// @temporal-coercion field rename + degree split — remove with model refactor
 			institution: e.institution || undefined,
 			studyType: e.degree || undefined,
 			startDate: formatDate(e.startDate),
@@ -188,6 +196,7 @@ export function toDocument(cv: CV): CvDocument {
 
 	if (projects.length) {
 		doc.projects = projects.map((p: ProjectEntry) => ({
+			// @temporal-coercion field renames — remove with model refactor
 			name: p.name || undefined,
 			description: p.description || undefined,
 			keywords: p.stack.map((t) => t.value).filter(Boolean) || undefined,
@@ -201,7 +210,7 @@ export function toDocument(cv: CV): CvDocument {
 	}));
 	doc.meta = {
 		humblehire: {
-			schemaVersion: SCHEMA_VERSION,
+			schemaVersion: '0.0.1',
 			...(contactStash.length ? { contacts: contactStash } : {})
 		}
 	};
@@ -209,7 +218,7 @@ export function toDocument(cv: CV): CvDocument {
 	return doc;
 }
 
-// --- Export: JSON Resume projection (lossy) ---
+// --- Export: JSON Resume projection (lossy, durable interop) ---
 
 export function toJsonResume(cv: CV): CvDocument {
 	const doc = toDocument(cv);
@@ -227,7 +236,7 @@ export function toJsonResume(cv: CV): CvDocument {
 		}
 	}
 
-	doc.$schema = JSON_RESUME_SCHEMA;
+	doc.$schema = 'https://raw.githubusercontent.com/jsonresume/resume-schema/master/schema.json';
 	delete doc.meta;
 
 	return doc;
@@ -235,24 +244,11 @@ export function toJsonResume(cv: CV): CvDocument {
 
 // --- Import ---
 
-export class UnsupportedSchemaVersionError extends Error {
-	constructor(version: string) {
-		super(
-			`This file was exported by a newer version of HumbleHire (schema v${version}). Update the app to import it.`
-		);
-		this.name = 'UnsupportedSchemaVersionError';
-	}
-}
-
 export function fromDocument(doc: CvDocument): CV {
-	const version = doc.meta?.humblehire?.schemaVersion;
-	if (version && !isVersionSupported(version)) {
-		throw new UnsupportedSchemaVersionError(version);
-	}
-
 	const name = doc.basics?.name?.trim() || 'Imported CV';
 	const cv = createCV({ name });
 
+	// @temporal-coercion field renames — remove with model refactor
 	cv.blocks.fullName.value = doc.basics?.name?.trim() ?? '';
 	cv.blocks.position.value = doc.basics?.label?.trim() ?? '';
 	cv.blocks.location.value = addressToLocation(doc);
@@ -264,6 +260,7 @@ export function fromDocument(doc: CvDocument): CV {
 
 	cv.blocks.jobHistory.value = (doc.work ?? []).map((w) => ({
 		objectId: createObjectId(),
+		// @temporal-coercion field renames — remove with model refactor
 		company: w.name ?? '',
 		role: w.position ?? '',
 		startDate: parseDate(w.startDate),
@@ -276,6 +273,7 @@ export function fromDocument(doc: CvDocument): CV {
 	cv.blocks.education.value = (doc.education ?? []).map((e) => ({
 		objectId: createObjectId(),
 		institution: e.institution ?? '',
+		// @temporal-coercion degree join (studyType + area) — remove with model refactor
 		degree: [e.studyType, e.area].filter(Boolean).join(' '),
 		startDate: parseDate(e.startDate),
 		endDate: parseDate(e.endDate),
@@ -290,6 +288,7 @@ export function fromDocument(doc: CvDocument): CV {
 
 	cv.blocks.projects.value = (doc.projects ?? []).map((p) => ({
 		objectId: createObjectId(),
+		// @temporal-coercion field renames — remove with model refactor
 		name: p.name ?? '',
 		description: p.description ?? '',
 		stack: (p.keywords ?? []).map((value) => ({ objectId: createObjectId(), value })),
@@ -297,26 +296,4 @@ export function fromDocument(doc: CvDocument): CV {
 	}));
 
 	return cv;
-}
-
-// --- Download helpers ---
-
-function triggerDownload(json: string, filename: string): void {
-	const blob = new Blob([json], { type: 'application/json' });
-	const url = URL.createObjectURL(blob);
-	const a = document.createElement('a');
-	a.href = url;
-	a.download = filename;
-	a.click();
-	URL.revokeObjectURL(url);
-}
-
-export function downloadHumbleHireJson(cv: CV): void {
-	const doc = toDocument(cv);
-	triggerDownload(JSON.stringify(doc, null, 2), `${sanitizeFilename(cv.name)}.humblehire.json`);
-}
-
-export function downloadJsonResume(cv: CV): void {
-	const doc = toJsonResume(cv);
-	triggerDownload(JSON.stringify(doc, null, 2), `${sanitizeFilename(cv.name)}.json`);
 }

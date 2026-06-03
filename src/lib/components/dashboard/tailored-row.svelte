@@ -7,7 +7,7 @@
 	import { SyncDrawer } from '$lib/components/tailoring';
 	import StatusBadge from './status-badge.svelte';
 	import HighlightedText from './highlighted-text.svelte';
-	import { ExportButton } from '$lib/components/editor';
+	import { ExportButton } from '$lib/components/export';
 	import { Eye, Trash2 } from '@lucide/svelte';
 
 	interface Props {

@@ -1,5 +1,8 @@
 # Auto-generated files
 CHANGELOG.md
+**/*.generated.js
+**/*.generated.ts
+**/*.generated.d.ts
 
 # Package Managers
 package-lock.json
