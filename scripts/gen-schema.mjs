@@ -4,7 +4,7 @@
 // Run with: pnpm gen:schema
 import { compile } from 'json-schema-to-typescript';
 import Ajv from 'ajv';
-import addFormats from 'ajv-formats';
+import { fastFormats, fullFormats } from 'ajv-formats/dist/formats.js';
 import standaloneCode from 'ajv/dist/standalone/index.js';
 import { readFileSync, writeFileSync } from 'fs';
 import { fileURLToPath } from 'url';
@@ -47,8 +47,11 @@ const writer = new TracedFileWriter(outDir);
 writer.writeFile('document.generated.ts', ts);
 
 // --- ajv standalone validator ---
+// Register only uri + email as RegExp formats so standalone codegen inlines them.
+// addFormats() emits require("ajv-formats/...") which breaks ESM/Vite (https://github.com/ajv-validator/ajv-formats/issues/85).
 const ajv = new Ajv({ code: { source: true, esm: true }, allErrors: true, strict: false });
-addFormats(ajv);
+ajv.addFormat('email', fullFormats.email);
+ajv.addFormat('uri', fastFormats.uri);
 const validate = ajv.compile(schema);
 const moduleCode = standaloneCode(ajv, validate);
 
