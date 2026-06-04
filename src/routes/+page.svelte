@@ -3,11 +3,9 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { db } from '$lib/db/index';
-	import { createCV } from '$lib/services/cv/create';
 	import { getHasCvsHint } from '$lib/services/cv/has-cvs-hint';
 	import { Hero, About } from '$lib/components/landing';
 	import { Dashboard } from '$lib/components/dashboard';
-	import { capture } from '$lib/analytics';
 
 	let mode = $state<'hero' | 'dashboard'>(getHasCvsHint() ? 'dashboard' : 'hero');
 
@@ -17,11 +15,8 @@
 		if (actual !== mode) mode = actual;
 	});
 
-	async function handleCreateFirstCv() {
-		const cv = createCV({ name: 'Untitled CV' });
-		await db.cvs.add(cv);
-		capture('cv_created', { source: 'hero' });
-		await goto(resolve(`/cv/${cv.id}`));
+	function handleCreate(id: string) {
+		goto(resolve(`/cv/${id}`));
 	}
 </script>
 
@@ -34,7 +29,7 @@
 </svelte:head>
 
 {#if mode === 'hero'}
-	<Hero onCreateCv={handleCreateFirstCv} />
+	<Hero onCreate={handleCreate} />
 {:else}
 	<Dashboard />
 {/if}
