@@ -1,9 +1,10 @@
 <script lang="ts">
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Button } from '$lib/components/ui/button';
-	import { Upload, FileBraces } from '@lucide/svelte';
+	import { Upload, FileBraces, Construction } from '@lucide/svelte';
 	import { importDocument } from '$lib/features/serialization/import';
 	import { capture } from '$lib/analytics';
+	import * as Alert from '$lib/components/ui/alert';
 
 	interface Props {
 		open?: boolean;
@@ -106,6 +107,11 @@
 			</Dialog.Description>
 		</Dialog.Header>
 
+		<Alert.Root>
+			<Construction />
+			<Alert.Title>Importing PDF files is not supported yet.</Alert.Title>
+		</Alert.Root>
+
 		<div class="flex min-w-0 flex-col gap-4 overflow-hidden py-2">
 			{#if !pendingText}
 				<label
@@ -113,7 +119,6 @@
 				>
 					<Upload class="text-muted-foreground h-8 w-8" />
 					<span class="text-sm font-medium">Click to choose a file</span>
-					<span class="text-muted-foreground text-xs">.humblehire.json or .json (JSON Resume)</span>
 					<input
 						bind:this={fileInput}
 						type="file"
