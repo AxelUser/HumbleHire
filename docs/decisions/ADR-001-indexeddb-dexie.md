@@ -8,7 +8,7 @@
 
 ## Context
 
-HumbleHire is a local-first, static SvelteKit application — there is no backend, no server, and no cloud sync. All CV data must be persisted entirely in the browser.
+HumbleHire is a local-first, static SvelteKit application — there is no backend, and no cloud sync. All CV data must be persisted entirely in the browser.
 
 The data we need to persist:
 
@@ -60,7 +60,7 @@ Dexie wraps all of this in a clean Promise-based API with:
 
 OPFS is a lower-level file-system API suited for binary data or large file blobs. It lacks native structured querying; building an index over CV records would require re-implementing what IndexedDB already provides.
 
-PGlite runs Postgres in WASM, which is genuinely impressive, but its bundle size (~3–7 MB gzipped depending on features) is too large for a structured document store with a simple schema. SQL joins and aggregations are not a requirement for this application.
+PGlite runs Postgres in WASM, which I admit is genuinely impressive, but its bundle size (~3–7 MB gzipped depending on features) is too large for a structured document store with a simple schema. SQL joins and aggregations are not a requirement for this application.
 
 ---
 

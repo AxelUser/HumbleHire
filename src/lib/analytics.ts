@@ -4,7 +4,6 @@ import * as env from '$env/static/public';
 
 export function initAnalytics(): void {
 	if (dev) return;
-	if (import.meta.env.VITE_E2E) return;
 	if (
 		!('PUBLIC_POSTHOG_API_KEY' in env) ||
 		!('PUBLIC_POSTHOG_HOST' in env) ||

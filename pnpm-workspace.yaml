@@ -3,5 +3,5 @@ publicHoistPattern:
 ignoreWorkspaceRootCheck: true
 packages:
   - .
-  - test-bridge
+  - dev-bridge
   - assets-cli

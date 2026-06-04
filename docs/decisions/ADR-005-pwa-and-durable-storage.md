@@ -31,7 +31,7 @@ Implement PWA support using **SvelteKit's native service worker** (`src/service-
 - **Request `navigator.storage.persist()` once, after the first CV save**, not on mount.
 - **Show a custom install control** in the header that doubles as a data-durability nudge, with an iOS instruction sheet for platforms that have no `beforeinstallprompt`.
 - **Hand-maintain the web app manifest** at `static/manifest.webmanifest`, with icons generated from the SVG source via `@vite-pwa/assets-generator` CLI.
-- **Disable the service worker under `VITE_E2E`** to keep the Playwright suite from fighting a caching SW.
+- **Disable the service worker under `VITE_DEV_NO_SW`** to keep the Playwright suite from fighting a caching SW.
 
 ---
 
@@ -65,7 +65,7 @@ This is more code than a single `skipWaiting()` call, but the 25-odd lines are s
 
 ### Why register manually rather than using the automatic default
 
-SvelteKit's automatic registration happens inside the framework at an unspecified point in the page lifecycle. Manual registration (on `onMount` in the root layout) gives precise control over when registration runs, makes the `VITE_E2E` guard trivial (just skip the call), and puts the registration and the update-detection logic in the same place for easier reading.
+SvelteKit's automatic registration happens inside the framework at an unspecified point in the page lifecycle. Manual registration (on `onMount` in the root layout) gives precise control over when registration runs, makes the `VITE_DEV_NO_SW` guard trivial (just skip the call), and puts the registration and the update-detection logic in the same place for easier reading.
 
 ### Why request `persist()` after the first CV save
 
@@ -89,7 +89,7 @@ Persistent storage resists automatic browser eviction. It does not survive the u
 - Persistent storage is requested at the highest-engagement moment; installing reinforces the grant.
 - The install control makes the data-durability story legible to the user in one place.
 - The new-version prompt prevents silent mid-edit reloads.
-- The e2e test suite is unaffected by the service worker (`VITE_E2E` guard skips registration).
+- The e2e test suite is unaffected by the service worker (`VITE_DEV_NO_SW` guard skips registration).
 - The SW file is a plain TypeScript file with no generated code, fully auditable and debuggable.
 
 ### Negative / Trade-offs

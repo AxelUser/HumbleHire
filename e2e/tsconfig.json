@@ -3,7 +3,7 @@
 	"include": [
 		"./**/*.ts",
 		"../.svelte-kit/ambient.d.ts",
-		// app.d.ts is needed for the Window.__hhTest.
+		// app.d.ts is needed for the Window.__devBridge.
 		"../src/app.d.ts"
 	]
 }

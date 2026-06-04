@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { useBridge } from '@humblehire/test-bridge';
+import { useBridge } from '@humblehire/dev-bridge';
 import { fillInlineField, gotoHome, waitForAutosave, reorder } from './helpers/ui';
 import type { CV } from '$lib/types/cv';
 

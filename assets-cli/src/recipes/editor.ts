@@ -1,5 +1,5 @@
 import { join } from 'node:path';
-import { useBridge } from '@humblehire/test-bridge';
+import { useBridge } from '@humblehire/dev-bridge';
 import type { Recipe } from '../recipe';
 import { dwightContent } from '../helpers/dwight';
 import {

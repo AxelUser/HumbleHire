@@ -4,16 +4,15 @@ import { createTailoredCV } from '$lib/features/tailoring/create-tailored';
 import { computeBlockHashes } from '$lib/features/tailoring/hash';
 import { setHasCvsHint } from '$lib/services/cv/has-cvs-hint';
 import { createObjectId } from '$lib/types/cv';
-import type { HhTestBridge, MasterSeedContent } from '@humblehire/test-bridge';
+import type { DevBridge, MasterSeedContent } from '@humblehire/dev-bridge';
 
-// The bridge contract lives in @humblehire/test-bridge so the app, the e2e suite,
+// The bridge contract lives in @humblehire/dev-bridge so the app, the e2e suite,
 // and the docs-asset harness all share one definition. This module implements it;
-// the out-of-process consumers drive it via `useBridge`. Re-exported so existing
-// `$lib/e2e-bridge` importers (e.g. app.d.ts) keep resolving the types here.
-export type { HhTestBridge, MasterSeedContent };
+// the out-of-process consumers drive it via `useBridge`.
+export type { DevBridge, MasterSeedContent };
 
-export function initE2eBridge(): void {
-	const bridge: HhTestBridge = {
+export function initDevBridge(): void {
+	const bridge: DevBridge = {
 		async reset() {
 			await db.cvs.clear();
 			setHasCvsHint(false);
@@ -128,5 +127,5 @@ export function initE2eBridge(): void {
 		}
 	};
 
-	window.__hhTest = bridge;
+	window.__devBridge = bridge;
 }

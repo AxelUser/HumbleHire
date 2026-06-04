@@ -73,6 +73,6 @@ Applicant tracking systems need to parse text out of the PDF. As long as PDF con
 ### Negative / Trade-offs
 
 - Each theme has to be implemented in the PDF rendering layer rather than as a stylesheet. Adding a new theme is more work than dropping in CSS.
-- pdfmake (~1 MB) and PDF.js (~700 KB) add meaningfully to the bundle. Both are lazy-loaded: pdfmake loads when any export is triggered (editor or dashboard); PDF.js loads only when the editor preview pane opens. The dashboard export path never loads PDF.js.
+- pdfmake (~1 MB) and PDF.js (~900 KB) add meaningfully to the bundle. Both are lazy-loaded: pdfmake loads when any export is triggered (editor or dashboard); PDF.js loads only when the editor preview pane opens. The dashboard export path never loads PDF.js.
 - Layout primitives in PDF rendering libraries are coarser than CSS. Some visual effects available in HTML are inconvenient or impossible in the PDF layer.
 - Debugging layout requires opening the generated PDF; the browser devtools do not see into PDF rendering directly.
