@@ -35,7 +35,7 @@ describe('parseDocument — not-json', () => {
 	it('includes a message', () => {
 		const r = parseDocument('not json');
 		expect(r.ok).toBe(false);
-		if (!r.ok) expect(r.error.message).toBeTruthy();
+		if (!r.ok && r.error.kind === 'not-json') expect(r.error.message).toBeTruthy();
 	});
 });
 

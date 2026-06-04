@@ -6,12 +6,7 @@ import type {
 	SkillCategory,
 	ProjectEntry
 } from '$lib/types/cv';
-import type {
-	CvDocument,
-	CvDocumentContact,
-	CvDocumentWorkItem,
-	CvDocumentBasics
-} from './document';
+import type { CvDocument, JsonResume } from './document.generated';
 import { createCV } from '$lib/services/cv/create';
 import { createObjectId } from '$lib/types/cv';
 
@@ -38,7 +33,7 @@ function parseDate(s: string | undefined): Date | undefined {
 
 function contactsToStandardFields(
 	contacts: ContactEntry[]
-): Pick<CvDocumentBasics, 'email' | 'phone' | 'url' | 'profiles'> {
+): Pick<NonNullable<JsonResume['basics']>, 'email' | 'phone' | 'url' | 'profiles'> {
 	let email: string | undefined;
 	let phone: string | undefined;
 	let url: string | undefined;
@@ -85,7 +80,7 @@ function standardFieldsToContacts(doc: CvDocument): ContactEntry[] {
 
 // --- Location @temporal-coercion — remove with model refactor (structured location) ---
 
-function locationToAddress(loc: string): Pick<CvDocumentBasics, 'location'> {
+function locationToAddress(loc: string) {
 	return { location: { address: loc } };
 }
 
@@ -141,7 +136,7 @@ export function toDocument(cv: CV): CvDocument {
 	const skills = b.skills.value;
 	const projects = b.projects.value;
 
-	const basics: CvDocumentBasics = {};
+	const basics: NonNullable<CvDocument['basics']> = {};
 	// @temporal-coercion field renames — remove with model refactor
 	if (b.fullName.value.trim()) basics.name = b.fullName.value.trim();
 	if (b.position.value.trim()) basics.label = b.position.value.trim();
@@ -159,19 +154,18 @@ export function toDocument(cv: CV): CvDocument {
 	if (Object.keys(basics).length) doc.basics = basics;
 
 	if (jobHistory.length) {
-		doc.work = jobHistory.map((j: JobEntry): CvDocumentWorkItem => {
-			const item: CvDocumentWorkItem = {
+		doc.work = jobHistory.map((j: JobEntry) => {
+			const hl = j.achievements.map((a) => a.text).filter(Boolean);
+			const kw = j.skills.map((s) => s.value).filter(Boolean);
+			return {
 				// @temporal-coercion field renames — remove with model refactor
 				name: j.company || undefined,
 				position: j.role || undefined,
 				startDate: formatDate(j.startDate),
-				endDate: j.current ? undefined : formatDate(j.endDate)
+				endDate: j.current ? undefined : formatDate(j.endDate),
+				...(hl.length && { highlights: hl }),
+				...(kw.length && { keywords: kw })
 			};
-			const hl = j.achievements.map((a) => a.text).filter(Boolean);
-			if (hl.length) item.highlights = hl;
-			const kw = j.skills.map((s) => s.value).filter(Boolean);
-			if (kw.length) item.keywords = kw;
-			return item;
 		});
 	}
 
@@ -204,7 +198,7 @@ export function toDocument(cv: CV): CvDocument {
 		}));
 	}
 
-	const contactStash: CvDocumentContact[] = contacts.map((c) => ({
+	const contactStash = contacts.map((c) => ({
 		label: c.label,
 		value: c.value
 	}));
@@ -267,7 +261,10 @@ export function fromDocument(doc: CvDocument): CV {
 		endDate: parseDate(w.endDate),
 		current: !!w.startDate && !w.endDate,
 		achievements: (w.highlights ?? []).map((text) => ({ objectId: createObjectId(), text })),
-		skills: (w.keywords ?? []).map((value) => ({ objectId: createObjectId(), value }))
+		skills: ((w as { keywords?: string[] }).keywords ?? []).map((value) => ({
+			objectId: createObjectId(),
+			value
+		}))
 	}));
 
 	cv.blocks.education.value = (doc.education ?? []).map((e) => ({

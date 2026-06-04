@@ -1,5 +1,5 @@
 import validate from './validator.generated.js';
-import type { CvDocument } from './document';
+import type { CvDocument } from './document.generated.js';
 
 export type SchemaIssue = { path: string; message: string };
 
