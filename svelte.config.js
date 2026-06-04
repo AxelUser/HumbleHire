@@ -11,6 +11,8 @@ const config = {
 	preprocess: vitePreprocess(),
 
 	kit: {
+		// Root-relative %sveltekit.assets% links (manifest, favicons), relative URLs break on /cv/[id].
+		paths: { relative: false },
 		adapter: adapter({ fallback: 'index.html' }),
 		serviceWorker: {
 			register: false
