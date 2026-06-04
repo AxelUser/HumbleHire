@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { APP_BASE_URL } from '$lib/config';
 import { toDocument, toJsonResume, fromDocument, unmappedSections } from './serialize';
 import type { CV } from '$lib/types/cv';
 import { makeCompleteCV } from './__fixtures__/complete-cv';
@@ -76,7 +77,7 @@ describe('toDocument', () => {
 	});
 
 	it('sets $schema to the HumbleHire schema URL', () => {
-		expect(toDocument(makeCV()).$schema).toContain('humblehire.app');
+		expect(toDocument(makeCV()).$schema).toBe(`${APP_BASE_URL}/schema/resume/v0.0.1.json`);
 	});
 });
 

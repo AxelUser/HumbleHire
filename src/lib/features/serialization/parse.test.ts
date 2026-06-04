@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { parseDocument } from './parse';
+import { APP_BASE_URL } from '$lib/config';
 
 // --- helpers ---
 
@@ -12,7 +13,7 @@ const SPARSE = json({});
 
 // A minimal valid HumbleHire JSON document.
 const MINIMAL_HH = json({
-	$schema: 'https://humblehire.app/schema/resume/v0.0.1.json',
+	$schema: `${APP_BASE_URL}/schema/resume/v0.0.1.json`,
 	basics: { name: 'Jane Doe' },
 	meta: { humblehire: { schemaVersion: '0.0.1' } }
 });

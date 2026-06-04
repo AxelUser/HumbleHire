@@ -9,6 +9,7 @@ import type {
 import type { CvDocument, JsonResume } from './document.generated';
 import { createCV } from '$lib/services/cv/create';
 import { createObjectId } from '$lib/types/cv';
+import { APP_BASE_URL } from '$lib/config';
 
 // --- Date helpers (durable: engine uses Date; wire uses YYYY-MM text) ---
 
@@ -150,7 +151,7 @@ export function toDocument(cv: CV): CvDocument {
 		if (std.profiles?.length) basics.profiles = std.profiles;
 	}
 
-	const doc: CvDocument = { $schema: 'https://humblehire.app/schema/resume/v0.0.1.json' };
+	const doc: CvDocument = { $schema: `${APP_BASE_URL}/schema/resume/v0.0.1.json` };
 	if (Object.keys(basics).length) doc.basics = basics;
 
 	if (jobHistory.length) {

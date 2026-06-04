@@ -1,5 +1,6 @@
 <script lang="ts">
 	import ProjectsBlock from '$lib/components/blocks/projects-block.svelte';
+	import { APP_BASE_URL } from '$lib/config';
 	import { createObjectId, type ObjectId, type ProjectEntry } from '$lib/types/cv';
 
 	interface Props {
@@ -38,7 +39,7 @@
 							{ objectId: createObjectId(), value: 'Tailwind CSS' },
 							{ objectId: createObjectId(), value: 'Dexie' }
 						],
-						link: 'humblehire.app'
+						link: APP_BASE_URL
 					}
 				]
 	);

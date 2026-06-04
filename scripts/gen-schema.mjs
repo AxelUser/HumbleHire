@@ -4,10 +4,27 @@
 // Run with: pnpm gen:schema
 import { compile } from 'json-schema-to-typescript';
 import Ajv from 'ajv';
+import addFormats from 'ajv-formats';
 import standaloneCode from 'ajv/dist/standalone/index.js';
 import { readFileSync, writeFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+
+class TracedFileWriter {
+	constructor(outDir) {
+		this.outDir = outDir;
+		this.written = [];
+	}
+
+	writeFile(filename, content) {
+		this.written.push(join(this.outDir, filename));
+		writeFileSync(join(this.outDir, filename), content);
+	}
+
+	files() {
+		return this.written;
+	}
+}
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const schemaPath = join(root, 'static/schema/resume/v0.0.1.json');
@@ -25,34 +42,32 @@ const ts = await compile({ ...schema, title: 'CvDocument' }, 'CvDocument', {
 	format: true
 });
 
-writeFileSync(join(outDir, 'document.generated.ts'), ts);
+const writer = new TracedFileWriter(outDir);
+
+writer.writeFile('document.generated.ts', ts);
 
 // --- ajv standalone validator ---
-// strict:false — JSON Resume uses format:"uri"/"email" which ajv doesn't know by default.
-// Format keywords remain in the generated validator but are treated as always-passing,
-// consistent with JSON Resume's own tooling.
 const ajv = new Ajv({ code: { source: true, esm: true }, allErrors: true, strict: false });
+addFormats(ajv);
 const validate = ajv.compile(schema);
 const moduleCode = standaloneCode(ajv, validate);
 
-writeFileSync(
-	join(outDir, 'validator.generated.js'),
+writer.writeFile(
+	'validator.generated.js',
 	`// @generated — do not edit. Run 'pnpm gen:schema' to regenerate.\n${moduleCode}`
 );
 
-writeFileSync(
-	join(outDir, 'validator.generated.d.ts'),
+writer.writeFile(
+	'validator.generated.d.ts',
 	`// @generated — do not edit. Run 'pnpm gen:schema' to regenerate.
-import type { CvDocument } from './document.generated';
-interface ValidateFn {
-  (data: unknown): data is CvDocument;
-  errors?: { instancePath: string; message?: string; [k: string]: unknown }[] | null;
-}
-declare const validate: ValidateFn;
-export default validate;
+	import type { CvDocument } from './document.generated';
+	interface ValidateFn {
+	  (data: unknown): data is CvDocument;
+	  errors?: { instancePath: string; message?: string; [k: string]: unknown }[] | null;
+	}
+	declare const validate: ValidateFn;
+	export default validate;
 `
 );
 
-console.log(
-	'Generated:\n  src/lib/features/serialization/document.ts\n  src/lib/features/serialization/validator.generated.{js,d.ts}'
-);
+console.log(`Generated:\n ${writer.files().join('\n ')}`);
