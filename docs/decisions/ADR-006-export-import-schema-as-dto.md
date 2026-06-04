@@ -2,99 +2,36 @@
 
 - **Status**: Accepted
 - **Date**: 2026-06-03
-- **Feature**: export/import
+- **Feature**: serialization
 
 ---
 
-The wire format for CV export/import is a separate `CvDocument` DTO type. Two functions — `toDocument(cv)` and `fromDocument(doc)` — are the only bridge between it and the runtime `CV` model.
+The wire format for CV export and import is a separate document DTO, not the runtime `CV`. Two functions, `toDocument(cv)` and `fromDocument(doc)`, are the only bridge between them. The concrete field mapping, extensions, and version rules live in the [serialization schema reference](../reference/serialization-schema.md); this ADR records why the two types are kept apart.
 
 ## Why not serialize the runtime model directly
 
 The runtime `CV` and the export format have incompatible requirements.
 
-`CV` feeds the diff/sync engine. That engine matches entries by `objectId`, hashes block values (ids included), expects all nine blocks present, and carries `Date` objects and explicit hidden state flags. Those contracts are defined by `diff.ts`, `apply.ts`, `hash.ts`, and `detection.ts`.
+`CV` feeds the diff/sync engine. That engine matches entries by `objectId`, hashes block values with ids included, expects all nine blocks present, and carries `Date` objects and explicit hidden-state flags. Those contracts are set by `diff.ts`, `apply.ts`, `hash.ts`, and `detection.ts`.
 
-`CvDocument` is read and edited by humans or LLMs, and must interoperate with the JSON Resume ecosystem. It uses JSON Resume vocabulary (`basics`, `work`, `keywords`), carries no machine IDs, omits empty sections, follows JSON Resume idioms (absent `endDate` for current roles rather than a `current` flag), and encodes dates as `YYYY-MM` text.
+The document is read and edited by humans and LLMs and has to interoperate with the JSON Resume ecosystem. It uses JSON Resume vocabulary (`basics`, `work`, `keywords`), carries no machine ids, omits empty sections, follows JSON Resume idioms (an absent `endDate` for a current role rather than a `current` flag), and encodes dates as `YYYY-MM` text.
 
-Serializing `CV` directly would push all those format concerns into the type the sync core depends on. A DTO keeps them in the mapper, where they are isolated and testable in both directions.
+Serializing `CV` directly would push all of those format concerns into the type the sync core depends on. A DTO keeps them in the mapper, isolated and testable in both directions.
 
 ## Consequences
 
-**Import always creates a new CV.** `CvDocument` carries no `id` and no per-entry `objectId`. `fromDocument` mints fresh IDs, recomputes hashes, and links nothing back to an existing CV. A file exported and re-imported is a new standalone CV with the same content. In-place update and identity round-trip are out of scope for this version.
+**Import always creates a new CV.** The document carries no `id` and no per-entry `objectId`. `fromDocument` mints fresh ids, recomputes hashes, and links nothing back. A file exported and re-imported is a new standalone CV with the same content. In-place update and identity round-trip are out of scope for this version.
 
-**Version gating belongs to the DTO.** `meta.humblehire.schemaVersion` is checked on import. A version higher than the app supports is rejected with an error. Missing or equal version is accepted. Unknown keys are ignored. The format accepts any valid JSON Resume document, not only HumbleHire exports. Additive schema changes stay forward- and backward-compatible under these rules.
+**Version gating belongs to the document.** The JSON schema version is checked on import: a version higher than the app supports is rejected, missing or equal is accepted, and unknown keys are ignored. The reader accepts any valid JSON Resume document, not only HumbleHire exports. The exact rules are in the [reference doc](../reference/serialization-schema.md).
 
-**The runtime model can change independently.** The planned model refactor (separate ADR) will align `CV` field names with JSON Resume vocabulary. When that happens, the mapper simplifies — but is not removed. `CvDocument` stays ID-less and human-shaped; `CV` stays ID-bearing and engine-shaped. Name alignment is a mapper convenience, not a reason to collapse the two types.
+**The runtime model can change independently.** A planned model refactor (a future ADR) will align `CV` field names with JSON Resume vocabulary. When it lands the mapper simplifies but does not disappear: the document stays id-less and human-shaped, and `CV` stays id-bearing and engine-shaped. Name alignment is a mapper convenience, not a reason to collapse the two types.
 
-## Schema specification (v0.0.1)
+## Temporal vs durable coercions
 
-### Format
+The mapper bridges two shapes, and the conversions split into two kinds that must stay separable in the code.
 
-Two export variants, one import path:
+**Durable** conversions are the permanent gap between an engine-shaped `CV` and a human-shaped document, and they outlive the refactor: the highlights list to and from a `summary`, the `keywords` and project `stack` extensions, `Date` to and from `YYYY-MM`, `current` to and from an absent `endDate`, and the DTO boundary itself (strip ids, omit empty sections, drop hidden blocks).
 
-- **HumbleHire JSON** (`.humblehire.json`) — JSON Resume superset, lossless. `$schema` points at the published HumbleHire superset schema. Used for round-trip backup/restore and LLM-assisted editing.
-- **JSON Resume** (`.json`) — plain JSON Resume, interop/lossy. `$schema` points at the official JSON Resume schema. Contacts and highlights are projected onto the standard fields; internal extensions are omitted.
-- **Import** — accepts either format. Prefers HumbleHire extensions when present; falls back to JSON Resume fields for foreign files.
+**Temporal** conversions exist only because the current `CV` is shaped differently from the wire: location, degree, and contacts, plus the `meta` stash that backs them. The planned refactor makes `CV` adopt JSON Resume's structures, at which point these collapse to identity and are removed. They carry a grep-able `@temporal-coercion` marker, so a future reader removing them follows the marker rather than gutting the mapper.
 
-### Field mapping
-
-| Document field                                  | Runtime model field                             | Notes                                                                                                 |
-| ----------------------------------------------- | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `basics.name`                                   | `blocks.fullName.value`                         |                                                                                                       |
-| `basics.label`                                  | `blocks.position.value`                         | JSON Resume `label` = job title                                                                       |
-| `basics.highlights`                             | `blocks.highlights.value[].text`                | HumbleHire extension; absent in JSON Resume export                                                    |
-| `basics.summary`                                | —                                               | JSON Resume export only: highlights joined by `\n`; on import, split by newlines into highlights list |
-| `basics.location.address`                       | `blocks.location.value`                         | Free string packed into `address` on export; joined back on import                                    |
-| `basics.email/phone/url/profiles`               | `blocks.contacts.value`                         | See contacts below                                                                                    |
-| `meta.humblehire.contacts`                      | `blocks.contacts.value`                         | HumbleHire extension; exact `{label, value}` stash for lossless round-trip                            |
-| `work[].name`                                   | `blocks.jobHistory.value[].company`             | JSON Resume calls the employer `name`; we keep `company` in the model                                 |
-| `work[].position`                               | `blocks.jobHistory.value[].role`                |                                                                                                       |
-| `work[].startDate` / `work[].endDate`           | `blocks.jobHistory.value[].startDate/endDate`   | `YYYY-MM` text on the wire, `Date` in the model; absent `endDate` encodes `current: true`             |
-| `work[].highlights`                             | `blocks.jobHistory.value[].achievements[].text` |                                                                                                       |
-| `work[].keywords`                               | `blocks.jobHistory.value[].skills[].value`      | HumbleHire extension                                                                                  |
-| `education[].institution`                       | `blocks.education.value[].institution`          |                                                                                                       |
-| `education[].studyType`                         | `blocks.education.value[].degree`               | Single string; JSON Resume splits `studyType` + `area`, but we don't                                  |
-| `education[].startDate` / `education[].endDate` | `blocks.education.value[].startDate/endDate`    | Same date encoding as work                                                                            |
-| `skills[].name`                                 | `blocks.skills.value[].name`                    |                                                                                                       |
-| `skills[].keywords`                             | `blocks.skills.value[].skills[].value`          |                                                                                                       |
-| `projects[].name`                               | `blocks.projects.value[].name`                  |                                                                                                       |
-| `projects[].description`                        | `blocks.projects.value[].description`           |                                                                                                       |
-| `projects[].keywords`                           | `blocks.projects.value[].stack[].value`         | HumbleHire extension                                                                                  |
-| `projects[].url`                                | `blocks.projects.value[].link`                  |                                                                                                       |
-
-### Extensions over JSON Resume
-
-The HumbleHire JSON format adds three fields absent from the JSON Resume standard. JSON Resume uses `additionalProperties: true` throughout, so these fields pass standard schema validation.
-
-1. **`basics.highlights`** — array of strings. The highlights block rendered as bullet points. Absent from the JSON Resume export (summary is used instead).
-2. **`work[].keywords`** — array of strings. Technologies and skills used in the role. Absent from the JSON Resume standard's `work` items.
-3. **`meta.humblehire`** — object. Carries `schemaVersion` for version-gating and `contacts` for lossless round-trip.
-
-### Version gating
-
-The reader checks `meta.humblehire.schemaVersion` when present. A version higher than the app supports is rejected with an error. Missing or equal version is accepted. Unknown keys are silently ignored regardless of version.
-
-## Round-trip adapter notes
-
-_This section documents workarounds for the gap between the current runtime model and the schema's vocabulary. It should be removed as part of the planned model refactor (separate ADR)._
-
-Three fields in the current model do not map cleanly onto JSON Resume shapes. The mappers bridge them with best-effort conversions that round-trip own-generated files exactly but may lose precision on foreign JSON Resume documents.
-
-**Location** — the model holds a single free-text string; JSON Resume `location` is an object `{address, city, postalCode, region, countryCode}`. Export: string → `location.address`. Import: take `address` as-is when present; join `city`/`region`/`countryCode` with ", " when `address` is absent (foreign file path). Own files always have `address`, so round-trip is exact.
-
-**Degree** — the model holds a single string (e.g. "BSc Computer Science"); JSON Resume splits this into `studyType` and `area`. Export: string → `studyType`. Import: read `studyType`; if absent, read `area`; if both present, join with " " (foreign file path). Own files always have `studyType`, so round-trip is exact.
-
-**Contacts** — the model holds generic `{label, value}` pairs; JSON Resume exposes typed top-level fields (`email`, `phone`, `url`) and `profiles[]` objects. Export (HumbleHire JSON): emit standard fields via heuristic _and_ stash the exact array in `meta.humblehire.contacts`. Import: prefer `meta.humblehire.contacts` when present (own file, exact round-trip); fall back to reconstructing from standard fields when absent (foreign file, heuristic: `email`→`{label:"Email",value}`, `phone`→`{label:"Phone",value}`, `url`→`{label:"Website",value}`, each `profiles[]` entry → `{label: network, value: url}`). Export (JSON Resume): heuristic only, no stash; contacts labels are lost.
-
-### What is temporal vs durable (clarification, 2026-06-04)
-
-The three coercions above are genuinely **temporal**. The planned model refactor makes the runtime model adopt JSON Resume's structures: a structured `location` object, a split `studyType`/`area` for degree, and typed `email`/`phone`/`url`/`profiles` contacts (dropping the generic `{label, value}` list). When that lands, these three coercions — and the `meta.humblehire.contacts` stash that exists only because arbitrary labels can't round-trip through typed fields — collapse to identity and are removed.
-
-The rest of the mapper is **durable** and must survive that deletion. It is the runtime↔wire gap this ADR exists to keep, not legacy scaffolding:
-
-- `highlights[]` ↔ `summary` — JSON Resume has no bullet list; the highlights block stays. Lossy projection on JSON Resume export, summary-split on foreign import.
-- `work[].keywords` and project `stack` as extensions — absent from the JSON Resume standard.
-- `Date` ↔ `YYYY-MM` and `current` ↔ absent `endDate` — the engine keeps `Date` objects and the explicit `current` flag.
-- strip IDs, omit empty sections, drop hidden blocks — the DTO boundary itself.
-
-To keep the two sets separable in code, the temporal coercions carry a grep-able `@temporal-coercion` marker. A future reader removing them should follow the marker, not gut the mapper. Foreign sections HumbleHire has no block for (awards, languages, volunteer, references, certificates…) are dropped on import; a pure `unmappedSections(doc)` inspector names them so the import surface can warn.
+The [reference doc](../reference/serialization-schema.md) spells out each conversion and the foreign sections dropped on import.
