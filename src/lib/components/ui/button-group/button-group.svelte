@@ -6,9 +6,9 @@
 		variants: {
 			orientation: {
 				horizontal:
-					'[&>[data-slot]:not(:has(~[data-slot]))]:rounded-r-lg! [&>[data-slot]]:rounded-r-none [&>[data-slot]~[data-slot]]:rounded-l-none [&>[data-slot]~[data-slot]]:border-l-0',
+					'[&>[data-slot]:not(:has(~[data-slot]))]:rounded-r-lg! [&>[data-slot]]:rounded-r-none [&>[data-slot]~[data-slot]]:rounded-l-none [&>[data-slot]~[data-slot]]:border-l-0 [&>[data-slot]~[data-slot]:hover]:border-l-2 [&>[data-slot]~[data-slot]:focus-visible]:border-l-2 [&>[data-slot]:hover+[data-slot]]:border-l-2 [&>[data-slot]:focus-visible+[data-slot]]:border-l-2',
 				vertical:
-					'[&>[data-slot]:not(:has(~[data-slot]))]:rounded-b-lg! flex-col [&>[data-slot]]:rounded-b-none [&>[data-slot]~[data-slot]]:rounded-t-none [&>[data-slot]~[data-slot]]:border-t-0'
+					'[&>[data-slot]:not(:has(~[data-slot]))]:rounded-b-lg! flex-col [&>[data-slot]]:rounded-b-none [&>[data-slot]~[data-slot]]:rounded-t-none [&>[data-slot]~[data-slot]]:border-t-0 [&>[data-slot]~[data-slot]:hover]:border-t-2 [&>[data-slot]~[data-slot]:focus-visible]:border-t-2 [&>[data-slot]:hover+[data-slot]]:border-t-2 [&>[data-slot]:focus-visible+[data-slot]]:border-t-2'
 			}
 		},
 		defaultVariants: {
