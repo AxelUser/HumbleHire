@@ -1,15 +1,7 @@
 <script lang="ts">
-	import {
-		Dialog,
-		DialogContent,
-		DialogHeader,
-		DialogTitle,
-		DialogDescription,
-		DialogFooter,
-		DialogClose
-	} from '$lib/components/ui/dialog';
+	import * as Dialog from '$lib/components/ui/dialog';
 	import { Button } from '$lib/components/ui/button';
-	import { Upload, FileJson } from '@lucide/svelte';
+	import { Upload, FileBraces } from '@lucide/svelte';
 	import { importDocument } from '$lib/features/serialization/import';
 	import { capture } from '$lib/analytics';
 
@@ -105,16 +97,16 @@
 	}
 </script>
 
-<Dialog {open} onOpenChange={handleOpenChange}>
-	<DialogContent class="sm:max-w-md">
-		<DialogHeader>
-			<DialogTitle class="font-bold">Import CV</DialogTitle>
-			<DialogDescription>
+<Dialog.Root {open} onOpenChange={handleOpenChange}>
+	<Dialog.Content class="sm:max-w-md">
+		<Dialog.Header>
+			<Dialog.Title class="font-bold">Import CV</Dialog.Title>
+			<Dialog.Description>
 				Import a CV from a HumbleHire JSON or JSON Resume file. A new CV will be created.
-			</DialogDescription>
-		</DialogHeader>
+			</Dialog.Description>
+		</Dialog.Header>
 
-		<div class="flex flex-col gap-4 py-2">
+		<div class="flex min-w-0 flex-col gap-4 overflow-hidden py-2">
 			{#if !pendingText}
 				<label
 					class="border-foreground hover:bg-muted flex cursor-pointer flex-col items-center gap-3 border-2 border-dashed px-6 py-8 text-center transition-colors"
@@ -132,9 +124,9 @@
 				</label>
 			{:else}
 				<div class="border-foreground flex items-center gap-3 border-2 px-4 py-3">
-					<FileJson class="text-accent h-5 w-5 shrink-0" />
+					<FileBraces class="text-accent h-5 w-5 shrink-0" />
 					<div class="min-w-0 flex-1">
-						<p class="truncate text-sm font-medium">{pendingFileName}</p>
+						<p class="truncate text-sm font-medium" title={pendingFileName}>{pendingFileName}</p>
 						<p class="text-muted-foreground text-xs">{pendingName || 'Unnamed CV'}</p>
 					</div>
 					<Button variant="ghost" size="sm" onclick={reset}>Change</Button>
@@ -146,13 +138,13 @@
 			{/if}
 		</div>
 
-		<DialogFooter>
-			<DialogClose>
+		<Dialog.Footer>
+			<Dialog.Close>
 				<Button variant="outline">Cancel</Button>
-			</DialogClose>
+			</Dialog.Close>
 			<Button onclick={handleImport} disabled={!pendingText || importing}>
 				{importing ? 'Importing…' : 'Import'}
 			</Button>
-		</DialogFooter>
-	</DialogContent>
-</Dialog>
+		</Dialog.Footer>
+	</Dialog.Content>
+</Dialog.Root>
