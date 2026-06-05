@@ -37,7 +37,7 @@ export const exportGif: Recipe = {
 			await rec.start({ holdMs: 1000 });
 
 			// Push in on the card so the Export button is the clear focus.
-			const exportBtn = page.getByRole('button', { name: 'Export' }).first();
+			const exportBtn = page.getByRole('button', { name: 'Export PDF' }).first();
 			await zoomTo(page, exportBtn, { scale: 1.5, durationMs: 650 });
 
 			// Register before click so a fast in-browser download cannot be missed.
