@@ -81,14 +81,16 @@ export function makeCompleteCV(overrides: Partial<CV> = {}): CV {
 		}
 	};
 
+	const finalBlocks = overrides.blocks ?? blocks;
+
 	return {
 		id: 'test-id',
 		name: 'Jane Doe',
 		createdAt: 0,
 		updatedAt: 0,
 		hiddenBlockIds: [],
-		blocks,
-		blockHashes: computeBlockHashes(blocks),
-		...overrides
+		...overrides,
+		blocks: finalBlocks,
+		blockHashes: computeBlockHashes(finalBlocks)
 	};
 }

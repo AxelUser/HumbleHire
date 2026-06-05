@@ -164,6 +164,7 @@ export function toDocument(cv: CV): CvDocument {
 				position: j.role || undefined,
 				startDate: formatDate(j.startDate),
 				endDate: j.current ? undefined : formatDate(j.endDate),
+				current: j.current,
 				...(hl.length && { highlights: hl }),
 				...(kw.length && { keywords: kw })
 			};
@@ -176,7 +177,8 @@ export function toDocument(cv: CV): CvDocument {
 			institution: e.institution || undefined,
 			studyType: e.degree || undefined,
 			startDate: formatDate(e.startDate),
-			endDate: e.current ? undefined : formatDate(e.endDate)
+			endDate: e.current ? undefined : formatDate(e.endDate),
+			current: e.current
 		}));
 	}
 
@@ -190,13 +192,16 @@ export function toDocument(cv: CV): CvDocument {
 	}
 
 	if (projects.length) {
-		doc.projects = projects.map((p: ProjectEntry) => ({
-			// @temporal-coercion field renames — remove with model refactor
-			name: p.name || undefined,
-			description: p.description || undefined,
-			keywords: p.stack.map((t) => t.value).filter(Boolean) || undefined,
-			url: p.link || undefined
-		}));
+		doc.projects = projects.map((p: ProjectEntry) => {
+			const kw = p.stack.map((t) => t.value).filter(Boolean);
+			return {
+				// @temporal-coercion field renames — remove with model refactor
+				name: p.name || undefined,
+				description: p.description || undefined,
+				...(kw.length && { keywords: kw }),
+				url: p.link || undefined
+			};
+		});
 	}
 
 	const contactStash = contacts.map((c) => ({
@@ -260,7 +265,7 @@ export function fromDocument(doc: CvDocument): CV {
 		role: w.position ?? '',
 		startDate: parseDate(w.startDate),
 		endDate: parseDate(w.endDate),
-		current: !!w.startDate && !w.endDate,
+		current: (w as { current?: boolean }).current ?? (!!w.startDate && !w.endDate),
 		achievements: (w.highlights ?? []).map((text) => ({ objectId: createObjectId(), text })),
 		skills: ((w as { keywords?: string[] }).keywords ?? []).map((value) => ({
 			objectId: createObjectId(),
@@ -275,7 +280,7 @@ export function fromDocument(doc: CvDocument): CV {
 		degree: [e.studyType, e.area].filter(Boolean).join(' '),
 		startDate: parseDate(e.startDate),
 		endDate: parseDate(e.endDate),
-		current: !!e.startDate && !e.endDate
+		current: (e as { current?: boolean }).current ?? (!!e.startDate && !e.endDate)
 	}));
 
 	cv.blocks.skills.value = (doc.skills ?? []).map((s) => ({

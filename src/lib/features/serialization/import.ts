@@ -5,9 +5,13 @@ import { db } from '$lib/db/index';
 import type { CV } from '$lib/types/cv';
 import type { DocumentError } from './parse';
 
+export type ImportPersistenceError = { kind: 'persistence'; message: string };
+
+export type ImportError = DocumentError | ImportPersistenceError;
+
 export type ImportResult =
 	| { ok: true; cv: CV; dropped: string[] }
-	| { ok: false; error: DocumentError };
+	| { ok: false; error: ImportError };
 
 export async function importDocument(text: string): Promise<ImportResult> {
 	const parsed = parseDocument(text);
@@ -16,6 +20,13 @@ export async function importDocument(text: string): Promise<ImportResult> {
 	const dropped = unmappedSections(parsed.doc);
 	const cv = fromDocument(parsed.doc);
 	cv.blockHashes = computeBlockHashes(cv.blocks);
-	await db.cvs.add(cv);
+
+	try {
+		await db.cvs.add(cv);
+	} catch (e) {
+		const message = e instanceof Error ? e.message : 'Could not save the imported CV.';
+		return { ok: false, error: { kind: 'persistence', message } };
+	}
+
 	return { ok: true, cv, dropped };
 }

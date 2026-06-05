@@ -48,6 +48,7 @@ describe('toDocument', () => {
 		expect(work![0].position).toBe('Senior Engineer');
 		expect(work![0].startDate).toBe('2020-01');
 		expect(work![0].endDate).toBeUndefined();
+		expect((work![0] as { current?: boolean }).current).toBe(true);
 		expect(work![0].highlights).toEqual(['Cut p99 latency by 40%']);
 		expect(work![0].keywords).toEqual(['Go', 'Kubernetes']);
 	});
@@ -67,6 +68,12 @@ describe('toDocument', () => {
 		const proj = toDocument(makeCV()).projects![0];
 		expect(proj.keywords).toEqual(['Rust', 'Postgres']);
 		expect(proj.url).toBe('https://example.com');
+	});
+
+	it('omits projects[].keywords when stack has no non-empty tokens', () => {
+		const cv = makeCV();
+		cv.blocks.projects.value[0].stack = [];
+		expect(toDocument(cv).projects![0].keywords).toBeUndefined();
 	});
 
 	it('omits empty blocks entirely', () => {
@@ -144,6 +151,24 @@ describe('fromDocument round-trip (via toDocument)', () => {
 		expect(job.endDate).toBeUndefined();
 		expect(job.achievements.map((a) => a.text)).toEqual(['Cut p99 latency by 40%']);
 		expect(job.skills.map((s) => s.value)).toEqual(['Go', 'Kubernetes']);
+	});
+
+	it('preserves current=true when no dates are set', () => {
+		const cv = makeCV();
+		cv.blocks.jobHistory.value = [
+			{
+				objectId: cv.blocks.jobHistory.value[0].objectId,
+				company: 'Acme',
+				role: 'Engineer',
+				startDate: undefined,
+				endDate: undefined,
+				current: true,
+				achievements: [],
+				skills: []
+			}
+		];
+		const job = roundTrip(cv).blocks.jobHistory.value[0];
+		expect(job.current).toBe(true);
 	});
 
 	it('preserves education degree and dates', () => {

@@ -82,6 +82,9 @@
 				case 'unsupported-version':
 					errorMessage = `This file was exported by a newer version of HumbleHire (schema v${result.error.version}). Update the app to import it.`;
 					break;
+				case 'persistence':
+					errorMessage = result.error.message;
+					break;
 			}
 			return;
 		}
