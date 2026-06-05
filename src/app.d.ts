@@ -15,7 +15,7 @@ declare global {
 	}
 
 	interface Window {
-		__hhTest?: import('$lib/e2e-bridge').HhTestBridge;
+		__devBridge?: import('$lib/dev-bridge').DevBridge;
 	}
 
 	interface WindowEventMap {

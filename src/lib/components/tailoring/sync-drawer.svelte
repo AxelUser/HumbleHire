@@ -16,7 +16,6 @@
 	import { describeDiff } from '$lib/features/tailoring/present';
 	import type { DiffItem } from '$lib/features/tailoring/types';
 	import type { CV, ObjectId } from '$lib/types/cv';
-	import { dev } from '$app/environment';
 
 	interface Props {
 		masterCv: CV;
@@ -75,9 +74,6 @@
 	function openDrawer() {
 		decisions.clear();
 		open = true;
-		if (dev) {
-			console.log('Diff items:', diffItems);
-		}
 	}
 
 	function handleApply() {

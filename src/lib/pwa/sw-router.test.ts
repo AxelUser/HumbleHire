@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { routeRequest } from './sw-router';
+import { APP_BASE_URL } from '$lib/config';
 
-const ORIGIN = 'https://humblehire.app';
+const ORIGIN = APP_BASE_URL;
 const ASSETS = new Set(['/', '/_app/immutable/entry/start.js', '/favicon/favicon.svg']);
 
 function req(overrides: Partial<{ method: string; url: string; mode: string }> = {}) {

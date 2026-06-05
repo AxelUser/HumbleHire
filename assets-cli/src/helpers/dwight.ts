@@ -1,4 +1,4 @@
-import type { MasterSeedContent } from '@humblehire/test-bridge';
+import type { MasterSeedContent } from '@humblehire/dev-bridge';
 
 export const dwightContent: MasterSeedContent = {
 	fullName: 'Dwight K. Schrute',

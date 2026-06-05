@@ -1,5 +1,14 @@
 <script lang="ts">
-	import { Code, Download, Folder, Split, HardDrive, Pencil, Combine } from '@lucide/svelte';
+	import {
+		Code,
+		Download,
+		Folder,
+		Split,
+		HardDrive,
+		Pencil,
+		Combine,
+		ArrowLeftRight
+	} from '@lucide/svelte';
 	import type { LucideIcon } from '@lucide/svelte';
 
 	const features: {
@@ -38,6 +47,14 @@
 			body: 'MIT-licensed, auditable, forkable. No paid tier hiding the useful stuff. Built in the open.'
 		}
 	];
+
+	const portabilityFeature = {
+		icon: ArrowLeftRight,
+		title: 'Yours to take',
+		body: 'Export any CV to JSON Resume, an open standard. Import any JSON Resume file as a new CV. Your data is a plain file you own.'
+	};
+
+	const PortabilityIcon = portabilityFeature.icon;
 
 	const steps = [
 		{
@@ -201,6 +218,45 @@
 		</div>
 
 		<div class="border-foreground border-2">
+			<!-- Featured portability card -->
+			<div class="border-foreground grid border-b-2 md:grid-cols-[1fr_auto]">
+				<div class="border-foreground flex flex-col gap-4 p-8 md:border-r-2">
+					<PortabilityIcon class="text-accent size-8 shrink-0" />
+					<div>
+						<h3 class="text-base font-extrabold tracking-tight">{portabilityFeature.title}</h3>
+						<p class="text-muted-foreground mt-2 max-w-lg text-sm leading-relaxed">
+							{portabilityFeature.body}
+						</p>
+					</div>
+				</div>
+				<div class="hidden flex-col justify-center gap-2.5 p-8 font-mono text-xs md:flex">
+					<p
+						class="text-muted-foreground mb-1 text-[10px] font-extrabold tracking-widest uppercase"
+					>
+						↳ both ways
+					</p>
+					<div class="flex items-center gap-3">
+						<span class="text-accent w-16 font-bold">→ export</span>
+						<span>resume.json</span>
+					</div>
+					<div class="flex items-center gap-3">
+						<span class="text-accent w-16 font-bold">→ export</span>
+						<span>.humblehire.json</span>
+					</div>
+					<div class="flex items-center gap-3">
+						<span class="text-accent w-16 font-bold">← import</span>
+						<span>resume.json</span>
+					</div>
+					<div class="border-foreground my-1 border-t-2"></div>
+					<a
+						href="https://humblehire.cv/schema/resume/v0.0.1.json"
+						target="_blank"
+						rel="noopener noreferrer"
+						class="text-accent font-bold hover:underline">schema v0.0.1 ↗</a
+					>
+				</div>
+			</div>
+			<!-- Regular 6-card grid -->
 			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
 				{#each features as f, i (f.title)}
 					{@const Icon = f.icon}
@@ -208,7 +264,6 @@
 						class="border-foreground flex flex-col gap-3 p-7"
 						class:border-r-2={i % 3 !== 2}
 						class:border-b-2={i < 3}
-						class:sm-border-r-reset={true}
 					>
 						<Icon class="text-accent size-7 shrink-0" />
 						<h3 class="text-base font-extrabold tracking-tight">{f.title}</h3>
@@ -259,8 +314,77 @@
 	</div>
 </section>
 
-<!-- Local-first -->
+<!-- Portability / No lock-in -->
 <section class="border-foreground bg-card border-b-2 px-6 py-20">
+	<div class="mx-auto grid max-w-5xl items-center gap-16 md:grid-cols-2">
+		<div>
+			<p class="text-muted-foreground mb-2 text-[11px] font-extrabold tracking-widest uppercase">
+				↳ No lock-in
+			</p>
+			<h2 class="mb-5 text-3xl font-extrabold tracking-tight md:text-4xl">
+				Your CV is a file you own.
+			</h2>
+			<p class="text-muted-foreground mb-4 text-base leading-relaxed">
+				Every CV exports to <a
+					href="https://jsonresume.org"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="text-foreground font-bold underline underline-offset-2">JSON Resume</a
+				>, an open standard. Edit it in another app, run it through an AI, or take it to a different
+				tool. It's just a file.
+			</p>
+			<p class="text-muted-foreground text-base leading-relaxed">
+				For a lossless round-trip, export HumbleHire JSON — it comes back exactly as it left. Any
+				valid JSON Resume file imports straight in as a new CV.
+			</p>
+		</div>
+
+		<div
+			class="border-foreground bg-background shadow-brutal flex flex-col gap-3 border-2 p-7 font-mono text-sm"
+		>
+			<p class="text-muted-foreground mb-1 text-[11px] font-extrabold tracking-widest uppercase">
+				↳ your data, both ways
+			</p>
+			<div class="flex items-center gap-3">
+				<span class="text-accent w-16 font-bold">→ export</span>
+				<span>resume.json</span>
+				<span class="text-muted-foreground ml-auto text-xs">open std</span>
+			</div>
+			<div class="flex items-center gap-3">
+				<span class="text-accent w-16 font-bold">→ export</span>
+				<span>.humblehire.json</span>
+				<span class="text-muted-foreground ml-auto text-xs">lossless</span>
+			</div>
+			<div class="flex items-center gap-3">
+				<span class="text-accent w-16 font-bold">← import</span>
+				<span>resume.json</span>
+				<span class="text-muted-foreground ml-auto text-xs">new CV</span>
+			</div>
+			<hr class="border-foreground border-t-2" />
+			<div class="flex justify-between">
+				<span>standard</span>
+				<a
+					href="https://jsonresume.org"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="text-accent font-bold hover:underline">jsonresume.org ↗</a
+				>
+			</div>
+			<div class="flex justify-between">
+				<span>schema</span>
+				<a
+					href="https://humblehire.cv/schema/resume/v0.0.1.json"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="text-accent font-bold hover:underline">v0.0.1 ↗</a
+				>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- Local-first -->
+<section class="border-foreground border-b-2 px-6 py-20">
 	<div class="mx-auto grid max-w-5xl items-center gap-16 md:grid-cols-2">
 		<div>
 			<p class="text-muted-foreground mb-2 text-[11px] font-extrabold tracking-widest uppercase">
@@ -277,7 +401,7 @@
 		</div>
 
 		<div
-			class="border-foreground bg-background shadow-brutal flex flex-col gap-3 border-2 p-7 font-mono text-sm"
+			class="border-foreground bg-card shadow-brutal flex flex-col gap-3 border-2 p-7 font-mono text-sm"
 		>
 			<div class="flex items-center gap-3">
 				<span class="border-foreground bg-accent h-2.5 w-2.5 shrink-0 border-2"></span>
@@ -311,7 +435,7 @@
 </section>
 
 <!-- FAQ -->
-<section id="faq" class="border-foreground border-b-2 px-6 py-20">
+<section id="faq" class="border-foreground bg-card border-b-2 px-6 py-20">
 	<div class="mx-auto max-w-5xl">
 		<div class="mb-10">
 			<p class="text-muted-foreground mb-2 text-[11px] font-extrabold tracking-widest uppercase">

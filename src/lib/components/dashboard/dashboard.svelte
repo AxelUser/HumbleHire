@@ -4,7 +4,7 @@
 	import { resolve } from '$app/paths';
 	import { db } from '$lib/db/index';
 	import CvList from './cv-list.svelte';
-	import NewCvButton from './new-cv-button.svelte';
+	import { CreateCvActions } from '$lib/components/cv';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { Button } from '$lib/components/ui/button';
 	import {
@@ -93,7 +93,7 @@
 				and check back when the master changes.
 			</p>
 		</div>
-		<NewCvButton onCreate={handleCreate} />
+		<CreateCvActions onCreate={handleCreate} source="dashboard" />
 	</div>
 </div>
 
@@ -118,7 +118,7 @@
 					<Empty.Description>Why not create one?</Empty.Description>
 				</Empty.Header>
 				<Empty.Content>
-					<NewCvButton onCreate={handleCreate} />
+					<CreateCvActions onCreate={handleCreate} source="dashboard" />
 				</Empty.Content>
 			</Empty.Root>
 		{/if}

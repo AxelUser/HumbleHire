@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
+	import { CreateCvActions } from '$lib/components/cv';
 	import Schematic from './schematic.svelte';
-	import { Plus } from '@lucide/svelte';
 
-	let { onCreateCv }: { onCreateCv: () => void } = $props();
+	let { onCreate }: { onCreate: (id: string) => void } = $props();
 </script>
 
 <section class="border-foreground bg-card border-b-2 px-6 py-20">
@@ -24,10 +24,12 @@
 				</p>
 
 				<div class="flex flex-wrap items-center gap-3">
-					<Button variant="accent" size="lg" onclick={onCreateCv}>
-						<Plus class="h-4 w-4" />
-						Create your first CV
-					</Button>
+					<CreateCvActions
+						{onCreate}
+						source="hero"
+						newCvLabel="Create your first CV"
+						class="gap-3"
+					/>
 					<Button variant="outline" size="lg" href="#how">See how it works ↓</Button>
 				</div>
 

@@ -2,6 +2,8 @@
 
 The shared vocabulary for HumbleHire, a local-first CV builder organised around master / tailored relationships and selective sync. Use these terms in code, docs, issue titles, and commit messages. When two words exist for the same idea, the one listed under `Avoid` should not appear in product-facing text.
 
+This file is a glossary. It defines what each term means, not how any of it is built. Implementation lives in the code and in `docs/decisions/`.
+
 ## Language
 
 ### Core
@@ -23,18 +25,22 @@ An item inside an entry. One achievement inside a job, one skill tag inside a pr
 _Avoid_: Sub-entry, child item
 
 **Hidden block**:
-A block whose content is preserved but excluded from the export. Hidden state is per CV, stored as a list of block IDs.
+A block whose content is preserved but excluded from the export. Hidden state is tracked per CV.
 _Avoid_: Disabled block, off block
 
+**Snapshot**:
+An immutable copy of a CV's block values at one moment, held as a value to hash, to save, or to compare against. A snapshot is a value, never a stored history of past states. Use "snapshot" for a particular captured state of a CV; "version" is not a HumbleHire word.
+_Avoid_: Version, checkpoint, revision
+
 **Local-first**:
-Every CV lives only in the user's own browser storage (IndexedDB) and its content is never sent to a server. "Local-first" describes where CV _content_ lives; it is not a promise of zero network activity. The app legitimately makes non-content requests (the app shell, web fonts, anonymous cookieless usage metrics). Product copy must not claim "zero telemetry," "0 bytes sent," or "no network requests" — those are false. The honest, durable guarantee is that **CV content never leaves the device**.
+Every CV lives only in the user's own browser storage and its content is never sent to a server. "Local-first" describes where CV _content_ lives; it is not a promise of zero network activity. The app legitimately makes non-content requests (the app shell, web fonts, anonymous cookieless usage metrics). Product copy must not claim "zero telemetry," "0 bytes sent," or "no network requests" — those are false. The honest, durable guarantee is that **CV content never leaves the device**.
 _Avoid_: "Zero telemetry", "no network", "offline-only" used as synonyms for local-first.
 
 ### Tailoring
 
 **Master CV**:
-A CV that was not derived from any other. The user's comprehensive career record. "Master" is a role determined by the absence of a link back; it is not a separate document type.
-_Avoid_: Source, parent, original, base CV. The code field `sourceId` references this concept; in product language only "master" is used.
+A CV that was not derived from any other. The user's comprehensive career record. "Master" is a role determined by the absence of a link back to another CV; it is not a separate document type.
+_Avoid_: Source, parent, original, base CV.
 
 **Tailored CV**:
 A CV created by copying from a master at a specific moment, retaining a link back to that master. Independent after creation: edits on either side do not propagate automatically.
@@ -51,11 +57,11 @@ _Avoid_: Merge, pull, update, refresh
 ### Sync mechanism
 
 **Sync baseline**:
-The snapshot of the master's blocks captured the moment a tailored CV was created or last fully synced. Sync diffs are computed against this baseline, not against the master's full edit history.
-_Avoid_: Snapshot, checkpoint, fork point
+The agreed reference state of a [[tailored cv]]: the [[snapshot]] of the master's blocks the tailored copy is measured against to detect what the master changed. Detection is three-sided, comparing the baseline, the master's current blocks, and the tailored copy's own edits. The baseline advances as changes are synced, so it always marks what has already been reconciled, not a fixed creation point.
+_Avoid_: Snapshot (too general; the baseline is one specific snapshot), checkpoint, fork point
 
 **Sync decisions**:
-The per-tailored-CV record of which incoming changes have been accepted or discarded, and at which master version that decision was made. Discarded decisions are remembered so the same change does not re-prompt until the master changes again.
+The record, kept per tailored CV, of which incoming changes have been accepted or discarded, and against which state of the master that decision was made. A discarded change is remembered so it does not re-prompt until the master changes again.
 _Avoid_: Sync state, sync log
 
 **Diff item**:
@@ -63,7 +69,7 @@ A single unit of change shown in the sync view. One of three kinds: a text edit 
 _Avoid_: Change, delta, hunk
 
 **Updates available**:
-The indicator on a tailored CV showing that its master has changed in a way that has not been reviewed yet. Determined by comparing per-block content hashes between the master and the tailored's sync baseline, skipping blocks that are hidden on either side.
+The indicator on a tailored CV showing that its master has changed in a way that has not been reviewed yet. Reflects the difference between the master and the tailored copy's [[sync baseline]], ignoring blocks hidden on either side.
 _Avoid_: Outdated, stale, behind
 
 **Orphaned tailored CV**:
@@ -81,7 +87,7 @@ The right-side pane in the editor that renders the live PDF of the current CV, p
 _Avoid_: Render, output, view
 
 **Theme**:
-A self-contained PDF rendering module that takes filtered CV blocks and produces a PDF layout. The v1 theme is "Classic." Adding a theme means adding a module, not editing the editor or the data model.
+A self-contained rendering module that takes filtered CV blocks and produces a PDF layout. The v1 theme is "Classic." Adding a theme means adding a module, not changing the editor or the data.
 _Avoid_: Template, style, layout
 
 ### Offline & durability
@@ -95,31 +101,60 @@ The state in which the app shell and the PDF engine are cached so HumbleHire ope
 _Avoid_: Offline mode (implies a user-toggled state), offline-only.
 
 **Durable storage**:
-Browser storage exempt from automatic eviction, so CV content survives storage pressure and a browser's periodic clean-up. Requested through the Storage API and reinforced by [[install]]. Describes resistance to eviction on _this device_; it never implies an off-device copy.
+Browser storage exempt from automatic eviction, so CV content survives storage pressure and a browser's periodic clean-up. Reinforced by [[install]]. Describes resistance to eviction on _this device_; it never implies an off-device copy.
 _Avoid_: "Saved to cloud", "backed up" (durable is not the same as backed up), permanent.
 
 **Export**:
-Turning a single CV into a PDF for sending to an employer. It is the output, not a safety net: a PDF cannot be re-imported as editable CV content.
+Turning a single CV into a downloadable file: a PDF for an employer, or a structured JSON file for re-import or use in other tools. Structured exports can be re-imported into HumbleHire.
 _Avoid_: Backup, save.
 
+**Import**:
+Bringing a structured file into HumbleHire as a new CV, the inverse of a structured [[export]]. Accepts the same structured formats HumbleHire exports.
+_Avoid_: Upload, load, restore (restore belongs to [[backup]]).
+
 **Backup**:
-A single downloadable file containing every CV, re-importable to restore them. The only copy that survives cleared site data, a different browser, or a dead disk. Distinct from [[export]].
+A single downloadable file containing every CV at once, re-importable to restore them. The copy that survives cleared site data, a different browser, or a dead disk. Distinct from [[export]] and [[import]], which work one CV at a time.
 _Avoid_: Export, dump, save.
+
+### Serialization
+
+**Serialization**:
+The feature that owns structured [[export]] and [[import]] in both directions, together with the rules that validate incoming files. Names the whole bridge between a CV inside the app and its file form, not just the export half.
+_Avoid_: Export (one direction only), mapping (too narrow).
+
+**DB schema**:
+The shape of locally stored CV data in the browser database. Carries its own version, the storage migration number, raised when the stored shape changes. Unrelated to a CV's content and to the [[json schema]].
+_Avoid_: Schema (unqualified), storage schema.
+
+**JSON schema**:
+The shape every structured [[export]] and [[import]] file must conform to, and the contract incoming files are checked against. Carries its own version, the JSON schema version, raised when the file format changes. Not to be confused with JSON Schema, the external validation standard (json-schema.org) used to express it, nor with [[json resume]], the resume standard it builds on.
+_Avoid_: Schema (unqualified); do not conflate with the JSON Schema standard.
+
+**HumbleHire JSON**:
+The lossless structured [[export]] variant (`.humblehire.json`). Keeps HumbleHire's extra fields so a file round-trips exactly.
+_Avoid_: Native format, full export.
+
+**JSON Resume**:
+Both the external standard HumbleHire interoperates with and the lossy [[export]] variant (`.json`) projected onto it. The variant drops HumbleHire's extra fields. When the variant is meant, say "JSON Resume export."
+_Avoid_: Standard format, plain export (unqualified).
+
+**Coercion**:
+A best-effort conversion between a HumbleHire shape and a JSON Resume shape. Two kinds stay distinct. _Durable_ coercions are the permanent gap between a CV inside the app and its file form, and they outlive any refactor. _Temporal_ coercions exist only because the app's current CV shape differs from the file shape; a planned refactor adopts JSON Resume's structures and removes them.
+_Avoid_: Mapping (reserve for direct field-to-field correspondence), hack, workaround.
 
 ## Flagged ambiguities
 
-**"Version"** has no place in HumbleHire language.
+**"Version" is ambiguous. Qualify it or avoid it.**
 
-- _Not acceptable_: "CV version," "version history," "save a version," "master version." These imply a Git-style snapshot store that does not exist. Use "tailored CV" for a derived copy or "sync baseline" for the captured-at-tailoring snapshot. Sync detection works off per-block content hashes, not a version counter.
+- A CV has no version. "CV version," "version history," "save a version," and "master version" all imply a stored history of past states that does not exist. For a particular captured state of a CV, use [[snapshot]]. For a derived copy, use [[tailored cv]]; for the agreed comparison point, use [[sync baseline]].
+- Two things legitimately carry a version, and each must say which: the [[db schema]] version (the local storage shape) and the [[json schema]] version (the file format). Never write "schema version" unqualified.
 
-**"Block"** sometimes appears in code to mean the `Block<T>` wrapper object (a `{ objectId, value }` pair). That is an implementation detail. In product language, "block" always means one of the nine CV sections.
+**"Schema" is ambiguous. Always qualify.** Say [[db schema]] or [[json schema]]. Bare "schema" could mean either, and "JSON schema" additionally risks reading as the JSON Schema standard.
 
-**"Master"** is a role, not a flag. A CV is a master whenever it has no `sourceId`. The same CV can have many tailored copies pointing to it; there is no inverse list on the master side.
+**"Update" is overloaded. Keep the two senses apart.**
 
-**"Update" is overloaded — keep the two senses apart.**
-
-- _Sync sense (reserved)_: "Updates available" / "updated" is the tailored-CV indicator that its master changed. See [[updates-available]] under Tailoring. Only sync uses this word.
-- _App sense_: when a new build is deployed and the service worker has a fresh version ready, the reload prompt must **not** say "update available." Use "a new version of HumbleHire is available" and "Reload." This keeps "updates" unambiguously about sync.
+- _Sync sense (reserved)_: "Updates available" / "updated" is the tailored-CV indicator that its master changed. See [[updates available]]. Only sync uses this word.
+- _App sense_: when a new build is deployed and a fresh version of the app is ready, the reload prompt must **not** say "update available." Use "a new version of HumbleHire is available" and "Reload." This keeps "updates" unambiguously about sync.
 
 ## Example dialogue
 
@@ -129,7 +164,7 @@ _Avoid_: Export, dump, save.
 >
 > **Dev**: And if they discard one, does it come back next time?
 >
-> **PM**: Not until the master changes again. We remember the discard against the current master version. Once the master moves forward, the diff is recomputed and that item may or may not reappear, depending on whether it is still a real difference.
+> **PM**: Not until the master changes again. We remember the discard against the master as it stood then. Once the master moves on, the diff is recomputed and that item may or may not reappear, depending on whether it is still a real difference.
 >
 > **Dev**: What about pushing a tailored edit back into the master?
 >

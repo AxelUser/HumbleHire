@@ -6,7 +6,7 @@
 	import { TailorDialog } from '$lib/components/tailoring';
 	import TailoredRow from './tailored-row.svelte';
 	import HighlightedText from './highlighted-text.svelte';
-	import { ExportButton } from '$lib/components/editor';
+	import { ExportButton } from '$lib/components/export';
 	import { Eye, Trash2, ChevronDown } from '@lucide/svelte';
 
 	interface Props {
@@ -57,7 +57,7 @@
 			<Button variant="outline" size="sm" href="/cv/{master.id}">
 				<Eye class="h-3.5 w-3.5" /> Open
 			</Button>
-			<ExportButton cv={master} variant="ghost" />
+			<ExportButton cv={master} />
 			<TailorDialog sourceCv={master} onCreate={onTailor} bind:open={tailorOpen} />
 			<Button variant="ghost" size="sm" class="px-2" onclick={() => (collapsed = !collapsed)}>
 				<ChevronDown

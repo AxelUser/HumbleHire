@@ -3,7 +3,7 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import { ExternalLink } from '@lucide/svelte';
 	import { TailorDialog, SyncDrawer } from '$lib/components/tailoring';
-	import ExportButton from './export-button.svelte';
+	import { ExportButton } from '$lib/components/export';
 	import type { CV } from '$lib/types/cv';
 	import type { SaveStatus } from '$lib/types/save-status';
 	import { resolve } from '$app/paths';

@@ -18,12 +18,11 @@
 		initAnalytics();
 		pwaInstall.init();
 
-		if (import.meta.env.VITE_E2E) {
-			import('$lib/e2e-bridge').then((m) => m.initE2eBridge());
-			return;
+		if (import.meta.env.VITE_DEV_BRIDGE) {
+			import('$lib/dev-bridge').then((m) => m.initDevBridge());
 		}
 
-		if ('serviceWorker' in navigator) {
+		if (!import.meta.env.VITE_DEV_NO_SW && 'serviceWorker' in navigator) {
 			navigator.serviceWorker
 				.register('/service-worker.js', { type: dev ? 'module' : 'classic' })
 				.then((reg) => {
@@ -75,6 +74,6 @@
 	{/if}
 </button>
 
-{#if dev}
+{#if dev || import.meta.env.VITE_DEV_TOOLBOX}
 	<DevToolbox />
 {/if}

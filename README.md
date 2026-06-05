@@ -49,6 +49,8 @@ HumbleHire keeps the master as your single source of truth. Tailored copies bran
   <img alt="Exporting a CV to PDF from the dashboard" src="docs/assets/export.light.gif">
 </picture>
 
+- **Bring your own JSON, and take it back out.** Export any CV to [JSON Resume](https://jsonresume.org), an open standard, or to HumbleHire JSON for a lossless round-trip. Any JSON Resume file imports straight in as a new CV. ([schema](https://humblehire.cv/schema/resume/v0.0.1.json))
+
 The CV structure is deliberately fixed: nine blocks, in a set order. That keeps the output consistent and easy for applicant tracking systems to parse, and it is one less thing to fiddle with when you should be applying.
 
 ## Local-first, and what that means

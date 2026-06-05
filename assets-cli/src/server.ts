@@ -8,9 +8,10 @@ import type { HarnessConfig } from './config';
 
 const isWindows = process.platform === 'win32';
 
-// VITE_E2E is read at build time and inlines the window.__hhTest seam, so it must
-// be present for `build`; we keep it on `preview` too for symmetry.
-const SERVE_ENV = { ...process.env, VITE_E2E: 'true' };
+// VITE_DEV_BRIDGE inlines the window.__devBridge seam; VITE_DEV_NO_SW disables the service
+// worker so the harness doesn't fight a caching SW. Both must be present for `build`;
+// we keep them on `preview` too for symmetry.
+const SERVE_ENV = { ...process.env, VITE_DEV_BRIDGE: 'true', VITE_DEV_NO_SW: 'true' };
 
 export interface PreviewServer {
 	stop(): Promise<void>;
@@ -100,7 +101,7 @@ async function killTree(child: ChildProcess): Promise<void> {
 // Build the app and start a preview the harness can drive on the configured port.
 // Resolves once the port is answering; the returned handle tears the preview down.
 export async function startPreview({ port, baseUrl }: HarnessConfig): Promise<PreviewServer> {
-	process.stdout.write('• building app (VITE_E2E)…\n');
+	process.stdout.write('• building app (VITE_DEV_BRIDGE)…\n');
 	await run('pnpm', ['build']);
 
 	process.stdout.write(`• starting preview on :${port}…\n`);

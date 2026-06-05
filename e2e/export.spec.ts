@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { useBridge } from '@humblehire/test-bridge';
+import { useBridge } from '@humblehire/dev-bridge';
 import { gotoHome } from './helpers/ui';
 
 test.describe('Export', () => {
@@ -23,9 +23,10 @@ test.describe('Export', () => {
 		const masterId = await b.seedMaster({ name: 'Editor Export CV' });
 		await page.goto(`/cv/${masterId}`, { waitUntil: 'networkidle' });
 
-		const downloadPromise = page.waitForEvent('download');
-		await page.getByRole('button', { name: /^Export$/ }).click();
-		const download = await downloadPromise;
+		const [download] = await Promise.all([
+			page.waitForEvent('download', { timeout: 60_000 }),
+			page.getByRole('button', { name: 'Export PDF' }).click()
+		]);
 
 		expect(download.suggestedFilename()).toMatch(/\.pdf$/);
 	});

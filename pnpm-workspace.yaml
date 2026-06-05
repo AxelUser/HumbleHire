@@ -1,6 +1,7 @@
 publicHoistPattern:
   - '@dnd-kit/*'
+ignoreWorkspaceRootCheck: true
 packages:
   - .
-  - test-bridge
+  - dev-bridge
   - assets-cli
