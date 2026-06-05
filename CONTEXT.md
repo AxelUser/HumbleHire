@@ -24,9 +24,9 @@ _Avoid_: Item, record, row
 An item inside an entry. One achievement inside a job, one skill tag inside a project's stack.
 _Avoid_: Sub-entry, child item
 
-**Hidden block**:
-A block whose content is preserved but excluded from the export. Hidden state is tracked per CV.
-_Avoid_: Disabled block, off block
+**Hidden**:
+Content that is preserved but excluded from the [[preview]] and [[export]]. Tracked per CV as a set of addresses — a section path (`work`, `basics.location`) today, an [[entry]] id when entry-level hiding ships. Used both while drafting a [[master cv]] (park a section) and while shaping a [[tailored cv]] (drop a section from one copy); it is not exclusively a tailoring concern.
+_Avoid_: Disabled, off, "hidden block" (the unit is no longer a block).
 
 **Snapshot**:
 An immutable copy of a CV's block values at one moment, held as a value to hash, to save, or to compare against. A snapshot is a value, never a stored history of past states. Use "snapshot" for a particular captured state of a CV; "version" is not a HumbleHire word.
@@ -35,6 +35,30 @@ _Avoid_: Version, checkpoint, revision
 **Local-first**:
 Every CV lives only in the user's own browser storage and its content is never sent to a server. "Local-first" describes where CV _content_ lives; it is not a promise of zero network activity. The app legitimately makes non-content requests (the app shell, web fonts, anonymous cookieless usage metrics). Product copy must not claim "zero telemetry," "0 bytes sent," or "no network requests" — those are false. The honest, durable guarantee is that **CV content never leaves the device**.
 _Avoid_: "Zero telemetry", "no network", "offline-only" used as synonyms for local-first.
+
+### Model representations
+
+The same CV exists in four shapes. Naming them keeps conversations about "the model" unambiguous about which one is meant.
+
+**Stored CV**:
+The shape of a CV as persisted in the browser database. Owns identity and whatever the [[runtime cv]] must survive a reload. Currently identical to the runtime shape; may diverge later to drop recomputed fields or to lay data out for storage consistency.
+_Avoid_: DB model (when product-facing), persisted blob.
+
+**Runtime CV**:
+The shape of a CV held in memory and edited in the editor. The working representation; the [[stored cv]], the [[sync tree]], and the [[document]] are all reached from it.
+_Avoid_: In-memory model, live CV.
+
+**Sync tree**:
+A generic node tree a [[runtime cv]] is projected into so the [[sync]] engine can diff and apply changes uniformly. Nodes carry a path, a kind, and a label. The runtime CV never imports the tree; the projection points one way only.
+_Avoid_: Diff model, AST.
+
+**Document**:
+The structured JSON shape a CV is exported to and imported from — a DTO, never the [[runtime cv]]. Carries no machine ids, speaks [[json resume]] vocabulary, and is the only shape that crosses the app boundary. See [[serialization]].
+_Avoid_: Export model, wire model (when a precise term is wanted), JSON (unqualified).
+
+**Descriptor**:
+The static schema that defines the [[sync tree]]: one tree of `NodeDescriptor`s mirroring the CV content shape, each carrying its kind (object, list, scalar) and its display labels, and **no values**. The single source of every label and breadcrumb in the [[sync]] view and the future i18n seam. Values come from the [[runtime cv]] during projection; the descriptor never holds data.
+_Avoid_: Schema (unqualified — collides with [[db schema]] / [[json schema]]), metadata, model.
 
 ### Tailoring
 
@@ -57,7 +81,7 @@ _Avoid_: Merge, pull, update, refresh
 ### Sync mechanism
 
 **Sync baseline**:
-The agreed reference state of a [[tailored cv]]: the [[snapshot]] of the master's blocks the tailored copy is measured against to detect what the master changed. Detection is three-sided, comparing the baseline, the master's current blocks, and the tailored copy's own edits. The baseline advances as changes are synced, so it always marks what has already been reconciled, not a fixed creation point.
+The agreed reference state of a [[tailored cv]]: the [[snapshot]] of the master's content the tailored copy is measured against to detect what the master changed. Detection is three-sided, comparing the baseline, the master's current content, and the tailored copy's own edits. The baseline advances **per resolved [[diff item]]** (accept or discard both move it to the master at that [[path]]), so it always marks what has already been reconciled, not a fixed creation point. A [[hidden]] section produces no diff items, so its baseline does not advance — its master changes surface honestly the moment it is unhidden, for the user to decide.
 _Avoid_: Snapshot (too general; the baseline is one specific snapshot), checkpoint, fork point
 
 **Sync decisions**:
@@ -65,8 +89,12 @@ The record, kept per tailored CV, of which incoming changes have been accepted o
 _Avoid_: Sync state, sync log
 
 **Diff item**:
-A single unit of change shown in the sync view. One of three kinds: a text edit on a single-text block, an entry change (added, removed, or modified at the top level), or a nested change (added, removed, or modified inside an entry). Each diff item is accepted or discarded independently.
+A single unit of change shown in the [[sync]] view, addressed by a [[path]] into the CV content. Two kinds: an [[entry]] added or removed (the path ends at a list entry id), or one scalar field modified (the path ends at that field, carrying before/after). Field changes are per-field — a job with three changed fields yields three diff items, each accepted or discarded independently.
 _Avoid_: Change, delta, hunk
+
+**Path**:
+The address of a node in the CV content, used by [[diff item]]s to locate what changed. A sequence of segments that alternates by context: a field name when descending into an object, an [[entry]]'s `objectId` when descending into a list. List descent is always by id, never by position, so diffs stay order-agnostic.
+_Avoid_: Pointer, selector, locator.
 
 **Updates available**:
 The indicator on a tailored CV showing that its master has changed in a way that has not been reviewed yet. Reflects the difference between the master and the tailored copy's [[sync baseline]], ignoring blocks hidden on either side.
@@ -143,6 +171,8 @@ A best-effort conversion between a HumbleHire shape and a JSON Resume shape. Two
 _Avoid_: Mapping (reserve for direct field-to-field correspondence), hack, workaround.
 
 ## Flagged ambiguities
+
+**"Block" is being redefined by the model refactor.** The definition above ("one of the nine fixed sections") conflates three jobs that the refactor splits apart: a content grouping, a rendered section, and the unit of hide / hash / sync. The new [[runtime cv]] groups content into typed sections (basics, work, education, skills, projects) with no flat list of nine blocks. Once the step-2 presentation design lands, "Block" is expected to survive only as a _presentation_ term (a rendered section in the editor and PDF), decoupled from the content shape. Until then, treat "Block" as legacy when it appears in code.
 
 **"Version" is ambiguous. Qualify it or avoid it.**
 

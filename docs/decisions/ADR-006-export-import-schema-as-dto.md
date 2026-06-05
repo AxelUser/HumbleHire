@@ -35,3 +35,13 @@ The mapper bridges two shapes, and the conversions split into two kinds that mus
 **Temporal** conversions exist only because the current `CV` is shaped differently from the wire: location, degree, and contacts, plus the `meta` stash that backs them. The planned refactor makes `CV` adopt JSON Resume's structures, at which point these collapse to identity and are removed. They carry a grep-able `@temporal-coercion` marker, so a future reader removing them follows the marker rather than gutting the mapper.
 
 The [reference doc](../reference/serialization-schema.md) spells out each conversion and the foreign sections dropped on import.
+
+## Update (2026-06-06): the planned refactor landed
+
+The "future ADR" promised above is now [ADR-010](./ADR-010-content-decoupled-from-presentation.md) (content decoupled from presentation) and [ADR-011](./ADR-011-descriptor-driven-sync-tree.md) (descriptor-driven sync). The DTO boundary itself is unchanged — `toDocument` / `fromDocument` stay — but the coercion split shifts:
+
+- **Temporal coercions are essentially emptied.** Splitting `degree` into `studyType` / `area` and adopting typed contacts (`email` / `phone` / `url` + `profiles[]`) make those mappings identity, and the `meta.humblehire.contacts` stash is removed. `location` deliberately stays a free-text string, so its string↔object mapping **reclassifies from temporal to durable**.
+- **`meta.humblehire` becomes a general wildcard** for values a target format cannot represent losslessly — not a contacts-specific stash. Its first durable use is the plain JSON Resume export, which folds `highlights` (and a set `summary`) into the standard `summary` field and stashes the originals in `meta` for exact round-trip. The HumbleHire JSON variant needs no stash because extensions are first-class schema fields.
+- **JSON schema bumps to `v0.1.0`** as a new frozen file. Old `v0.0.1` files are not given a compatibility shim (no advertised traffic yet); they still import on a best-effort basis via their standard fields.
+
+The reference doc's temporal/durable sections are rewritten to match.
