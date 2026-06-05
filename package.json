@@ -17,8 +17,8 @@
 		"test:e2e": "playwright test",
 		"storybook": "storybook dev -p 6006",
 		"build-storybook": "storybook build",
-		"generate-pwa-assets": "pwa-assets-generator",
-		"assets:generate": "pnpm --filter @humblehire/docs-assets generate",
+		"gen:pwa-assets": "pwa-assets-generator",
+		"gen:docs-assets": "pnpm --filter @humblehire/docs-assets generate",
 		"gen:schema": "node scripts/gen-schema.mjs"
 	},
 	"devDependencies": {
