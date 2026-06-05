@@ -32,7 +32,7 @@
 		a.href = url;
 		a.download = filename;
 		a.click();
-		URL.revokeObjectURL(url);
+		setTimeout(() => URL.revokeObjectURL(url), 100);
 	}
 
 	async function exportAs(format: 'pdf' | 'humblehire_json' | 'json_resume'): Promise<void> {
