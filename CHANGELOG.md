@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/AxelUser/HumbleHire/compare/v0.1.2...v0.2.0) (2026-06-05)
+
+
+### Features
+
+* export and import JSONs ([#15](https://github.com/AxelUser/HumbleHire/issues/15)) ([53e2e81](https://github.com/AxelUser/HumbleHire/commit/53e2e81a2e5d3758dec67d9118dd148d6d8ab10f))
+
 ## [0.1.2](https://github.com/AxelUser/HumbleHire/compare/v0.1.1...v0.1.2) (2026-06-03)
 
 
