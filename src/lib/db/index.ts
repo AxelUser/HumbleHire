@@ -8,9 +8,12 @@ class HumbleHireDB extends Dexie {
 
 	constructor() {
 		super('humblehire');
-		this.version(1).stores({
-			cvs: 'id, updatedAt, sourceId'
-		});
+		// v1 stored the old presentation-coupled `blocks` model. The v0.1.0 content model (ADR-010)
+		// is incompatible, so the store is dropped and recreated empty rather than migrated — a
+		// deliberate one-time wipe, justified by pre-launch status and not a pattern to repeat.
+		this.version(1).stores({ cvs: 'id, updatedAt, sourceId' });
+		this.version(2).stores({ cvs: null });
+		this.version(3).stores({ cvs: 'id, updatedAt, sourceId' });
 
 		this.cvs.hook('creating', () => {
 			setHasCvsHint(true);
