@@ -1,7 +1,7 @@
 // @generated — do not edit. Run 'pnpm gen:schema' to regenerate.
 
 /**
- * A superset of JSON Resume (https://jsonresume.org). Any valid JSON Resume document is a valid HumbleHire resume. HumbleHire adds basics.highlights (bullet-point list alongside the standard summary string), work[].keywords (per-role skills), and meta.humblehire (schema version + lossless contacts round-trip). The JSON Resume base schema is inlined under definitions/jsonResume for reproducibility — this document has no external dependencies.
+ * A superset of JSON Resume (https://jsonresume.org). Any valid JSON Resume document is a valid HumbleHire resume. HumbleHire adds basics.highlights (a bullet list alongside the standard summary string), work[].keywords (per-role skills), and meta.humblehire (the schema version plus a general wildcard for anything a target format cannot represent losslessly). The JSON Resume base schema is inlined under definitions/jsonResume for reproducibility — this document has no external dependencies.
  */
 export type CvDocument = JsonResume & {
   basics?: {
@@ -18,26 +18,22 @@ export type CvDocument = JsonResume & {
   }[];
   meta?: {
     /**
-     * HumbleHire-specific metadata. Ignored by standard JSON Resume tooling. Present only in HumbleHire JSON exports.
+     * HumbleHire-specific metadata. Ignored by standard JSON Resume tooling. A general wildcard for values a target format cannot represent losslessly; present in HumbleHire JSON exports and, for round-trip recovery, in the JSON Resume export too.
      */
     humblehire?: {
       /**
-       * HumbleHire schema version of this document, e.g. "0.0.1". Importers refuse files with a version higher than they support.
+       * HumbleHire schema version of this document, e.g. "0.1.0". Importers refuse files with a version higher than they support.
        */
       schemaVersion: string;
       /**
-       * Exact contact entries for lossless round-trip. Takes precedence over basics.email/phone/url/profiles on import.
+       * The original basics.highlights, stashed when they are folded into summary for the JSON Resume export, so re-importing a HumbleHire-produced plain file restores them exactly. Takes precedence over the summary split on import.
        */
-      contacts?: {
-        /**
-         * Human-readable label, e.g. "Email", "LinkedIn", "GitHub".
-         */
-        label: string;
-        /**
-         * The contact value, e.g. an email address or URL.
-         */
-        value: string;
-      }[];
+      highlights?: string[];
+      /**
+       * The original basics.summary, stashed alongside folded highlights for exact round-trip.
+       */
+      summary?: string;
+      [k: string]: unknown;
     };
   };
 };
@@ -47,7 +43,7 @@ export type CvDocument = JsonResume & {
 export type Iso8601 = string;
 
 /**
- * JSON Resume schema (https://jsonresume.org), vendored at the version current when HumbleHire schema v0.0.1 was published. All fields are optional; additionalProperties is true throughout so HumbleHire extensions pass JSON Resume validators unchanged.
+ * JSON Resume schema (https://jsonresume.org), vendored at the version current when HumbleHire schema v0.1.0 was published. All fields are optional; additionalProperties is true throughout so HumbleHire extensions pass JSON Resume validators unchanged.
  */
 export interface JsonResume {
   /**

@@ -10,7 +10,7 @@ export type DocumentError =
 
 export type ParseResult = { ok: true; doc: CvDocument } | { ok: false; error: DocumentError };
 
-const SCHEMA_VERSION = '0.0.1';
+const SCHEMA_VERSION = '0.1.0';
 
 function isVersionSupported(version: string): boolean {
 	const [ma, mi, pa] = version.split('.').map(Number);

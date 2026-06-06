@@ -27,7 +27,7 @@ class TracedFileWriter {
 }
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const schemaPath = join(root, 'static/schema/resume/v0.0.1.json');
+const schemaPath = join(root, 'static/schema/resume/v0.1.0.json');
 const outDir = join(root, 'src/lib/features/serialization');
 
 const schema = JSON.parse(readFileSync(schemaPath, 'utf8'));

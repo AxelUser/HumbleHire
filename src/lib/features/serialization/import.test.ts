@@ -9,9 +9,9 @@ import { db } from '$lib/db/index';
 import { importDocument } from './import';
 
 const VALID = JSON.stringify({
-	$schema: `${APP_BASE_URL}/schema/resume/v0.0.1.json`,
+	$schema: `${APP_BASE_URL}/schema/resume/v0.1.0.json`,
 	basics: { name: 'Jane Doe' },
-	meta: { humblehire: { schemaVersion: '0.0.1' } }
+	meta: { humblehire: { schemaVersion: '0.1.0' } }
 });
 
 describe('importDocument', () => {

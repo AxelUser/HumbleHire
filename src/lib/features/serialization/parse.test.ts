@@ -13,9 +13,9 @@ const SPARSE = json({});
 
 // A minimal valid HumbleHire JSON document.
 const MINIMAL_HH = json({
-	$schema: `${APP_BASE_URL}/schema/resume/v0.0.1.json`,
+	$schema: `${APP_BASE_URL}/schema/resume/v0.1.0.json`,
 	basics: { name: 'Jane Doe' },
-	meta: { humblehire: { schemaVersion: '0.0.1' } }
+	meta: { humblehire: { schemaVersion: '0.1.0' } }
 });
 
 // --- not-json ---
@@ -69,14 +69,6 @@ describe('parseDocument — schema errors', () => {
 		expect(r.ok).toBe(false);
 		if (!r.ok) expect(r.error.kind).toBe('schema');
 	});
-
-	it('returns schema error when meta.humblehire.contacts item is missing label', () => {
-		const r = parseDocument(
-			json({ meta: { humblehire: { schemaVersion: '0.0.1', contacts: [{ value: 'x' }] } } })
-		);
-		expect(r.ok).toBe(false);
-		if (!r.ok) expect(r.error.kind).toBe('schema');
-	});
 });
 
 // --- unsupported-version ---
@@ -113,7 +105,7 @@ describe('parseDocument — ok', () => {
 	});
 
 	it('accepts the current schema version', () => {
-		const r = parseDocument(json({ meta: { humblehire: { schemaVersion: '0.0.1' } } }));
+		const r = parseDocument(json({ meta: { humblehire: { schemaVersion: '0.1.0' } } }));
 		expect(r.ok).toBe(true);
 	});
 

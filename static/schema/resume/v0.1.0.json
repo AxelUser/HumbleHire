@@ -1,0 +1,567 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://humblehire.cv/schema/resume/v0.1.0.json",
+	"title": "HumbleHire Resume v0.1.0",
+	"description": "A superset of JSON Resume (https://jsonresume.org). Any valid JSON Resume document is a valid HumbleHire resume. HumbleHire adds basics.highlights (a bullet list alongside the standard summary string), work[].keywords (per-role skills), and meta.humblehire (the schema version plus a general wildcard for anything a target format cannot represent losslessly). The JSON Resume base schema is inlined under definitions/jsonResume for reproducibility — this document has no external dependencies.",
+	"definitions": {
+		"iso8601": {
+			"type": "string",
+			"description": "Similar to the standard date type, but each section after the year is optional. e.g. 2014-06-29 or 2023-04",
+			"pattern": "^([1-2][0-9]{3}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])|[1-2][0-9]{3}-(0[1-9]|1[0-2])|[1-2][0-9]{3})$"
+		},
+		"jsonResume": {
+			"description": "JSON Resume schema (https://jsonresume.org), vendored at the version current when HumbleHire schema v0.1.0 was published. All fields are optional; additionalProperties is true throughout so HumbleHire extensions pass JSON Resume validators unchanged.",
+			"type": "object",
+			"additionalProperties": true,
+			"properties": {
+				"$schema": {
+					"type": "string",
+					"description": "Link to the version of the schema that can validate the resume.",
+					"format": "uri"
+				},
+				"basics": {
+					"type": "object",
+					"additionalProperties": true,
+					"properties": {
+						"name": {
+							"type": "string",
+							"description": "Full name."
+						},
+						"label": {
+							"type": "string",
+							"description": "Job title, e.g. Web Developer."
+						},
+						"image": {
+							"type": "string",
+							"description": "URL (as per RFC 3986) to a image in JPEG or PNG format."
+						},
+						"email": {
+							"type": "string",
+							"description": "e.g. thomas@gmail.com",
+							"format": "email"
+						},
+						"phone": {
+							"type": "string",
+							"description": "Phone numbers are stored as strings so use any format you like, e.g. 712-117-2923."
+						},
+						"url": {
+							"type": "string",
+							"description": "URL (as per RFC 3986) to your website, e.g. personal homepage.",
+							"format": "uri"
+						},
+						"summary": {
+							"type": "string",
+							"description": "Write a short 2-3 sentence biography about yourself."
+						},
+						"location": {
+							"type": "object",
+							"additionalProperties": true,
+							"properties": {
+								"address": {
+									"type": "string",
+									"description": "To add multiple address lines, use \\n. For example, 1234 Glücklichkeit Straße\\nHinterhaus 5. Etage li."
+								},
+								"postalCode": {
+									"type": "string"
+								},
+								"city": {
+									"type": "string"
+								},
+								"countryCode": {
+									"type": "string",
+									"description": "Code as per ISO-3166-1 ALPHA-2, e.g. US, AU, IN."
+								},
+								"region": {
+									"type": "string",
+									"description": "The general region where you live. Can be a US state, or a province, for instance."
+								}
+							}
+						},
+						"profiles": {
+							"type": "array",
+							"description": "Specify any number of social networks that you participate in.",
+							"additionalItems": false,
+							"items": {
+								"type": "object",
+								"additionalProperties": true,
+								"properties": {
+									"network": {
+										"type": "string",
+										"description": "e.g. Facebook or Twitter."
+									},
+									"username": {
+										"type": "string",
+										"description": "e.g. neutralthoughts."
+									},
+									"url": {
+										"type": "string",
+										"description": "e.g. http://twitter.example.com/neutralthoughts.",
+										"format": "uri"
+									}
+								}
+							}
+						}
+					}
+				},
+				"work": {
+					"type": "array",
+					"additionalItems": false,
+					"items": {
+						"type": "object",
+						"additionalProperties": true,
+						"properties": {
+							"name": {
+								"type": "string",
+								"description": "Employer name, e.g. Facebook."
+							},
+							"location": {
+								"type": "string",
+								"description": "e.g. Menlo Park, CA."
+							},
+							"description": {
+								"type": "string",
+								"description": "e.g. Social Media Company."
+							},
+							"position": {
+								"type": "string",
+								"description": "e.g. Software Engineer."
+							},
+							"url": {
+								"type": "string",
+								"description": "e.g. http://facebook.example.com",
+								"format": "uri"
+							},
+							"startDate": {
+								"$ref": "#/definitions/iso8601"
+							},
+							"endDate": {
+								"$ref": "#/definitions/iso8601"
+							},
+							"summary": {
+								"type": "string",
+								"description": "Give an overview of your responsibilities at the company."
+							},
+							"highlights": {
+								"type": "array",
+								"description": "Specify multiple accomplishments.",
+								"additionalItems": false,
+								"items": {
+									"type": "string",
+									"description": "e.g. Increased profits by 20% from 2011-2012 through viral advertising."
+								}
+							}
+						}
+					}
+				},
+				"volunteer": {
+					"type": "array",
+					"additionalItems": false,
+					"items": {
+						"type": "object",
+						"additionalProperties": true,
+						"properties": {
+							"organization": {
+								"type": "string",
+								"description": "e.g. Facebook."
+							},
+							"position": {
+								"type": "string",
+								"description": "e.g. Software Engineer."
+							},
+							"url": {
+								"type": "string",
+								"description": "e.g. http://facebook.example.com",
+								"format": "uri"
+							},
+							"startDate": {
+								"$ref": "#/definitions/iso8601"
+							},
+							"endDate": {
+								"$ref": "#/definitions/iso8601"
+							},
+							"summary": {
+								"type": "string",
+								"description": "Give an overview of your responsibilities at the company."
+							},
+							"highlights": {
+								"type": "array",
+								"description": "Specify accomplishments and achievements.",
+								"additionalItems": false,
+								"items": {
+									"type": "string",
+									"description": "e.g. Awarded 'Volunteer of the Month'."
+								}
+							}
+						}
+					}
+				},
+				"education": {
+					"type": "array",
+					"additionalItems": false,
+					"items": {
+						"type": "object",
+						"additionalProperties": true,
+						"properties": {
+							"institution": {
+								"type": "string",
+								"description": "e.g. Massachusetts Institute of Technology."
+							},
+							"url": {
+								"type": "string",
+								"description": "e.g. https://mit.edu",
+								"format": "uri"
+							},
+							"area": {
+								"type": "string",
+								"description": "e.g. Arts."
+							},
+							"studyType": {
+								"type": "string",
+								"description": "e.g. Bachelor."
+							},
+							"startDate": {
+								"$ref": "#/definitions/iso8601"
+							},
+							"endDate": {
+								"$ref": "#/definitions/iso8601"
+							},
+							"score": {
+								"type": "string",
+								"description": "Grade point average, e.g. 3.67/4.0."
+							},
+							"courses": {
+								"type": "array",
+								"description": "List notable courses/subjects.",
+								"additionalItems": false,
+								"items": {
+									"type": "string",
+									"description": "e.g. H1302 - Introduction to American history."
+								}
+							}
+						}
+					}
+				},
+				"awards": {
+					"type": "array",
+					"description": "Specify any awards you have received throughout your professional career.",
+					"additionalItems": false,
+					"items": {
+						"type": "object",
+						"additionalProperties": true,
+						"properties": {
+							"title": {
+								"type": "string",
+								"description": "e.g. One of the 100 greatest minds of the century."
+							},
+							"date": {
+								"$ref": "#/definitions/iso8601"
+							},
+							"awarder": {
+								"type": "string",
+								"description": "e.g. Time Magazine."
+							},
+							"summary": {
+								"type": "string",
+								"description": "e.g. Received for my work with Quantum Physics."
+							}
+						}
+					}
+				},
+				"certificates": {
+					"type": "array",
+					"description": "Specify any certificates you have received throughout your professional career.",
+					"additionalItems": false,
+					"items": {
+						"type": "object",
+						"additionalProperties": true,
+						"properties": {
+							"name": {
+								"type": "string",
+								"description": "e.g. Certified Kubernetes Administrator."
+							},
+							"date": {
+								"$ref": "#/definitions/iso8601"
+							},
+							"url": {
+								"type": "string",
+								"description": "e.g. http://example.com",
+								"format": "uri"
+							},
+							"issuer": {
+								"type": "string",
+								"description": "e.g. CNCF."
+							}
+						}
+					}
+				},
+				"publications": {
+					"type": "array",
+					"description": "Specify your publications through your career.",
+					"additionalItems": false,
+					"items": {
+						"type": "object",
+						"additionalProperties": true,
+						"properties": {
+							"name": {
+								"type": "string",
+								"description": "e.g. The World Wide Web."
+							},
+							"publisher": {
+								"type": "string",
+								"description": "e.g. IEEE, Computer Magazine."
+							},
+							"releaseDate": {
+								"$ref": "#/definitions/iso8601"
+							},
+							"url": {
+								"type": "string",
+								"description": "e.g. http://www.computer.org.example.com/csdl/mags/co/1996/10/rx069-abs.html",
+								"format": "uri"
+							},
+							"summary": {
+								"type": "string",
+								"description": "Short summary of publication. e.g. Discussion of the World Wide Web, HTTP, HTML."
+							}
+						}
+					}
+				},
+				"skills": {
+					"type": "array",
+					"description": "List out your professional skill-set.",
+					"additionalItems": false,
+					"items": {
+						"type": "object",
+						"additionalProperties": true,
+						"properties": {
+							"name": {
+								"type": "string",
+								"description": "e.g. Web Development."
+							},
+							"level": {
+								"type": "string",
+								"description": "e.g. Master."
+							},
+							"keywords": {
+								"type": "array",
+								"description": "List some keywords pertaining to this skill.",
+								"additionalItems": false,
+								"items": {
+									"type": "string",
+									"description": "e.g. HTML."
+								}
+							}
+						}
+					}
+				},
+				"languages": {
+					"type": "array",
+					"description": "List any other languages you speak.",
+					"additionalItems": false,
+					"items": {
+						"type": "object",
+						"additionalProperties": true,
+						"properties": {
+							"language": {
+								"type": "string",
+								"description": "e.g. English, Spanish."
+							},
+							"fluency": {
+								"type": "string",
+								"description": "e.g. Fluent, Beginner."
+							}
+						}
+					}
+				},
+				"interests": {
+					"type": "array",
+					"additionalItems": false,
+					"items": {
+						"type": "object",
+						"additionalProperties": true,
+						"properties": {
+							"name": {
+								"type": "string",
+								"description": "e.g. Philosophy."
+							},
+							"keywords": {
+								"type": "array",
+								"additionalItems": false,
+								"items": {
+									"type": "string",
+									"description": "e.g. Friedrich Nietzsche."
+								}
+							}
+						}
+					}
+				},
+				"references": {
+					"type": "array",
+					"description": "List references you have received.",
+					"additionalItems": false,
+					"items": {
+						"type": "object",
+						"additionalProperties": true,
+						"properties": {
+							"name": {
+								"type": "string",
+								"description": "e.g. Timothy Cook."
+							},
+							"reference": {
+								"type": "string",
+								"description": "e.g. Joe blogs was a great employee..."
+							}
+						}
+					}
+				},
+				"projects": {
+					"type": "array",
+					"description": "Specify career projects.",
+					"additionalItems": false,
+					"items": {
+						"type": "object",
+						"additionalProperties": true,
+						"properties": {
+							"name": {
+								"type": "string",
+								"description": "e.g. The World Wide Web."
+							},
+							"description": {
+								"type": "string",
+								"description": "Short summary of project."
+							},
+							"highlights": {
+								"type": "array",
+								"description": "Specify multiple features.",
+								"additionalItems": false,
+								"items": {
+									"type": "string"
+								}
+							},
+							"keywords": {
+								"type": "array",
+								"description": "Specify special elements involved.",
+								"additionalItems": false,
+								"items": {
+									"type": "string",
+									"description": "e.g. AngularJS."
+								}
+							},
+							"startDate": {
+								"$ref": "#/definitions/iso8601"
+							},
+							"endDate": {
+								"$ref": "#/definitions/iso8601"
+							},
+							"url": {
+								"type": "string",
+								"format": "uri"
+							},
+							"roles": {
+								"type": "array",
+								"description": "Specify your role on this project or in company.",
+								"additionalItems": false,
+								"items": {
+									"type": "string",
+									"description": "e.g. Team Lead, Speaker, Writer."
+								}
+							},
+							"entity": {
+								"type": "string",
+								"description": "Specify the relevant company/entity affiliations e.g. 'greenpeace', 'corporationXYZ'."
+							},
+							"type": {
+								"type": "string",
+								"description": "e.g. 'volunteering', 'presentation', 'talk', 'application', 'conference'."
+							}
+						}
+					}
+				},
+				"meta": {
+					"type": "object",
+					"description": "The schema version and any other tooling configuration lives here.",
+					"additionalProperties": true,
+					"properties": {
+						"canonical": {
+							"type": "string",
+							"description": "URL (as per RFC 3986) to latest version of this document.",
+							"format": "uri"
+						},
+						"version": {
+							"type": "string",
+							"description": "A version field which follows semver - e.g. v1.0.0."
+						},
+						"lastModified": {
+							"type": "string",
+							"description": "Using ISO 8601 with YYYY-MM-DDThh:mm:ss."
+						}
+					}
+				}
+			}
+		}
+	},
+	"allOf": [
+		{
+			"$ref": "#/definitions/jsonResume"
+		},
+		{
+			"type": "object",
+			"properties": {
+				"basics": {
+					"type": "object",
+					"properties": {
+						"highlights": {
+							"type": "array",
+							"description": "Key highlights as a list of bullet points. HumbleHire-native alternative to the summary string — human-editable, LLM-friendly. Use instead of or alongside summary. Absent from the JSON Resume export, where highlights are joined into summary.",
+							"items": {
+								"type": "string"
+							}
+						}
+					}
+				},
+				"work": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"keywords": {
+								"type": "array",
+								"description": "Technologies and skills used in this role. HumbleHire extension; absent from JSON Resume export.",
+								"items": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"meta": {
+					"type": "object",
+					"properties": {
+						"humblehire": {
+							"type": "object",
+							"description": "HumbleHire-specific metadata. Ignored by standard JSON Resume tooling. A general wildcard for values a target format cannot represent losslessly; present in HumbleHire JSON exports and, for round-trip recovery, in the JSON Resume export too.",
+							"required": ["schemaVersion"],
+							"additionalProperties": true,
+							"properties": {
+								"schemaVersion": {
+									"type": "string",
+									"description": "HumbleHire schema version of this document, e.g. \"0.1.0\". Importers refuse files with a version higher than they support."
+								},
+								"highlights": {
+									"type": "array",
+									"description": "The original basics.highlights, stashed when they are folded into summary for the JSON Resume export, so re-importing a HumbleHire-produced plain file restores them exactly. Takes precedence over the summary split on import.",
+									"items": {
+										"type": "string"
+									}
+								},
+								"summary": {
+									"type": "string",
+									"description": "The original basics.summary, stashed alongside folded highlights for exact round-trip."
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	]
+}

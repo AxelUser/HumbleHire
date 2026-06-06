@@ -1,34 +1,51 @@
 import { createId } from '$lib/id.js';
-import { createObjectId, type CV, type CVBlocks } from '$lib/types/cv';
-import { computeBlockHashes } from '$lib/features/tailoring/hash';
+import type { CV, CVContent } from '$lib/types/cv';
+import { computeHashes } from '$lib/features/tailoring/hash';
 
 export interface CreateCVOptions {
 	name: string;
 	id?: string;
 }
 
+/** An empty content shell: blank basics and an empty array for every section. */
+export function emptyContent(): CVContent {
+	return {
+		basics: {
+			fullName: '',
+			position: '',
+			location: '',
+			summary: '',
+			highlights: [],
+			email: '',
+			phone: '',
+			url: '',
+			profiles: []
+		},
+		work: [],
+		volunteer: [],
+		education: [],
+		awards: [],
+		certificates: [],
+		publications: [],
+		skills: [],
+		languages: [],
+		interests: [],
+		references: [],
+		projects: []
+	};
+}
+
 export function createCV({ name, id = createId() }: CreateCVOptions): CV {
 	const now = Date.now();
-
-	const blocks: CVBlocks = {
-		fullName: { objectId: createObjectId(), value: '' },
-		position: { objectId: createObjectId(), value: '' },
-		location: { objectId: createObjectId(), value: '' },
-		contacts: { objectId: createObjectId(), value: [] },
-		highlights: { objectId: createObjectId(), value: [] },
-		skills: { objectId: createObjectId(), value: [] },
-		jobHistory: { objectId: createObjectId(), value: [] },
-		projects: { objectId: createObjectId(), value: [] },
-		education: { objectId: createObjectId(), value: [] }
-	};
+	const content = emptyContent();
 
 	return {
 		id,
 		name,
 		createdAt: now,
 		updatedAt: now,
-		blocks,
-		blockHashes: computeBlockHashes(blocks),
-		hiddenBlockIds: []
+		content,
+		hashes: computeHashes(content),
+		hidden: []
 	};
 }
