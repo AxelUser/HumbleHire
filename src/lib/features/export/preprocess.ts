@@ -1,45 +1,42 @@
-import type { CV, CVBlocks } from '$lib/types/cv';
+import type { CV, CVContent } from '$lib/types/cv';
 
 /**
- * Strips hidden blocks (by objectId in hiddenBlockIds) and empty blocks before
- * passing data to a theme. Themes receive already-filtered data and never
- * re-implement visibility logic.
+ * Test whether an editor block's hide marker is covered by the CV's hidden set, using the same
+ * prefix rule the sync engine uses (every marker ends in `/`).
  */
-export function preprocessBlocks(cv: CV): Partial<CVBlocks> {
-	const result: Partial<CVBlocks> = {};
-	const hidden = new Set(cv.hiddenBlockIds);
-	const b = cv.blocks;
+function markerHidden(hidden: Set<string>, marker: string): boolean {
+	for (const prefix of hidden) {
+		if (marker.startsWith(prefix)) return true;
+	}
+	return false;
+}
 
-	if (!hidden.has(b.fullName.objectId) && b.fullName.value.trim()) {
-		result.fullName = b.fullName;
-	}
-	if (!hidden.has(b.position.objectId) && b.position.value.trim()) {
-		result.position = b.position;
-	}
-	if (!hidden.has(b.location.objectId) && b.location.value.trim()) {
-		result.location = b.location;
-	}
-	if (!hidden.has(b.contacts.objectId)) {
-		const nonEmpty = b.contacts.value.filter((c) => c.label.trim() || c.value.trim());
-		if (nonEmpty.length > 0) result.contacts = { ...b.contacts, value: nonEmpty };
-	}
-	if (!hidden.has(b.highlights.objectId)) {
-		const nonEmpty = b.highlights.value.filter((h) => h.text.trim());
-		if (nonEmpty.length > 0) result.highlights = { ...b.highlights, value: nonEmpty };
-	}
-	if (!hidden.has(b.skills.objectId)) {
-		const nonEmpty = b.skills.value.filter((cat) => cat.skills.length > 0);
-		if (nonEmpty.length > 0) result.skills = { ...b.skills, value: nonEmpty };
-	}
-	if (!hidden.has(b.jobHistory.objectId) && b.jobHistory.value.length > 0) {
-		result.jobHistory = b.jobHistory;
-	}
-	if (!hidden.has(b.projects.objectId) && b.projects.value.length > 0) {
-		result.projects = b.projects;
-	}
-	if (!hidden.has(b.education.objectId) && b.education.value.length > 0) {
-		result.education = b.education;
-	}
+/**
+ * Filter a CV's content for rendering: blank out whatever the editor has hidden, so themes receive
+ * already-filtered data and never reimplement visibility. Basics sub-fields hide by their field path;
+ * the list sections hide by their section path. `basics/contacts/` is a synthetic group marker for
+ * the email/phone/url/profiles row — not a real content path, so the sync engine never emits it; it
+ * only drives editor and preview visibility.
+ */
+export function preprocessContent(cv: CV): CVContent {
+	const hidden = new Set(cv.hidden);
+	const content = structuredClone(cv.content);
+	const b = content.basics;
 
-	return result;
+	if (markerHidden(hidden, 'basics/fullName/')) b.fullName = '';
+	if (markerHidden(hidden, 'basics/position/')) b.position = '';
+	if (markerHidden(hidden, 'basics/location/')) b.location = '';
+	if (markerHidden(hidden, 'basics/highlights/')) b.highlights = [];
+	if (markerHidden(hidden, 'basics/contacts/')) {
+		b.email = '';
+		b.phone = '';
+		b.url = '';
+		b.profiles = [];
+	}
+	if (markerHidden(hidden, 'skills/')) content.skills = [];
+	if (markerHidden(hidden, 'work/')) content.work = [];
+	if (markerHidden(hidden, 'projects/')) content.projects = [];
+	if (markerHidden(hidden, 'education/')) content.education = [];
+
+	return content;
 }

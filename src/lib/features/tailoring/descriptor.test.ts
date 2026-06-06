@@ -42,7 +42,9 @@ describe('CV_DESCRIPTOR coverage', () => {
 				missing.push(key);
 				continue;
 			}
-			missing.push(...missingNodes((content as Record<string, unknown>)[key], node, key));
+			missing.push(
+				...missingNodes((content as unknown as Record<string, unknown>)[key], node, key)
+			);
 		}
 		expect(missing).toEqual([]);
 	});

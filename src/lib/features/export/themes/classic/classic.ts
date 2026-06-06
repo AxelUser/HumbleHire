@@ -1,5 +1,5 @@
 import type { ThemeModule, TDocumentDefinitions } from '../../types';
-import type { CVBlocks, JobEntry, ProjectEntry, EducationEntry } from '$lib/types/cv';
+import type { CVContent, WorkEntry, ProjectEntry, EducationEntry } from '$lib/types/cv';
 import { formatDateRange, trimUrl, formatSkillCategory } from './format';
 
 // A4: 595.28pt × 841.89pt. Margins: 15mm L/R (~42.5pt), 20mm T/B (~56.7pt)
@@ -44,51 +44,43 @@ function entryHeader(left: object, dateRange?: string) {
 	};
 }
 
-function renderJob(job: JobEntry) {
+function renderJob(job: WorkEntry) {
 	const dateRange = formatDateRange(job.startDate, job.endDate, job.current);
-	const label = inlineText(job.company, true, job.role ? ` · ${job.role}` : undefined);
+	const label = inlineText(job.name, true, job.position ? ` · ${job.position}` : undefined);
 	const items: object[] = [{ ...entryHeader(label, dateRange), margin: [0, 0, 0, 0] }];
 
-	if (job.achievements.length > 0) {
-		items.push({
-			ul: job.achievements.map((a) => a.text).filter(Boolean),
-			style: 'body',
-			margin: [0, 3, 0, 0]
-		});
+	const highlights = job.highlights.map((h) => h.value).filter(Boolean);
+	if (highlights.length > 0) {
+		items.push({ ul: highlights, style: 'body', margin: [0, 3, 0, 0] });
 	}
-	if (job.skills.length > 0) {
-		items.push({
-			text: job.skills.map((s) => s.value).join(', '),
-			style: 'tagLine',
-			margin: [0, 3, 0, 0]
-		});
+	const keywords = job.keywords.map((k) => k.value).filter(Boolean);
+	if (keywords.length > 0) {
+		items.push({ text: keywords.join(', '), style: 'tagLine', margin: [0, 3, 0, 0] });
 	}
 	return { stack: items };
 }
 
 function renderProject(project: ProjectEntry) {
-	const nameEl = project.link
-		? { text: project.name, link: project.link, style: 'link' }
+	const nameEl = project.url
+		? { text: project.name, link: project.url, style: 'link' }
 		: { text: project.name, bold: true };
-	const urlEl = project.link ? { text: ` — ${trimUrl(project.link)}`, style: 'urlText' } : null;
+	const urlEl = project.url ? { text: ` — ${trimUrl(project.url)}`, style: 'urlText' } : null;
 
 	const items: object[] = [{ text: [nameEl, ...(urlEl ? [urlEl] : [])], margin: [0, 0, 0, 0] }];
 	if (project.description.trim()) {
 		items.push({ text: project.description, style: 'body', margin: [0, 2, 0, 0] });
 	}
-	if (project.stack.length > 0) {
-		items.push({
-			text: project.stack.map((s) => s.value).join(', '),
-			style: 'tagLine',
-			margin: [0, 2, 0, 0]
-		});
+	const keywords = project.keywords.map((k) => k.value).filter(Boolean);
+	if (keywords.length > 0) {
+		items.push({ text: keywords.join(', '), style: 'tagLine', margin: [0, 2, 0, 0] });
 	}
 	return { stack: items };
 }
 
 function renderEducation(edu: EducationEntry) {
 	const dateRange = formatDateRange(edu.startDate, edu.endDate, edu.current);
-	const label = inlineText(edu.institution, true, edu.degree ? ` · ${edu.degree}` : undefined);
+	const degree = [edu.studyType, edu.area].filter(Boolean).join(' ');
+	const label = inlineText(edu.institution, true, degree ? ` · ${degree}` : undefined);
 	return { stack: [{ ...entryHeader(label, dateRange) }] };
 }
 
@@ -111,85 +103,73 @@ function sectionEntries<T>(
 export const classicTheme: ThemeModule = {
 	name: 'Classic',
 
-	build(blocks: Partial<CVBlocks>): TDocumentDefinitions {
+	build(cv: CVContent): TDocumentDefinitions {
 		const content: object[] = [];
+		const b = cv.basics;
 
 		// Header
-		if (blocks.fullName) {
-			content.push({ text: blocks.fullName.value, style: 'name', margin: [0, 0, 0, 2] });
+		if (b.fullName.trim()) {
+			content.push({ text: b.fullName, style: 'name', margin: [0, 0, 0, 2] });
 		}
-		if (blocks.position) {
-			content.push({ text: blocks.position.value, style: 'position', margin: [0, 0, 0, 4] });
+		if (b.position.trim()) {
+			content.push({ text: b.position, style: 'position', margin: [0, 0, 0, 4] });
 		}
 
-		// Contacts row: location first, then label: value pairs
+		// Contacts row: location first, then the typed contact fields and profiles
 		const contactParts: string[] = [];
-		if (blocks.location) contactParts.push(blocks.location.value);
-		if (blocks.contacts) {
-			for (const c of blocks.contacts.value) {
-				const part = c.label.trim() ? `${c.label}: ${c.value}` : c.value;
-				if (part.trim()) contactParts.push(part);
-			}
+		if (b.location.trim()) contactParts.push(b.location);
+		if (b.email.trim()) contactParts.push(b.email);
+		if (b.phone.trim()) contactParts.push(b.phone);
+		if (b.url.trim()) contactParts.push(b.url);
+		for (const p of b.profiles) {
+			const value = p.url || p.username || '';
+			if (value.trim()) contactParts.push(p.network.trim() ? `${p.network}: ${value}` : value);
 		}
 		if (contactParts.length > 0) {
 			content.push({ text: contactParts.join(' | '), style: 'contacts', margin: [0, 0, 0, 12] });
 		}
 
 		// Summary (Highlights)
-		if (blocks.highlights && blocks.highlights.value.length > 0) {
+		const highlights = b.highlights.map((h) => h.value).filter(Boolean);
+		if (highlights.length > 0) {
 			content.push({
-				stack: [
-					sectionHeading('Summary'),
-					{
-						ul: blocks.highlights.value.map((h) => h.text).filter(Boolean),
-						style: 'body',
-						margin: [0, 6, 0, 0]
-					}
-				],
+				stack: [sectionHeading('Summary'), { ul: highlights, style: 'body', margin: [0, 6, 0, 0] }],
 				margin: [0, 0, 0, 4]
 			});
 		}
 
 		// Skills
-		if (blocks.skills && blocks.skills.value.length > 0) {
-			const lines = blocks.skills.value
-				.filter((cat) => cat.skills.length > 0)
-				.map((cat) =>
-					formatSkillCategory(
-						cat.name,
-						cat.skills.map((s) => s.value)
-					)
-				);
-			if (lines.length > 0) {
-				content.push({
-					stack: [
-						sectionHeading('Skills'),
-						{ text: lines.join('\n'), style: 'body', margin: [0, 6, 0, 0] }
-					],
-					margin: [0, 0, 0, 4]
-				});
-			}
+		const skillLines = cv.skills
+			.filter((cat) => cat.keywords.length > 0)
+			.map((cat) =>
+				formatSkillCategory(
+					cat.name,
+					cat.keywords.map((k) => k.value)
+				)
+			);
+		if (skillLines.length > 0) {
+			content.push({
+				stack: [
+					sectionHeading('Skills'),
+					{ text: skillLines.join('\n'), style: 'body', margin: [0, 6, 0, 0] }
+				],
+				margin: [0, 0, 0, 4]
+			});
 		}
 
 		// Experience
-		if (blocks.jobHistory && blocks.jobHistory.value.length > 0) {
-			content.push(
-				...sectionEntries(sectionHeading('Experience'), blocks.jobHistory.value, renderJob)
-			);
+		if (cv.work.length > 0) {
+			content.push(...sectionEntries(sectionHeading('Experience'), cv.work, renderJob));
 		}
 
 		// Projects
-		if (blocks.projects && blocks.projects.value.length > 0) {
-			content.push(
-				...sectionEntries(sectionHeading('Projects'), blocks.projects.value, renderProject)
-			);
+		if (cv.projects.length > 0) {
+			content.push(...sectionEntries(sectionHeading('Projects'), cv.projects, renderProject));
 		}
 
 		// Education
-		if (blocks.education && blocks.education.value.length > 0) {
-			content.push(
-				...sectionEntries(sectionHeading('Education'), blocks.education.value, renderEducation)
-			);
+		if (cv.education.length > 0) {
+			content.push(...sectionEntries(sectionHeading('Education'), cv.education, renderEducation));
 		}
 
 		// pdfmake's content DSL uses plain objects; cast content to satisfy the interface contract

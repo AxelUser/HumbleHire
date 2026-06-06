@@ -81,7 +81,7 @@ export function describeDiff(item: DiffItem, master: CV, tailored: CV): DiffRowM
 	for (const seg of item.path) {
 		if ('field' in seg) {
 			if (node.kind !== 'object') break;
-			const child = node.fields[seg.field];
+			const child: NodeDescriptor | undefined = node.fields[seg.field];
 			if (!child) break;
 			breadcrumb.push(child.label);
 			if (child.kind === 'scalar') lastScalarLabel = child.label;

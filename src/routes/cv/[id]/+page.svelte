@@ -9,7 +9,7 @@
 	import type { CV } from '$lib/types/cv';
 	import type { SaveStatus } from '$lib/types/save-status';
 	import { toast } from 'svelte-sonner';
-	import { computeBlockHashes } from '$lib/features/tailoring/hash';
+	import { computeHashes } from '$lib/features/tailoring/hash';
 	import { orphanTailored } from '$lib/features/tailoring/orphan';
 
 	let cv = $state<CV | null>(null);
@@ -48,7 +48,7 @@
 				await db.cvs.put({
 					...snapshot,
 					updatedAt: Date.now(),
-					blockHashes: computeBlockHashes(snapshot.blocks)
+					hashes: computeHashes(snapshot.content)
 				});
 				saveStatus = { status: 'saved', savedAt: Date.now() };
 			} catch (err) {

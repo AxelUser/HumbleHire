@@ -1,5 +1,5 @@
 import type { CV } from '$lib/types/cv';
-import { preprocessBlocks } from './preprocess';
+import { preprocessContent } from './preprocess';
 import { themes, DEFAULT_THEME_KEY } from './themes/index';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -24,9 +24,9 @@ async function getPdfMake() {
 }
 
 export function buildDocDef(cv: CV, themeKey = DEFAULT_THEME_KEY) {
-	const blocks = preprocessBlocks(cv);
+	const content = preprocessContent(cv);
 	const theme = themes[themeKey] ?? themes[DEFAULT_THEME_KEY];
-	return theme.build(blocks);
+	return theme.build(content);
 }
 
 export function sanitizeFilename(name: string): string {
