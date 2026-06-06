@@ -1,27 +1,17 @@
-import type {
-	CVBlockKey,
-	JobEntry,
-	ProjectEntry,
-	ContactEntry,
-	SkillCategory,
-	EducationEntry,
-	Achievement,
-	Highlight,
-	Tag,
-	CV
-} from '$lib/types/cv';
-import type { AnyEntry, DiffItem, NestedListKey } from './types';
-import { BLOCK_LABELS, FIELD_LABELS } from './types';
-import { resolveParentEntry, resolveDiffEntry } from './locate';
+import type { CV } from '$lib/types/cv';
+import { CV_DESCRIPTOR, type ListDescriptor, type NodeDescriptor } from './descriptor';
+import type { DiffItem } from './types';
 
 const monthYear = new Intl.DateTimeFormat('en', { month: 'short', year: 'numeric' });
 
+/** Render a value for display: a Date as "Mon YYYY", an empty value as a placeholder, else as text. */
 export function formatValue(value: unknown): string {
 	if (value instanceof Date) return monthYear.format(value);
 	if (value === undefined || value === null || value === '') return '(empty)';
 	return String(value);
 }
 
+/** Render a start–end period, collapsing to a single date or "Present", or nothing when undated. */
 export function formatPeriod(start?: Date, end?: Date, current = false): string | undefined {
 	if (!start && !end && !current) return undefined;
 	const from = start ? monthYear.format(start) : '?';
@@ -30,113 +20,92 @@ export function formatPeriod(start?: Date, end?: Date, current = false): string 
 	return `${from} – ${monthYear.format(end)}`;
 }
 
+/** Join the non-empty parts with a middot, or return nothing when they're all empty. */
 export function joinParts(...parts: Array<string | undefined>): string | undefined {
 	const kept = parts.filter((p): p is string => !!p && p.length > 0);
 	return kept.length > 0 ? kept.join(' · ') : undefined;
 }
 
-export type EntryKind =
-	| 'job'
-	| 'project'
-	| 'contact'
-	| 'skillCategory'
-	| 'education'
-	| 'achievement'
-	| 'highlight'
-	| 'tag';
-
-export function entryKind(blockKey: CVBlockKey, nestedListKey?: NestedListKey): EntryKind {
-	if (nestedListKey === 'achievements') return 'achievement';
-	if (nestedListKey === 'skills' || nestedListKey === 'stack') return 'tag';
-	switch (blockKey) {
-		case 'jobHistory':
-			return 'job';
-		case 'projects':
-			return 'project';
-		case 'contacts':
-			return 'contact';
-		case 'skills':
-			return 'skillCategory';
-		case 'education':
-			return 'education';
-		case 'highlights':
-			return 'highlight';
-		default:
-			return 'tag';
+/** Titles a specific list entry: its value-label field, else the first non-empty scalar, else a placeholder. */
+export function entryTitle(
+	list: ListDescriptor,
+	entry: Record<string, unknown> | undefined
+): string {
+	if (!entry) return '(unknown)';
+	if (list.itemValueLabel) {
+		const v = entry[list.itemValueLabel];
+		if (typeof v === 'string' && v.trim()) return v;
 	}
-}
-
-export const ENTRY_NOUNS: Record<EntryKind, string> = {
-	job: 'job entry',
-	project: 'project',
-	contact: 'contact',
-	skillCategory: 'skill category',
-	education: 'education entry',
-	achievement: 'achievement',
-	highlight: 'highlight',
-	tag: 'skill'
-};
-
-export function entryTitle(kind: EntryKind, entry: AnyEntry): string {
-	switch (kind) {
-		case 'job':
-			return (entry as JobEntry).company || '(untitled)';
-		case 'project':
-			return (entry as ProjectEntry).name || '(untitled)';
-		case 'contact':
-			return (entry as ContactEntry).value || '(empty)';
-		case 'skillCategory':
-			return (entry as SkillCategory).name || '(untitled)';
-		case 'education':
-			return (entry as EducationEntry).institution || '(untitled)';
-		case 'achievement':
-			return (entry as Achievement).text || '(empty)';
-		case 'highlight':
-			return (entry as Highlight).text || '(empty)';
-		case 'tag':
-			return (entry as Tag).value || '(empty)';
+	for (const [key, node] of Object.entries(list.entry.fields)) {
+		if (node.kind !== 'scalar') continue;
+		const v = entry[key];
+		if (typeof v === 'string' && v.trim()) return v;
 	}
+	return '(untitled)';
 }
 
 export interface DiffRowMeta {
-	blockLabel: string;
-	title: string;
+	breadcrumb: string[];
 	description: string;
-	change: 'added' | 'removed' | 'modified';
+	change: DiffItem['change'];
 }
 
-export function describeDiff(item: DiffItem, masterCv: CV, tailoredCv: CV): DiffRowMeta {
-	const blockLabel = BLOCK_LABELS[item.blockKey] ?? String(item.blockKey);
-
-	if (item.kind === 'text') {
-		return {
-			blockLabel,
-			title: blockLabel,
-			description: `Changed ${blockLabel}`,
-			change: 'modified'
-		};
-	}
-
-	if (item.kind === 'nested') {
-		const kind = entryKind(item.blockKey, item.nestedListKey);
-		const noun = ENTRY_NOUNS[kind];
-		const verb =
-			item.change === 'added' ? 'Added' : item.change === 'removed' ? 'Removed' : 'Modified';
-		const parent = resolveParentEntry(item, masterCv, tailoredCv);
-		const parentKind = entryKind(item.blockKey);
-		const title = parent ? entryTitle(parentKind, parent) : '(unknown)';
-		return { blockLabel, title, description: `${verb} ${noun}`, change: item.change };
-	}
-
-	// top-level entry
-	const kind = entryKind(item.blockKey);
-	const noun = ENTRY_NOUNS[kind];
-	const entry = resolveDiffEntry(item, masterCv, tailoredCv);
-	const title = entry ? entryTitle(kind, entry) : '(unknown)';
-	const verb =
-		item.change === 'added' ? 'Added' : item.change === 'removed' ? 'Removed' : 'Modified';
-	const description = item.change === 'modified' ? `Modified ${noun}` : `${verb} ${noun}`;
-	return { blockLabel, title, description, change: item.change };
+/** Narrow a value to a plain record, or undefined when it isn't one, so the walk can read fields off it. */
+function asRecord(value: unknown): Record<string, unknown> | undefined {
+	return value && typeof value === 'object' ? (value as Record<string, unknown>) : undefined;
 }
 
-export { BLOCK_LABELS, FIELD_LABELS };
+/** Find an entry by id in what should be a list, returning undefined when it isn't there. */
+function findById(value: unknown, id: string): Record<string, unknown> | undefined {
+	if (!Array.isArray(value)) return undefined;
+	return value.find((e) => (e as { objectId?: string }).objectId === id) as
+		| Record<string, unknown>
+		| undefined;
+}
+
+/**
+ * Build a readable breadcrumb and a one-line description for a diff item, reading every word from
+ * the descriptor along the item's path: section and list labels, an entry title from the list's
+ * itemValueLabel, and the field label at the end. No hard-coded label maps, which is what leaves
+ * room for translation later. Entry titles come from the master, falling back to the tailored copy
+ * for a removed entry that's already gone from the master.
+ */
+export function describeDiff(item: DiffItem, master: CV, tailored: CV): DiffRowMeta {
+	const breadcrumb: string[] = [];
+	let node: NodeDescriptor = CV_DESCRIPTOR;
+	let valM: unknown = master.content;
+	let valT: unknown = tailored.content;
+	let lastListLabel = '';
+	let lastScalarLabel = '';
+
+	for (const seg of item.path) {
+		if ('field' in seg) {
+			if (node.kind !== 'object') break;
+			const child = node.fields[seg.field];
+			if (!child) break;
+			breadcrumb.push(child.label);
+			if (child.kind === 'scalar') lastScalarLabel = child.label;
+			node = child;
+			valM = asRecord(valM)?.[seg.field];
+			valT = asRecord(valT)?.[seg.field];
+		} else {
+			if (node.kind !== 'list') break;
+			lastListLabel = node.itemLabel;
+			const entryM = findById(valM, seg.id);
+			const entryT = findById(valT, seg.id);
+			breadcrumb.push(entryTitle(node, entryM ?? entryT));
+			node = node.entry;
+			valM = entryM;
+			valT = entryT;
+		}
+	}
+
+	const description =
+		item.change === 'modified'
+			? `Changed ${lastScalarLabel}`
+			: item.change === 'added'
+				? `Added ${lastListLabel}`
+				: `Removed ${lastListLabel}`;
+
+	return { breadcrumb, description, change: item.change };
+}

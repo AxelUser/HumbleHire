@@ -10,86 +10,151 @@ export interface WithId {
 	objectId: ObjectId;
 }
 
-export interface Block<T> extends WithId {
-	value: T;
-}
-
-export interface Tag extends WithId {
+/**
+ * A list item that is a bare string but carries an id internally so the
+ * sync engine can match it by identity (e.g. highlights, keywords, courses, roles).
+ */
+export interface StringEntry extends WithId {
 	value: string;
 }
 
-export interface ContactEntry extends WithId {
-	label: string;
-	value: string;
+export interface Profile extends WithId {
+	network: string;
+	username?: string;
+	url: string;
 }
 
-export interface JobEntry extends WithId {
-	company: string;
-	role: string;
-	startDate: Date | undefined;
-	endDate: Date | undefined;
+export interface Basics {
+	fullName: string; // JSON Resume basics.name
+	position: string; // basics.label
+	image?: string; // URL to a photo
+	location: string; // kept a plain string deliberately
+	summary: string; // reserved; highlights drives the UI for now
+	highlights: StringEntry[];
+	email: string;
+	phone: string;
+	url: string;
+	profiles: Profile[]; // custom labels live in `network`
+}
+
+export interface WorkEntry extends WithId {
+	name: string; // employer/entity; may be "Freelance", a gap, etc.
+	position: string;
+	location?: string;
+	description?: string; // e.g. "Social Media Company" (work[].description)
+	url?: string;
+	startDate?: Date;
+	endDate?: Date;
 	current: boolean;
-	achievements: Achievement[];
-	skills: Tag[];
+	summary?: string;
+	highlights: StringEntry[];
+	keywords: StringEntry[];
 }
 
-export interface Achievement extends WithId {
-	text: string;
+export interface VolunteerEntry extends WithId {
+	organization: string;
+	position: string;
+	url?: string;
+	startDate?: Date;
+	endDate?: Date;
+	current: boolean;
+	summary?: string;
+	highlights: StringEntry[];
 }
 
-export interface Highlight extends WithId {
-	text: string;
+export interface EducationEntry extends WithId {
+	institution: string;
+	url?: string;
+	studyType?: string;
+	area?: string;
+	startDate?: Date;
+	endDate?: Date;
+	current: boolean;
+	score?: string;
+	courses: StringEntry[];
+}
+
+export interface AwardEntry extends WithId {
+	title: string;
+	date?: Date;
+	awarder?: string;
+	summary?: string;
+}
+
+export interface CertificateEntry extends WithId {
+	name: string;
+	date?: Date;
+	url?: string;
+	issuer?: string;
+}
+
+export interface PublicationEntry extends WithId {
+	name: string;
+	publisher?: string;
+	releaseDate?: Date;
+	url?: string;
+	summary?: string;
+}
+
+export interface SkillCategory extends WithId {
+	name: string;
+	level?: string;
+	keywords: StringEntry[];
+}
+
+export interface LanguageEntry extends WithId {
+	language: string;
+	fluency?: string;
+}
+
+export interface InterestEntry extends WithId {
+	name: string;
+	keywords: StringEntry[];
+}
+
+export interface ReferenceEntry extends WithId {
+	name: string;
+	reference: string;
 }
 
 export interface ProjectEntry extends WithId {
 	name: string;
 	description: string;
-	stack: Tag[];
-	link: string;
-}
-
-export interface SkillCategory extends WithId {
-	name: string;
-	skills: Tag[];
-}
-
-export interface EducationEntry extends WithId {
-	institution: string;
-	degree: string;
-	startDate: Date | undefined;
-	endDate: Date | undefined;
+	url?: string;
+	startDate?: Date;
+	endDate?: Date;
 	current: boolean;
+	highlights: StringEntry[];
+	keywords: StringEntry[];
+	roles: StringEntry[];
+	entity?: string;
+	type?: string;
 }
 
-export interface CVBlocks {
-	fullName: Block<string>;
-	position: Block<string>;
-	location: Block<string>;
-
-	contacts: Block<ContactEntry[]>;
-
-	highlights: Block<Highlight[]>;
-
-	skills: Block<SkillCategory[]>;
-
-	jobHistory: Block<JobEntry[]>;
-
-	projects: Block<ProjectEntry[]>;
-
-	education: Block<EducationEntry[]>;
+/**
+ * Presentation-free resume data, grouped into the full JSON Resume section set.
+ * Block order, on-page grouping, and layout are presentation concerns and live
+ * with the theme, never here. See ADR-010.
+ */
+export interface CVContent {
+	basics: Basics;
+	work: WorkEntry[];
+	volunteer: VolunteerEntry[];
+	education: EducationEntry[];
+	awards: AwardEntry[];
+	certificates: CertificateEntry[];
+	publications: PublicationEntry[];
+	skills: SkillCategory[];
+	languages: LanguageEntry[];
+	interests: InterestEntry[];
+	references: ReferenceEntry[];
+	projects: ProjectEntry[];
 }
 
-export type CVBlockKey = keyof CVBlocks;
+export type SectionKey = keyof CVContent;
 
-export type TextBlockKey = {
-	[K in keyof CVBlocks]: CVBlocks[K] extends Block<string> ? K : never;
-}[keyof CVBlocks];
-
-export type ListBlockKey = {
-	[K in keyof CVBlocks]: CVBlocks[K] extends Block<Array<WithId>> ? K : never;
-}[keyof CVBlocks];
-
-export type BlockHashes = Record<CVBlockKey, string>;
+/** Per-section canonical hash, a derived cache refreshed at the content-write chokepoint. */
+export type SectionHashes = Record<SectionKey, string>;
 
 export interface CV {
 	id: string;
@@ -97,11 +162,11 @@ export interface CV {
 	company?: string;
 	createdAt: number;
 	updatedAt: number;
-	blocks: CVBlocks;
-	blockHashes: BlockHashes;
-	hiddenBlockIds: ObjectId[];
+	content: CVContent;
+	hidden: string[]; // canonical-encoded section/field/entry paths
+	hashes: SectionHashes;
 
 	sourceId?: string;
-	syncBaseline?: CVBlocks;
-	syncBaselineHashes?: BlockHashes;
+	baseline?: CVContent; // snapshot of master content at last sync
+	baselineHashes?: SectionHashes;
 }

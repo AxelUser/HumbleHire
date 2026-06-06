@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { canonicalJson, hashBlock } from './hash';
+import { canonicalJson, computeHashes, hashSection, SECTION_KEYS } from './hash';
+import { completeContent, emptyContent, str } from './_fixtures';
 
 describe('canonicalJson', () => {
 	it('sorts keys alphabetically regardless of insertion order', () => {
@@ -49,38 +50,44 @@ describe('canonicalJson', () => {
 	});
 });
 
-describe('hashBlock', () => {
+describe('hashSection', () => {
 	it('same content, different key order → same hash', () => {
-		expect(hashBlock({ company: 'Acme', role: 'Eng' })).toBe(
-			hashBlock({ role: 'Eng', company: 'Acme' })
+		expect(hashSection({ company: 'Acme', role: 'Eng' })).toBe(
+			hashSection({ role: 'Eng', company: 'Acme' })
 		);
 	});
 
 	it('different content → different hash', () => {
-		expect(hashBlock({ role: 'Eng' })).not.toBe(hashBlock({ role: 'Sr Eng' }));
-	});
-
-	it('hashing the same input twice is deterministic', () => {
-		const input = {
-			fullName: 'John',
-			jobs: [{ company: 'A', role: 'B' }]
-		};
-		expect(hashBlock(input)).toBe(hashBlock(input));
-	});
-
-	it('returns a fixed-width hex string', () => {
-		const h = hashBlock({ value: 'anything' });
-		expect(h).toMatch(/^[0-9a-f]+$/);
-		expect(h.length).toBeGreaterThan(0);
-	});
-
-	it('empty array vs empty object differ', () => {
-		expect(hashBlock([])).not.toBe(hashBlock({}));
+		expect(hashSection({ role: 'Eng' })).not.toBe(hashSection({ role: 'Sr Eng' }));
 	});
 
 	it('Date round-trip is stable', () => {
 		const d1 = new Date('2024-06-01T00:00:00.000Z');
 		const d2 = new Date('2024-06-01T00:00:00.000Z');
-		expect(hashBlock({ when: d1 })).toBe(hashBlock({ when: d2 }));
+		expect(hashSection({ when: d1 })).toBe(hashSection({ when: d2 }));
+	});
+});
+
+describe('computeHashes', () => {
+	it('produces a hash for every section', () => {
+		const hashes = computeHashes(completeContent());
+		for (const key of SECTION_KEYS) {
+			expect(hashes[key]).toMatch(/^[0-9a-f]+$/);
+		}
+	});
+
+	it('is deterministic for the same content', () => {
+		const content = completeContent();
+		expect(computeHashes(content)).toEqual(computeHashes(content));
+	});
+
+	it('changes only the section whose content changed', () => {
+		const before = computeHashes(emptyContent());
+		const after = computeHashes(
+			emptyContent({ skills: [{ objectId: '1' as never, name: 'X', keywords: [str('Go')] }] })
+		);
+		expect(after.skills).not.toBe(before.skills);
+		expect(after.work).toBe(before.work);
+		expect(after.basics).toBe(before.basics);
 	});
 });

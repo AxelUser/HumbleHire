@@ -1,16 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import type { ObjectId } from '$lib/types/cv';
 import { hasUpdatesAvailable } from './detection';
 import { diffCVs } from './diff';
 import { applySyncDecisions } from './apply';
-import { computeBlockHashes } from './hash';
-import { listBlock, makeAchievement, makeJob, makeMaster, makeTailored } from './_fixtures';
+import { computeHashes } from './hash';
+import { encodePath } from './paths';
+import { makeMaster, makeTailored, makeWork, str } from './_fixtures';
 
-function refreshMasterHashes(master: {
-	blocks: Parameters<typeof computeBlockHashes>[0];
-	blockHashes: ReturnType<typeof computeBlockHashes>;
-}) {
-	master.blockHashes = computeBlockHashes(master.blocks);
+function refreshMaster(master: ReturnType<typeof makeMaster>) {
+	master.hashes = computeHashes(master.content);
 }
 
 describe('hasUpdatesAvailable', () => {
@@ -20,132 +17,99 @@ describe('hasUpdatesAvailable', () => {
 		expect(hasUpdatesAvailable(master, tailored)).toBe(false);
 	});
 
-	it('master text edit triggers updates', () => {
+	it('master scalar edit triggers updates', () => {
 		const master = makeMaster();
 		const tailored = makeTailored(master);
-		master.blocks.position.value = 'Staff Engineer';
-		refreshMasterHashes(master);
+		master.content.basics.position = 'Staff Engineer';
+		refreshMaster(master);
 		expect(hasUpdatesAvailable(master, tailored)).toBe(true);
 	});
 
 	it('master nested edit triggers updates', () => {
-		const job = makeJob('Acme', 'Engineer');
-		const master = makeMaster({ jobHistory: listBlock([job]) });
+		const job = makeWork('Acme', 'Eng');
+		const master = makeMaster({ work: [job] });
 		const tailored = makeTailored(master);
-		master.blocks.jobHistory.value[0].achievements.push(makeAchievement('New'));
-		refreshMasterHashes(master);
+		master.content.work[0].highlights.push(str('New'));
+		refreshMaster(master);
 		expect(hasUpdatesAvailable(master, tailored)).toBe(true);
 	});
 
 	it('tailored-only edit does NOT trigger updates', () => {
 		const master = makeMaster();
 		const tailored = makeTailored(master);
-		tailored.blocks.position.value = 'My Custom Position';
-		tailored.blockHashes = computeBlockHashes(tailored.blocks);
+		tailored.content.basics.position = 'My Custom Position';
+		tailored.hashes = computeHashes(tailored.content);
 		expect(hasUpdatesAvailable(master, tailored)).toBe(false);
 	});
 
-	it('master change to hidden-on-master block does NOT trigger updates', () => {
-		const job = makeJob('Acme', 'Engineer');
-		const master = makeMaster({ jobHistory: listBlock([job]) });
-		master.hiddenBlockIds = [master.blocks.jobHistory.objectId];
+	it('master change to a section hidden on master does NOT trigger updates', () => {
+		const job = makeWork('Acme', 'Eng');
+		const master = makeMaster({ work: [job] }, { hidden: ['work/'] });
 		const tailored = makeTailored(master);
-		master.blocks.jobHistory.value[0].role = 'Staff Engineer';
-		refreshMasterHashes(master);
+		master.content.work[0].position = 'Staff Engineer';
+		refreshMaster(master);
 		expect(hasUpdatesAvailable(master, tailored)).toBe(false);
 	});
 
-	it('master change to hidden-on-tailored block does NOT trigger updates', () => {
-		const job = makeJob('Acme', 'Engineer');
-		const master = makeMaster({ jobHistory: listBlock([job]) });
-		const tailored = makeTailored(master);
-		tailored.hiddenBlockIds = [master.blocks.jobHistory.objectId];
-		master.blocks.jobHistory.value[0].role = 'Staff Engineer';
-		refreshMasterHashes(master);
-		expect(hasUpdatesAvailable(master, tailored)).toBe(false);
-	});
-
-	it('unhiding the block on tailored re-introduces updates', () => {
-		const job = makeJob('Acme', 'Engineer');
-		const master = makeMaster({ jobHistory: listBlock([job]) });
-		const tailored = makeTailored(master);
-		tailored.hiddenBlockIds = [master.blocks.jobHistory.objectId];
-		master.blocks.jobHistory.value[0].role = 'Staff Engineer';
-		refreshMasterHashes(master);
+	it('master change to a section hidden on tailored does NOT trigger updates, but unhide does', () => {
+		const job = makeWork('Acme', 'Eng');
+		const master = makeMaster({ work: [job] });
+		const tailored = makeTailored(master, { hidden: ['work/'] });
+		master.content.work[0].position = 'Staff Engineer';
+		refreshMaster(master);
 		expect(hasUpdatesAvailable(master, tailored)).toBe(false);
 
-		tailored.hiddenBlockIds = [];
+		tailored.hidden = [];
 		expect(hasUpdatesAvailable(master, tailored)).toBe(true);
 	});
 
-	it('master toggling visibility alone is not a content change', () => {
-		const job = makeJob('Acme', 'Engineer');
-		const master = makeMaster({ jobHistory: listBlock([job]) });
-		const tailored = makeTailored(master);
-		master.hiddenBlockIds = [master.blocks.jobHistory.objectId];
-		expect(hasUpdatesAvailable(master, tailored)).toBe(false);
-		master.hiddenBlockIds = [];
-		expect(hasUpdatesAvailable(master, tailored)).toBe(false);
-	});
-
-	it('after Apply with all discards, indicator turns off', () => {
+	it('turns off after applying all discards', () => {
 		const master = makeMaster();
 		const tailored = makeTailored(master);
-		master.blocks.position.value = 'Staff Engineer';
-		refreshMasterHashes(master);
+		master.content.basics.position = 'Staff Engineer';
+		refreshMaster(master);
 		expect(hasUpdatesAvailable(master, tailored)).toBe(true);
 
 		const items = diffCVs(master, tailored);
-		const decisions = new Map<ObjectId, 'accepted' | 'discarded'>(
-			items.map((i) => [i.objectId, 'discarded'] as const)
+		applySyncDecisions(
+			tailored,
+			master,
+			new Map(items.map((i) => [encodePath(i.path), 'discarded' as const]))
 		);
-		applySyncDecisions(tailored, master, decisions);
-
 		expect(hasUpdatesAvailable(master, tailored)).toBe(false);
 	});
 
-	it('after Apply with all accepts, indicator turns off', () => {
+	it('turns off after applying all accepts', () => {
 		const master = makeMaster();
 		const tailored = makeTailored(master);
-		master.blocks.position.value = 'Staff Engineer';
-		refreshMasterHashes(master);
+		master.content.basics.position = 'Staff Engineer';
+		refreshMaster(master);
 
 		const items = diffCVs(master, tailored);
-		const decisions = new Map<ObjectId, 'accepted' | 'discarded'>(
-			items.map((i) => [i.objectId, 'accepted'] as const)
+		applySyncDecisions(
+			tailored,
+			master,
+			new Map(items.map((i) => [encodePath(i.path), 'accepted' as const]))
 		);
-		applySyncDecisions(tailored, master, decisions);
-
 		expect(hasUpdatesAvailable(master, tailored)).toBe(false);
 	});
 
-	it('a CV without syncBaselineHashes (e.g. orphaned) has no updates', () => {
+	it('a CV without baselineHashes (e.g. orphaned) has no updates', () => {
 		const master = makeMaster();
 		const tailored = makeTailored(master);
-		tailored.syncBaselineHashes = undefined;
-		master.blocks.position.value = 'Anything';
-		refreshMasterHashes(master);
+		tailored.baselineHashes = undefined;
+		master.content.basics.position = 'Anything';
+		refreshMaster(master);
 		expect(hasUpdatesAvailable(master, tailored)).toBe(false);
 	});
 
-	it('indicator is on iff diffCVs returns ≥1 item (strict equivalence) — multiple scenarios', () => {
-		const scenarios = [
-			(m: ReturnType<typeof makeMaster>) => {
-				m.blocks.fullName.value = 'Different Name';
-			},
-			(m: ReturnType<typeof makeMaster>) => {
-				m.blocks.highlights.value.push(makeAchievement('x') as never);
-			},
-			(m: ReturnType<typeof makeMaster>) => {
-				m.blocks.location.value = 'Berlin';
-			}
-		];
-		for (const mutate of scenarios) {
-			const master = makeMaster();
-			const tailored = makeTailored(master);
-			mutate(master);
-			refreshMasterHashes(master);
-			expect(hasUpdatesAvailable(master, tailored)).toBe(diffCVs(master, tailored).length > 0);
-		}
+	it('documented wart: a sole change in a hidden basics field lights the badge with an empty drawer', () => {
+		// Field-level hiding is per-field; the badge is per-section. This false positive is accepted.
+		const master = makeMaster();
+		const tailored = makeTailored(master, { hidden: ['basics/location/'] });
+		master.content.basics.location = 'Berlin';
+		refreshMaster(master);
+		expect(diffCVs(master, tailored)).toEqual([]); // drawer is empty (field hidden)
+		expect(hasUpdatesAvailable(master, tailored)).toBe(true); // badge still lights
 	});
 });
