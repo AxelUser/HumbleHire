@@ -25,7 +25,7 @@ An item inside an entry. One achievement inside a job, one skill tag inside a pr
 _Avoid_: Sub-entry, child item
 
 **Hidden**:
-Content that is preserved but excluded from the [[preview]] and [[export]]. Tracked per CV as a set of addresses — a section path (`work`, `basics.location`) today, an [[entry]] id when entry-level hiding ships. Used both while drafting a [[master cv]] (park a section) and while shaping a [[tailored cv]] (drop a section from one copy); it is not exclusively a tailoring concern.
+Content that is preserved but excluded from the [[preview]] and [[export]]. Tracked per CV as a set of [[path]]s — the same address type [[diff item]]s use — that may stop at a section (`work`), a field (`basics.location`), or, when entry-level hiding ships, an [[entry]] id. Stored and compared in the single canonical path-string encoding shared with [[sync decisions]] keys. Used both while drafting a [[master cv]] (park a section) and while shaping a [[tailored cv]] (drop a section from one copy); it is not exclusively a tailoring concern.
 _Avoid_: Disabled, off, "hidden block" (the unit is no longer a block).
 
 **Snapshot**:
@@ -41,7 +41,7 @@ _Avoid_: "Zero telemetry", "no network", "offline-only" used as synonyms for loc
 The same CV exists in four shapes. Naming them keeps conversations about "the model" unambiguous about which one is meant.
 
 **Stored CV**:
-The shape of a CV as persisted in the browser database. Owns identity and whatever the [[runtime cv]] must survive a reload. Currently identical to the runtime shape; may diverge later to drop recomputed fields or to lay data out for storage consistency.
+The shape of a CV as persisted in the browser database. Owns identity and whatever the [[runtime cv]] must survive a reload, including derived caches kept on purpose — the per-section hashes are stored so the [[dashboard]] can detect [[updates available]] without rehydrating full content. Currently identical to the runtime shape; if it ever diverges, the difference is the [[runtime cv]] holding extra ephemeral state, not the Stored CV dropping a cache.
 _Avoid_: DB model (when product-facing), persisted blob.
 
 **Runtime CV**:

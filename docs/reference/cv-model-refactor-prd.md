@@ -224,7 +224,8 @@ interface StringEntry extends WithId {
 
 - The new sections (`volunteer`, `awards`, `certificates`, `publications`, `languages`, `interests`, `references`) and the extra fields (`basics.image`, `work.description`, `projects.roles`/`entity`/`type`) are modelled, described, synced, and serialized in step 1; only their editor UI and PDF rendering wait for step 2.
 - `highlights`, `keywords`, `courses`, `roles` are id-bearing `StringEntry` internally so the engine matches them by id; they serialize to `string[]`.
-- `hidden` holds **addresses**: a section path (`"work"`, `"basics.location"`) today; an entry `objectId` later for entry-level hiding, with no model change.
+- `hidden` holds **addresses**, and an address _is_ a `Path` in its canonical string encoding — the same encoding the diff decision keys use (one shared encoder, see Path utils). It stops at a section (`"work"`), a field (`"basics.location"`) today, or an entry `objectId` later for entry-level hiding, with no model change. `hidden: string[]` lives on **both** Stored and Runtime CV; membership-heavy operations build a transient `new Set(cv.hidden)` per call (as `detection.ts` does today) — never a persisted `Set`, never a tree, never a Storage/Runtime divergence for hide-state.
+- Entry-level hiding (step 2) resolves through **read-time ancestor containment**: a node is hidden if its own encoded path _or any ancestor prefix_ is in the set. This is non-destructive — a section-hide shadows entry-hides under it without erasing them, so unhiding the section restores each entry to its prior hidden/visible state. Because paths are shallow, the prefix check is O(depth); no compaction tree is needed or wanted (compaction would force the lossy semantics).
 - `hashes`/`baselineHashes` are derived per **section**, recomputed only through a single content-write chokepoint so they cannot drift from `content`.
 
 ### Descriptor and Sync tree (sync engine)
@@ -284,6 +285,8 @@ Resolving reconciles the baseline to the master at that path; accept additionall
 
 Per-section canonical hash, computed from `content` (reuse the existing canonical-JSON approach, ids included). `hasUpdatesAvailable` compares master section hashes against the tailored baseline hashes, skipping sections hidden on either side. Known accepted wart: a hidden basics field that is the sole change can light the badge with an empty drawer, since hashes are per section not per field.
 
+This wart must be **explained in a code comment at `hasUpdatesAvailable`** — that is where the section-granularity hash comparison meets the per-field hiding the drawer honours, so it is where the false positive is born. `computeHashes` gets only a one-line note that it intentionally ignores hide-state (it hashes every field of a section, hidden or not), so that detection stays a cheap section-level check; the hasher must not be coupled to hide-state.
+
 ### Serialization (Document DTO, JSON schema v0.1.0)
 
 - `meta.humblehire` is a general wildcard for values a target format cannot represent losslessly, not a contacts-specific stash. The contacts stash is removed (typed contacts round-trip through standard fields).
@@ -315,7 +318,7 @@ Deep modules to build or rewrite, each with a small interface that rarely change
 - **Detection** — `hasUpdatesAvailable(master, tailored)` over section hashes, skipping hidden.
 - **Present** — breadcrumb and description from descriptor plus path.
 - **Serialization mapper** — `toDocument` / `fromDocument` / `toJsonResume`, the `meta` wildcard, near-identity field mapping across all twelve sections (foreign sections are imported, not dropped).
-- **Path utils** — canonical path-string encoding shared by `hidden` keys and diff decision keys.
+- **Path utils** — canonical path-string encoding shared by `hidden` keys and diff decision keys. The encoding must be **prefix-safe** (a segment terminator, e.g. `work/` rather than `work`) so the read-time ancestor-containment check for hide-state can never false-match a sibling (`work` vs `workshops`).
 - **Persistence / creation** — Dexie version bump and wipe; `createCV` and `createTailoredCV` content defaults and baseline cloning.
 - **Editor port** — block components and other consumers, minimal.
 
