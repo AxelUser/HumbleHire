@@ -24,36 +24,42 @@ This is delivered in two steps on one branch:
 
 ## User Stories
 
-1. As a job seeker, I want my full name, job title, location, summary, and highlights grouped under one "basics" section, so that the model mirrors how a resume actually reads.
-2. As a job seeker, I want a real summary field alongside my highlights, so that I can keep a prose summary and a bullet list without one overwriting the other.
-3. As a job seeker, I want my highlights to keep driving the editor for now, so that nothing about my current editing flow regresses while the summary field waits for its editor.
-4. As a job seeker, I want typed email, phone, and website contacts plus a list of profiles, so that my contacts export losslessly to any JSON Resume tool.
-5. As a job seeker, I want custom contact types (Mastodon, Telegram, and so on) to survive as profiles, so that I keep the free-form flexibility I had before without a lossy stash.
-6. As a job seeker with a career gap or freelance period, I want a work entry's employer to be any text (not "company"), so that I can record "Freelance" or "Parental leave" honestly.
-7. As a job seeker, I want each work entry to carry location, url, summary, highlights, and keywords, so that I can describe a role completely.
-8. As a job seeker, I want education entries to split study type and area and to hold score, courses, and a url, so that my education matches the JSON Resume shape.
-9. As a job seeker, I want skill categories to carry an optional level, so that I can express proficiency.
+_Content model (job seeker):_
+
+1. As a job seeker, I want my name, job title, location, summary, and highlights grouped under one "basics" section, so that the model reads like a real resume.
+2. As a job seeker, I want a real summary field alongside my highlights, so that a prose summary and a bullet list can coexist without overwriting each other.
+3. As a job seeker, I want my current highlights-driven editing flow to keep working unchanged, so that the refactor does not regress how I edit today.
+4. As a job seeker, I want typed email, phone, and website contacts plus a list of profiles — including custom ones like Mastodon or Telegram — so that every contact exports losslessly as a standard profile instead of a lossy stash.
+5. As a job seeker with a career gap or freelance period, I want a work entry's employer to be free text, so that I can record "Freelance" or "Parental leave" honestly.
+6. As a job seeker, I want each work entry to carry location, url, summary, highlights, and keywords, so that I can describe a role completely.
+7. As a job seeker, I want education entries to split study type and area and to hold score, courses, and a url, so that my education matches the JSON Resume shape.
+8. As a job seeker, I want skill categories to carry an optional proficiency level.
+9. As a job seeker, I want projects to carry roles, entity, and type, so that project entries match JSON Resume fully.
+
+_Export, import, and round-trip (job seeker):_
+
 10. As a job seeker, I want my CVs to export to standard JSON Resume and re-import without losing my highlights, so that round-tripping is safe.
-11. As a job seeker, I want exporting to lossless HumbleHire JSON to keep every field as first-class data, so that backups are exact.
-12. As a job seeker importing a foreign JSON Resume that only has a summary, I want that summary turned into highlights, so that the content shows up in my highlights-driven editor.
-13. As a job seeker tailoring a CV, I want to accept or discard each changed field of a job independently, so that I can take the master's new title but keep my tailored summary.
-14. As a job seeker, I want a discarded change to stay discarded until the master changes that field again, so that I am not re-prompted for decisions I already made.
-15. As a job seeker, I want a hidden section that the master changed to show its changes the moment I unhide it, so that hiding while drafting never silently swallows updates.
-16. As a job seeker, I want to hide whole sections (and, later, individual entries) without deleting their content, so that I can shape a tailored copy or park a section while drafting.
-17. As a job seeker, I want the sync view to show a readable breadcrumb for each change, so that I know exactly which entry and field a change belongs to.
-18. As a job seeker, I want the "updates available" badge to stay accurate and cheap, so that the dashboard reflects real master changes without lag.
-19. As a maintainer, I want one descriptor to drive diff, apply, labels, and breadcrumbs, so that adding a section later touches one declarative place instead of six files.
-20. As a maintainer, I want a coverage test that fails when a content field has no descriptor node, so that a field can never silently fall out of sync.
-21. As a maintainer, I want the content model free of presentation and sync machinery, so that the type the editor binds to stays simple.
-22. As a maintainer, I want the sync engine to recurse arbitrary depth, so that deeper Axis B sections work without relaxing a depth cap by hand.
-23. As a maintainer, I want the serialization mapper to thin toward identity, so that the wire format and the model drift apart as little as possible.
-24. As a job seeker, I want my volunteer experience stored with the same shape as work, so that unpaid roles are first-class on my record.
-25. As a job seeker, I want awards, certificates, and publications stored, so that my full professional record survives export and sync even before they have editors.
-26. As a job seeker, I want languages and interests stored, so that a complete JSON Resume imports without dropping sections.
-27. As a job seeker, I want references stored, so that I can keep them on the master and hide them on tailored copies.
-28. As a job seeker, I want projects to carry roles, entity, and type, so that project entries match JSON Resume fully.
-29. As a job seeker, I want a photo URL on basics, so that imported resumes that carry an image are not silently stripped.
-30. As a job seeker, I want every section I cannot yet edit in the UI to still round-trip through HumbleHire JSON export, import, and master sync, so that no data is lost while the editors are being built.
+11. As a job seeker, I want lossless HumbleHire JSON export to keep every field first-class, so that backups are exact.
+12. As a job seeker importing a foreign JSON Resume that has only a summary, I want it split into highlights, so that the content lands in my highlights-driven editor.
+13. As a job seeker, I want every section I cannot yet edit in the UI — volunteer, awards, certificates, publications, languages, interests, references, and a basics photo — still stored and round-tripped through export, import, and master sync, so that no data is lost before its editor exists.
+
+_Tailoring and sync (job seeker):_
+
+14. As a job seeker tailoring a CV, I want to accept or discard each changed field independently in any entry — a job's new title apart from its summary, a school's dates apart from its area — so that I can take some of the master's changes and keep my own.
+15. As a job seeker, I want a discarded change to stay discarded until the master changes that field again, so that I am not re-prompted for decisions I already made.
+16. As a job seeker, I want to hide whole sections (and, later, individual entries) without deleting their content, so that I can park a section while drafting a master or drop one from a tailored copy — references, say, kept on the master and hidden on a tailored copy.
+17. As a job seeker, I want a hidden section the master changed to reveal those changes the moment I unhide it, so that hiding never silently swallows updates.
+18. As a job seeker, I want the sync view to show a readable breadcrumb for each change, so that I know exactly which entry and field it belongs to.
+19. As a job seeker, I want the "updates available" badge to light up only for real, unreviewed master changes and stay dark for changes I have hidden, so that I can trust it.
+
+_Maintainability (maintainer):_
+
+20. As a maintainer, I want one descriptor to drive diff, apply, labels, and breadcrumbs, so that adding a section later touches one declarative place instead of six files.
+21. As a maintainer, I want a coverage test that fails when a content field has no descriptor node, so that a field can never silently fall out of sync.
+22. As a maintainer, I want the content model free of presentation and sync machinery, so that the type the editor binds to stays simple.
+23. As a maintainer, I want the sync engine to recurse arbitrary depth, so that deeply nested sections work without relaxing a depth cap by hand.
+24. As a maintainer, I want the serialization mapper to thin toward identity, so that the wire format and the model drift apart as little as possible.
+25. As a maintainer, I want updates-available detection to run on cheap per-section hashes, so that the dashboard stays responsive as the model grows.
 
 ## Implementation Decisions
 
@@ -331,7 +337,7 @@ Modules to cover:
 ## Out of Scope
 
 - The editor redesign, entry dialogs, the styling/layout sidebar, and presentation/order settings (step 2).
-- **Editor UI and PDF rendering** for the sections that had no surface before — volunteer, awards, certificates, publications, languages, interests, references, and the basics photo. The model, descriptor, sync, and serialization for these land in step 1; only their editors and theme rendering are step 2. (This is the correction to the earlier "Axis B is deferred" framing: only the _surfaces_ are deferred, not the model.)
+- **Editor UI and PDF rendering** for the sections that had no surface before — volunteer, awards, certificates, publications, languages, interests, references, and the basics photo. The model, descriptor, sync, and serialization for these land in step 1; only their editors and theme rendering are step 2. Only the _surfaces_ are deferred, never the model.
 - A live summary editor (the field exists, highlights drives the UI).
 - A database migration (deliberate wipe) and any `v0.0.1` import compatibility shim.
 - Entry-level and field-level hiding UI (the `hidden` address set already supports it; only section hiding ships now).
