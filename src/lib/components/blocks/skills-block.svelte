@@ -11,11 +11,10 @@
 
 	interface Props {
 		skills: SkillCategory[];
-		blockId: ObjectId;
-		hiddenBlockIds: ObjectId[];
+		hidden: string[];
 	}
 
-	let { skills = $bindable(), blockId, hiddenBlockIds = $bindable() }: Props = $props();
+	let { skills = $bindable(), hidden = $bindable() }: Props = $props();
 
 	const isFlat = $derived(skills.length <= 1 && (skills.length === 0 || skills[0].name === ''));
 
@@ -28,12 +27,12 @@
 
 	$effect.pre(() => {
 		if (skills.length === 0) {
-			skills = [{ objectId: createObjectId(), name: '', skills: [] }];
+			skills = [{ objectId: createObjectId(), name: '', keywords: [] }];
 		}
 	});
 
 	function addCategory() {
-		skills = [...skills, { objectId: createObjectId(), name: '', skills: [] }];
+		skills = [...skills, { objectId: createObjectId(), name: '', keywords: [] }];
 	}
 
 	function removeCategory(objectId: ObjectId) {
@@ -41,11 +40,11 @@
 	}
 </script>
 
-<BlockWrapper title="Skills" {blockId} bind:hiddenBlockIds>
+<BlockWrapper title="Skills" path="skills/" bind:hidden>
 	{#if isFlat}
 		<div class="flex flex-col gap-2">
 			<TagInput
-				bind:tags={skills[0].skills}
+				bind:tags={skills[0].keywords}
 				placeholder="Add skill (e.g. React, AWS, Leadership)"
 			/>
 			<Button variant="outline" size="sm" class="self-start" onclick={addCategory}>
@@ -78,7 +77,7 @@
 										<Trash2 class="h-4 w-4" />
 									</Button>
 								</div>
-								<TagInput bind:tags={category.skills} placeholder="Add skill..." />
+								<TagInput bind:tags={category.keywords} placeholder="Add skill..." />
 							</div>
 						{/snippet}
 					</SortableItem>

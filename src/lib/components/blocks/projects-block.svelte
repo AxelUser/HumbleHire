@@ -12,11 +12,10 @@
 
 	interface Props {
 		projects: ProjectEntry[];
-		blockId: ObjectId;
-		hiddenBlockIds: ObjectId[];
+		hidden: string[];
 	}
 
-	let { projects = $bindable(), blockId, hiddenBlockIds = $bindable() }: Props = $props();
+	let { projects = $bindable(), hidden = $bindable() }: Props = $props();
 
 	const drag = createSortableDragHandlers(
 		() => projects,
@@ -32,8 +31,11 @@
 				objectId: createObjectId(),
 				name: '',
 				description: '',
-				stack: [],
-				link: ''
+				url: '',
+				current: false,
+				highlights: [],
+				keywords: [],
+				roles: []
 			}
 		];
 	}
@@ -43,7 +45,7 @@
 	}
 </script>
 
-<BlockWrapper title="Projects" {blockId} bind:hiddenBlockIds>
+<BlockWrapper title="Projects" path="projects/" bind:hidden>
 	<DragDropProvider {...drag}>
 		<div class="flex flex-col gap-4">
 			{#each projects as project, index (project.objectId)}
@@ -75,11 +77,11 @@
 								rows={3}
 							/>
 							<TagInput
-								bind:tags={project.stack}
+								bind:tags={project.keywords}
 								placeholder="Add tech (e.g. TypeScript, Svelte)"
 							/>
 							<InlineField
-								bind:value={project.link}
+								bind:value={project.url}
 								placeholder="Link (optional)"
 								class="w-full text-sm"
 							/>

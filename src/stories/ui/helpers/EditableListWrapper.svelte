@@ -4,7 +4,7 @@
 
 	interface ListItem {
 		objectId: ObjectId;
-		text: string;
+		value: string;
 	}
 
 	interface Props {
@@ -13,7 +13,9 @@
 
 	let { startItems = [] }: Props = $props();
 
-	let items = $state<ListItem[]>(startItems.map((text) => ({ objectId: createObjectId(), text })));
+	let items = $state<ListItem[]>(
+		startItems.map((value) => ({ objectId: createObjectId(), value }))
+	);
 </script>
 
 <div class="flex flex-col gap-4">

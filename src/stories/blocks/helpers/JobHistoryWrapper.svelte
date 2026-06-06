@@ -1,6 +1,6 @@
 <script lang="ts">
 	import JobHistoryBlock from '$lib/components/blocks/job-history-block.svelte';
-	import { createObjectId, type ObjectId, type JobEntry } from '$lib/types/cv';
+	import { createObjectId, type WorkEntry } from '$lib/types/cv';
 
 	interface Props {
 		startVisible?: boolean;
@@ -9,61 +9,55 @@
 
 	let { startVisible = true, startEmpty = false }: Props = $props();
 
-	const blockId = createObjectId();
+	function mkKeywords(values: string[]) {
+		return values.map((value) => ({ objectId: createObjectId(), value }));
+	}
 
-	let jobs = $state<JobEntry[]>(
+	let jobs = $state<WorkEntry[]>(
 		startEmpty
 			? []
 			: [
 					{
 						objectId: createObjectId(),
-						company: 'Stripe',
-						role: 'Senior Software Engineer',
+						name: 'Stripe',
+						position: 'Senior Software Engineer',
 						startDate: new Date(Date.UTC(2021, 0, 1)),
 						endDate: undefined,
 						current: true,
-						achievements: [
+						highlights: [
 							{
 								objectId: createObjectId(),
-								text: 'Built and maintained payment processing APIs handling $10B+ annually.'
+								value: 'Built and maintained payment processing APIs handling $10B+ annually.'
 							},
 							{
 								objectId: createObjectId(),
-								text: 'Reduced API latency by 40% through query optimization and caching.'
+								value: 'Reduced API latency by 40% through query optimization and caching.'
 							}
 						],
-						skills: [
-							{ objectId: createObjectId(), value: 'Go' },
-							{ objectId: createObjectId(), value: 'Kubernetes' },
-							{ objectId: createObjectId(), value: 'PostgreSQL' }
-						]
+						keywords: mkKeywords(['Go', 'Kubernetes', 'PostgreSQL'])
 					},
 					{
 						objectId: createObjectId(),
-						company: 'Vercel',
-						role: 'Software Engineer',
+						name: 'Vercel',
+						position: 'Software Engineer',
 						startDate: new Date(Date.UTC(2019, 5, 1)),
 						endDate: new Date(Date.UTC(2020, 11, 1)),
 						current: false,
-						achievements: [
+						highlights: [
 							{
 								objectId: createObjectId(),
-								text: 'Contributed to the Edge Runtime rollout across 50+ enterprise customers.'
+								value: 'Contributed to the Edge Runtime rollout across 50+ enterprise customers.'
 							},
 							{
 								objectId: createObjectId(),
-								text: 'Improved CI/CD pipeline speed by 60% with parallelized test execution.'
+								value: 'Improved CI/CD pipeline speed by 60% with parallelized test execution.'
 							}
 						],
-						skills: [
-							{ objectId: createObjectId(), value: 'TypeScript' },
-							{ objectId: createObjectId(), value: 'React' },
-							{ objectId: createObjectId(), value: 'AWS' }
-						]
+						keywords: mkKeywords(['TypeScript', 'React', 'AWS'])
 					}
 				]
 	);
-	let hiddenBlockIds = $state<ObjectId[]>(startVisible ? [] : [blockId]);
+	let hidden = $state<string[]>(startVisible ? [] : ['work/']);
 </script>
 
-<JobHistoryBlock bind:jobs {blockId} bind:hiddenBlockIds />
+<JobHistoryBlock bind:jobs bind:hidden />

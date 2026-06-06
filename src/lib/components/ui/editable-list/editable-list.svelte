@@ -10,7 +10,7 @@
 
 	interface ListItem {
 		objectId: ObjectId;
-		text: string;
+		value: string;
 	}
 
 	interface Props {
@@ -35,7 +35,7 @@
 	);
 
 	function addItem() {
-		items = [...items, { objectId: createObjectId(), text: '' }];
+		items = [...items, { objectId: createObjectId(), value: '' }];
 	}
 
 	function removeItem(index: number) {
@@ -59,7 +59,7 @@
 								<GripVertical class="size-4" />
 							</span>
 							<InlineTextarea
-								bind:value={items[index].text}
+								bind:value={items[index].value}
 								{placeholder}
 								class="flex-1"
 								rows={2}
@@ -88,7 +88,7 @@
 			{#if item}
 				<div class="bg-background flex items-center gap-2 rounded px-1 py-1 shadow-lg">
 					<GripVertical class="text-muted-foreground size-4 shrink-0" />
-					<span class="flex-1 text-sm">{item.text || placeholder}</span>
+					<span class="flex-1 text-sm">{item.value || placeholder}</span>
 				</div>
 			{/if}
 		{/snippet}

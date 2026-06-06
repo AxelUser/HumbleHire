@@ -2,25 +2,21 @@
 	import type { Snippet } from 'svelte';
 	import { Eye, EyeOff } from '@lucide/svelte';
 	import { PanelCard } from '$lib/components/ui/panel-card';
-	import type { ObjectId } from '$lib/types/cv';
 
 	interface Props {
 		title: string;
-		blockId: ObjectId;
-		hiddenBlockIds: ObjectId[];
+		/** The canonical hide marker for this block, e.g. "work/" or "basics/location/". */
+		path: string;
+		hidden: string[];
 		children: Snippet;
 	}
 
-	let { title, blockId, hiddenBlockIds = $bindable(), children }: Props = $props();
+	let { title, path, hidden = $bindable(), children }: Props = $props();
 
-	const visible = $derived(!hiddenBlockIds.includes(blockId));
+	const visible = $derived(!hidden.includes(path));
 
 	function toggle() {
-		if (visible) {
-			hiddenBlockIds = [...hiddenBlockIds, blockId];
-		} else {
-			hiddenBlockIds = hiddenBlockIds.filter((id) => id !== blockId);
-		}
+		hidden = visible ? [...hidden, path] : hidden.filter((p) => p !== path);
 	}
 </script>
 

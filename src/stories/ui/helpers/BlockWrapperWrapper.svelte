@@ -1,6 +1,7 @@
 <script lang="ts">
 	import BlockWrapper from '$lib/components/ui/block-wrapper/block-wrapper.svelte';
-	import { createObjectId, type ObjectId } from '$lib/types/cv';
+
+	const path = 'example/';
 
 	interface Props {
 		startVisible?: boolean;
@@ -8,10 +9,9 @@
 
 	let { startVisible = true }: Props = $props();
 
-	const blockId = createObjectId();
-	let hiddenBlockIds = $state<ObjectId[]>(startVisible ? [] : [blockId]);
+	let hidden = $state<string[]>(startVisible ? [] : [path]);
 </script>
 
-<BlockWrapper title="Example Section" {blockId} bind:hiddenBlockIds>
+<BlockWrapper title="Example Section" {path} bind:hidden>
 	<p class="text-muted-foreground text-sm">This is the block content.</p>
 </BlockWrapper>

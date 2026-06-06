@@ -65,8 +65,9 @@ export interface VolunteerEntry extends WithId {
 export interface EducationEntry extends WithId {
 	institution: string;
 	url?: string;
-	studyType?: string;
-	area?: string;
+	// Required at runtime (editor-bound; '' when unset) though optional on the wire.
+	studyType: string;
+	area: string;
 	startDate?: Date;
 	endDate?: Date;
 	current: boolean;
@@ -120,7 +121,8 @@ export interface ReferenceEntry extends WithId {
 export interface ProjectEntry extends WithId {
 	name: string;
 	description: string;
-	url?: string;
+	// Required at runtime (editor-bound; '' when unset) though optional on the wire.
+	url: string;
 	startDate?: Date;
 	endDate?: Date;
 	current: boolean;

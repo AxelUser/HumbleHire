@@ -12,11 +12,10 @@
 
 	interface Props {
 		education: EducationEntry[];
-		blockId: ObjectId;
-		hiddenBlockIds: ObjectId[];
+		hidden: string[];
 	}
 
-	let { education = $bindable(), blockId, hiddenBlockIds = $bindable() }: Props = $props();
+	let { education = $bindable(), hidden = $bindable() }: Props = $props();
 
 	const drag = createSortableDragHandlers(
 		() => education,
@@ -31,10 +30,12 @@
 			{
 				objectId: createObjectId(),
 				institution: '',
-				degree: '',
+				studyType: '',
+				area: '',
 				startDate: undefined,
 				endDate: undefined,
-				current: false
+				current: false,
+				courses: []
 			}
 		];
 	}
@@ -44,7 +45,7 @@
 	}
 </script>
 
-<BlockWrapper title="Education" {blockId} bind:hiddenBlockIds>
+<BlockWrapper title="Education" path="education/" bind:hidden>
 	<DragDropProvider {...drag}>
 		<div class="flex flex-col gap-4">
 			{#each education as entry, index (entry.objectId)}
@@ -74,11 +75,14 @@
 									<Trash2 class="h-4 w-4" />
 								</Button>
 							</div>
-							<InlineField
-								bind:value={entry.degree}
-								placeholder="Degree / Field of study"
-								class="w-full"
-							/>
+							<div class="flex flex-wrap gap-2">
+								<InlineField
+									bind:value={entry.studyType}
+									placeholder="Degree / Study type"
+									class="flex-1"
+								/>
+								<InlineField bind:value={entry.area} placeholder="Field of study" class="flex-1" />
+							</div>
 							<div class="flex flex-wrap items-center gap-2">
 								<DatePickerField bind:value={entry.startDate} placeholder="Start date" />
 								<span class="text-muted-foreground">—</span>
@@ -124,7 +128,7 @@
 								>
 							</div>
 							<span class="text-muted-foreground text-sm"
-								>{entry.degree || 'Degree / Field of study'}</span
+								>{[entry.studyType, entry.area].filter(Boolean).join(' ') || 'Degree'}</span
 							>
 						</div>
 					</div>

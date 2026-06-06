@@ -55,6 +55,8 @@ export function makeEducation(
 	return {
 		objectId: id(),
 		institution,
+		studyType: '',
+		area: '',
 		current: false,
 		courses: [],
 		...over
@@ -70,6 +72,7 @@ export function makeProject(name: string, over: Partial<ProjectEntry> = {}): Pro
 		objectId: id(),
 		name,
 		description: '',
+		url: '',
 		current: false,
 		highlights: [],
 		keywords: [],

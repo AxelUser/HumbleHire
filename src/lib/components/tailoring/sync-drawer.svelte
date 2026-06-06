@@ -12,10 +12,11 @@
 	import DiffItemRow from './diff-item-row.svelte';
 	import { diffCVs } from '$lib/features/tailoring/diff';
 	import { applySyncDecisions } from '$lib/features/tailoring/apply';
-	import { SvelteMap } from 'svelte/reactivity';
+	import { encodePath } from '$lib/features/tailoring/paths';
 	import { describeDiff } from '$lib/features/tailoring/present';
+	import { SvelteMap } from 'svelte/reactivity';
 	import type { DiffItem } from '$lib/features/tailoring/types';
-	import type { CV, ObjectId } from '$lib/types/cv';
+	import type { CV } from '$lib/types/cv';
 
 	interface Props {
 		masterCv: CV;
@@ -26,7 +27,10 @@
 
 	let { masterCv, tailoredCv, onSync, open = $bindable(false) }: Props = $props();
 
-	let decisions = new SvelteMap<ObjectId, 'accepted' | 'discarded'>();
+	// Decisions key by the encoded path — the same key apply uses to look each one up.
+	let decisions = new SvelteMap<string, 'accepted' | 'discarded'>();
+
+	const keyOf = (item: DiffItem) => encodePath(item.path);
 
 	const diffItems = $derived.by((): DiffItem[] =>
 		diffCVs($state.snapshot(masterCv), $state.snapshot(tailoredCv))
@@ -35,40 +39,32 @@
 	const groupedItems = $derived.by(() => {
 		const groups: { label: string; items: DiffItem[] }[] = [];
 		for (const item of diffItems) {
-			const meta = describeDiff(item, masterCv, tailoredCv);
-			const label = meta.blockLabel;
+			const label = describeDiff(item, masterCv, tailoredCv).breadcrumb[0] ?? '';
 			const existing = groups.find((g) => g.label === label);
-			if (existing) {
-				existing.items.push(item);
-			} else {
-				groups.push({ label, items: [item] });
-			}
+			if (existing) existing.items.push(item);
+			else groups.push({ label, items: [item] });
 		}
 		return groups;
 	});
 
-	function accept(objectId: ObjectId) {
-		decisions.set(objectId, 'accepted');
+	function accept(key: string) {
+		decisions.set(key, 'accepted');
 	}
 
-	function discard(objectId: ObjectId) {
-		decisions.set(objectId, 'discarded');
+	function discard(key: string) {
+		decisions.set(key, 'discarded');
 	}
 
-	function revert(objectId: ObjectId) {
-		decisions.delete(objectId);
+	function revert(key: string) {
+		decisions.delete(key);
 	}
 
 	function acceptAll() {
-		for (const item of diffItems) {
-			decisions.set(item.objectId, 'accepted');
-		}
+		for (const item of diffItems) decisions.set(keyOf(item), 'accepted');
 	}
 
 	function discardAll() {
-		for (const item of diffItems) {
-			decisions.set(item.objectId, 'discarded');
-		}
+		for (const item of diffItems) decisions.set(keyOf(item), 'discarded');
 	}
 
 	function openDrawer() {
@@ -89,7 +85,7 @@
 		open = false;
 	}
 
-	const pendingCount = $derived(diffItems.filter((item) => !decisions.has(item.objectId)).length);
+	const pendingCount = $derived(diffItems.filter((item) => !decisions.has(keyOf(item))).length);
 
 	$effect(() => {
 		if (!open) {
@@ -142,15 +138,15 @@
 									{group.label}
 								</span>
 								<div class="flex flex-col gap-2">
-									{#each group.items as item (item.objectId)}
+									{#each group.items as item (keyOf(item))}
 										<DiffItemRow
 											{item}
 											{masterCv}
 											{tailoredCv}
-											decision={decisions.get(item.objectId)}
-											onAccept={() => accept(item.objectId)}
-											onDiscard={() => discard(item.objectId)}
-											onRevert={() => revert(item.objectId)}
+											decision={decisions.get(keyOf(item))}
+											onAccept={() => accept(keyOf(item))}
+											onDiscard={() => discard(keyOf(item))}
+											onRevert={() => revert(keyOf(item))}
 										/>
 									{/each}
 								</div>

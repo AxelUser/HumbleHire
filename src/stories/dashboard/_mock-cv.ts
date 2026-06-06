@@ -1,40 +1,31 @@
-import type { CV, CVBlocks, ObjectId } from '$lib/types/cv';
-import { computeBlockHashes } from '$lib/features/tailoring/hash';
+import type { CV, CVContent } from '$lib/types/cv';
+import { computeHashes } from '$lib/features/tailoring/hash';
+import { emptyContent } from '$lib/services/cv/create';
 
-function id(slug: string): ObjectId {
-	return slug as ObjectId;
-}
-
-export function mkBlocks(name = '', position = '', location = ''): CVBlocks {
-	return {
-		fullName: { objectId: id(`${name}-fn`), value: name },
-		position: { objectId: id(`${name}-pos`), value: position },
-		location: { objectId: id(`${name}-loc`), value: location },
-		contacts: { objectId: id(`${name}-cb`), value: [] },
-		highlights: { objectId: id(`${name}-hb`), value: [] },
-		skills: { objectId: id(`${name}-sb`), value: [] },
-		jobHistory: { objectId: id(`${name}-jb`), value: [] },
-		projects: { objectId: id(`${name}-pb`), value: [] },
-		education: { objectId: id(`${name}-eb`), value: [] }
-	};
+function mkContent(name = '', position = '', location = ''): CVContent {
+	const content = emptyContent();
+	content.basics.fullName = name;
+	content.basics.position = position;
+	content.basics.location = location;
+	return content;
 }
 
 const now = Date.now();
 
-const masterBlocks = mkBlocks('Aleksey Maltsev', 'Software Engineer', 'San Francisco, CA');
-const masterHashes = computeBlockHashes(masterBlocks);
+const masterContent = mkContent('Aleksey Maltsev', 'Software Engineer', 'San Francisco, CA');
+const masterHashes = computeHashes(masterContent);
 
 export const masterCv: CV = {
 	id: 'master-1',
 	name: 'Software Engineer',
 	createdAt: now - 86400000 * 14,
 	updatedAt: now - 86400000 * 4,
-	blocks: masterBlocks,
-	blockHashes: masterHashes,
-	hiddenBlockIds: []
+	content: masterContent,
+	hashes: masterHashes,
+	hidden: []
 };
 
-const syncedTailoredBlocks = mkBlocks(
+const syncedTailoredContent = mkContent(
 	'Aleksey Maltsev',
 	'Senior Frontend Engineer',
 	'San Francisco, CA'
@@ -45,38 +36,38 @@ export const syncedTailored: CV = {
 	company: 'Stripe',
 	createdAt: now - 86400000 * 5,
 	updatedAt: now,
-	blocks: syncedTailoredBlocks,
-	blockHashes: computeBlockHashes(syncedTailoredBlocks),
-	hiddenBlockIds: [],
+	content: syncedTailoredContent,
+	hashes: computeHashes(syncedTailoredContent),
+	hidden: [],
 	sourceId: 'master-1',
-	syncBaseline: masterBlocks,
-	syncBaselineHashes: masterHashes
+	baseline: masterContent,
+	baselineHashes: masterHashes
 };
 
-const staleTailoredBlocks = mkBlocks('Aleksey Maltsev', 'SWE L5', 'Mountain View, CA');
-const staleBaselineBlocks = mkBlocks('Aleksey Maltsev', 'Older Title', 'Mountain View, CA');
-const staleBaselineHashes = computeBlockHashes(staleBaselineBlocks);
+const staleTailoredContent = mkContent('Aleksey Maltsev', 'SWE L5', 'Mountain View, CA');
+const staleBaselineContent = mkContent('Aleksey Maltsev', 'Older Title', 'Mountain View, CA');
+const staleBaselineHashes = computeHashes(staleBaselineContent);
 export const staleTailored: CV = {
 	id: 'tailored-2',
 	name: 'SWE L5',
 	company: 'Google',
 	createdAt: now - 86400000 * 9,
 	updatedAt: now - 86400000 * 9,
-	blocks: staleTailoredBlocks,
-	blockHashes: computeBlockHashes(staleTailoredBlocks),
-	hiddenBlockIds: [],
+	content: staleTailoredContent,
+	hashes: computeHashes(staleTailoredContent),
+	hidden: [],
 	sourceId: 'master-1',
-	syncBaseline: staleBaselineBlocks,
-	syncBaselineHashes: staleBaselineHashes
+	baseline: staleBaselineContent,
+	baselineHashes: staleBaselineHashes
 };
 
-const masterCv2Blocks = mkBlocks('Aleksey Maltsev', 'Product Manager', 'New York, NY');
+const masterCv2Content = mkContent('Aleksey Maltsev', 'Product Manager', 'New York, NY');
 export const masterCv2: CV = {
 	id: 'master-2',
 	name: 'Product Manager',
 	createdAt: now - 86400000 * 30,
 	updatedAt: now - 86400000 * 7,
-	blocks: masterCv2Blocks,
-	blockHashes: computeBlockHashes(masterCv2Blocks),
-	hiddenBlockIds: []
+	content: masterCv2Content,
+	hashes: computeHashes(masterCv2Content),
+	hidden: []
 };

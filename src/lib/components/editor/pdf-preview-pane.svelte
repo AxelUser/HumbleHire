@@ -49,13 +49,13 @@
 	const canZoomIn = $derived(ZOOM_STOPS.some((s) => s > effectiveZoom + 0.001));
 	const canZoomOut = $derived(ZOOM_STOPS.some((s) => s < effectiveZoom - 0.001));
 
-	// Only blocks and hiddenBlockIds affect the PDF output
+	// Only content and hidden affect the PDF output
 	$effect(() => {
-		const blocks = $state.snapshot(cv.blocks);
-		const hiddenBlockIds = $state.snapshot(cv.hiddenBlockIds);
+		const content = $state.snapshot(cv.content);
+		const hidden = $state.snapshot(cv.hidden);
 		isPending = true;
 		const mpv = ++pendingVersion;
-		const timer = setTimeout(() => regenerate({ ...cv, blocks, hiddenBlockIds } as CV, mpv), 1000);
+		const timer = setTimeout(() => regenerate({ ...cv, content, hidden } as CV, mpv), 1000);
 		return () => clearTimeout(timer);
 	});
 

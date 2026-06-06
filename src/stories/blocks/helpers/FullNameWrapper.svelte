@@ -1,6 +1,7 @@
 <script lang="ts">
 	import TextBlock from '$lib/components/blocks/text-block.svelte';
-	import { createObjectId, type ObjectId, type Block } from '$lib/types/cv';
+
+	const path = 'basics/fullName/';
 
 	interface Props {
 		startVisible?: boolean;
@@ -8,13 +9,14 @@
 
 	let { startVisible = true }: Props = $props();
 
-	let block = $state<Block<string>>({ objectId: createObjectId(), value: 'Aleksey Maltsev' });
-	let hiddenBlockIds = $state<ObjectId[]>(startVisible ? [] : [block.objectId]);
+	let value = $state('Aleksey Maltsev');
+	let hidden = $state<string[]>(startVisible ? [] : [path]);
 </script>
 
 <TextBlock
-	bind:block
-	bind:hiddenBlockIds
+	bind:value
+	bind:hidden
+	{path}
 	title="Full Name"
 	placeholder="Your full name"
 	class="text-3xl font-bold"

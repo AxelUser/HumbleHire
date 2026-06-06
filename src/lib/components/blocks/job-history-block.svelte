@@ -10,15 +10,14 @@
 	import { DragDropProvider, DragOverlay } from '@dnd-kit/svelte';
 	import type { Draggable } from '@dnd-kit/dom';
 	import { Trash2, Plus, GripVertical } from '@lucide/svelte';
-	import { createObjectId, type JobEntry, type ObjectId } from '$lib/types/cv';
+	import { createObjectId, type WorkEntry, type ObjectId } from '$lib/types/cv';
 
 	interface Props {
-		jobs: JobEntry[];
-		blockId: ObjectId;
-		hiddenBlockIds: ObjectId[];
+		jobs: WorkEntry[];
+		hidden: string[];
 	}
 
-	let { jobs = $bindable(), blockId, hiddenBlockIds = $bindable() }: Props = $props();
+	let { jobs = $bindable(), hidden = $bindable() }: Props = $props();
 
 	const drag = createSortableDragHandlers(
 		() => jobs,
@@ -32,13 +31,13 @@
 			...jobs,
 			{
 				objectId: createObjectId(),
-				company: '',
-				role: '',
+				name: '',
+				position: '',
 				startDate: undefined,
 				endDate: undefined,
 				current: false,
-				achievements: [],
-				skills: []
+				highlights: [],
+				keywords: []
 			}
 		];
 	}
@@ -48,7 +47,7 @@
 	}
 </script>
 
-<BlockWrapper title="Job History" {blockId} bind:hiddenBlockIds>
+<BlockWrapper title="Job History" path="work/" bind:hidden>
 	<DragDropProvider {...drag}>
 		<div class="flex flex-col gap-4">
 			{#each jobs as job, index (job.objectId)}
@@ -70,13 +69,9 @@
 									<GripVertical class="h-4 w-4" />
 								</span>
 								<div class="flex flex-1 flex-wrap items-baseline gap-2">
-									<InlineField
-										bind:value={job.company}
-										placeholder="Company"
-										class="font-semibold"
-									/>
+									<InlineField bind:value={job.name} placeholder="Company" class="font-semibold" />
 									<span class="text-muted-foreground">—</span>
-									<InlineField bind:value={job.role} placeholder="Role" class="flex-1" />
+									<InlineField bind:value={job.position} placeholder="Role" class="flex-1" />
 								</div>
 								<Button
 									variant="ghost"
@@ -112,11 +107,11 @@
 								</SegmentedControl>
 							</div>
 							<EditableList
-								bind:items={job.achievements}
+								bind:items={job.highlights}
 								placeholder="Describe an achievement..."
 								addLabel="Add Achievement"
 							/>
-							<TagInput bind:tags={job.skills} placeholder="Add skill (e.g. React, AWS)" />
+							<TagInput bind:tags={job.keywords} placeholder="Add skill (e.g. React, AWS)" />
 						</div>
 					{/snippet}
 				</SortableItem>
@@ -134,9 +129,9 @@
 						<div class="flex items-start gap-2">
 							<GripVertical class="text-muted-foreground mt-1 h-4 w-4 shrink-0" />
 							<div class="flex flex-wrap items-baseline gap-2">
-								<span class="text-sm font-semibold">{job.company || 'Company'}</span>
+								<span class="text-sm font-semibold">{job.name || 'Company'}</span>
 								<span class="text-muted-foreground">—</span>
-								<span class="text-sm">{job.role || 'Role'}</span>
+								<span class="text-sm">{job.position || 'Role'}</span>
 							</div>
 						</div>
 					</div>

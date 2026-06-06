@@ -1,6 +1,6 @@
 <script lang="ts">
 	import BulletListBlock from '$lib/components/blocks/bullet-list-block.svelte';
-	import { createObjectId, type ObjectId, type Highlight } from '$lib/types/cv';
+	import { createObjectId, type StringEntry } from '$lib/types/cv';
 
 	interface Props {
 		startVisible?: boolean;
@@ -9,27 +9,25 @@
 
 	let { startVisible = true, startEmpty = false }: Props = $props();
 
-	const blockId = createObjectId();
-
-	let highlights = $state<Highlight[]>(
+	let highlights = $state<StringEntry[]>(
 		startEmpty
 			? []
 			: [
 					{
 						objectId: createObjectId(),
-						text: 'Led infrastructure migrations across 3 AWS regions with zero downtime.'
+						value: 'Led infrastructure migrations across 3 AWS regions with zero downtime.'
 					},
 					{
 						objectId: createObjectId(),
-						text: 'Owned the deploy pipeline from local dev to production for 2 years.'
+						value: 'Owned the deploy pipeline from local dev to production for 2 years.'
 					},
 					{
 						objectId: createObjectId(),
-						text: 'Mentored 4 junior engineers through structured pairing sessions.'
+						value: 'Mentored 4 junior engineers through structured pairing sessions.'
 					}
 				]
 	);
-	let hiddenBlockIds = $state<ObjectId[]>(startVisible ? [] : [blockId]);
+	let hidden = $state<string[]>(startVisible ? [] : ['basics/highlights/']);
 </script>
 
-<BulletListBlock bind:highlights {blockId} bind:hiddenBlockIds />
+<BulletListBlock bind:highlights bind:hidden />

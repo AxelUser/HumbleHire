@@ -1,58 +1,41 @@
 <script lang="ts">
 	import SyncDrawer from '$lib/components/tailoring/sync-drawer.svelte';
-	import type { CV, ObjectId } from '$lib/types/cv';
-	import { computeBlockHashes } from '$lib/features/tailoring/hash';
+	import type { CV, CVContent } from '$lib/types/cv';
+	import { computeHashes } from '$lib/features/tailoring/hash';
+	import { emptyContent } from '$lib/services/cv/create';
 
-	const IDS = {
-		fn: 'mock-fn' as unknown as ObjectId,
-		pos: 'mock-pos' as unknown as ObjectId,
-		loc: 'mock-loc' as unknown as ObjectId,
-		cb: 'mock-cb' as unknown as ObjectId,
-		hb: 'mock-hb' as unknown as ObjectId,
-		sb: 'mock-sb' as unknown as ObjectId,
-		jb: 'mock-jb' as unknown as ObjectId,
-		pb: 'mock-pb' as unknown as ObjectId,
-		eb: 'mock-eb' as unknown as ObjectId
-	};
-
-	function mkBlocks(position: string) {
-		return {
-			fullName: { objectId: IDS.fn, value: 'Alex Smith' },
-			position: { objectId: IDS.pos, value: position },
-			location: { objectId: IDS.loc, value: 'San Francisco, CA' },
-			contacts: { objectId: IDS.cb, value: [] },
-			highlights: { objectId: IDS.hb, value: [] },
-			skills: { objectId: IDS.sb, value: [] },
-			jobHistory: { objectId: IDS.jb, value: [] },
-			projects: { objectId: IDS.pb, value: [] },
-			education: { objectId: IDS.eb, value: [] }
-		};
+	function mkContent(position: string): CVContent {
+		const content = emptyContent();
+		content.basics.fullName = 'Alex Smith';
+		content.basics.position = position;
+		content.basics.location = 'San Francisco, CA';
+		return content;
 	}
 
-	const masterBlocks = mkBlocks('Senior Software Engineer');
-	const masterHashes = computeBlockHashes(masterBlocks);
+	const masterContent = mkContent('Senior Software Engineer');
 	const masterCv: CV = {
 		id: 'master-2',
 		name: 'Master CV',
 		createdAt: Date.now() - 86400000 * 7,
 		updatedAt: Date.now() - 3600000,
-		blocks: masterBlocks,
-		blockHashes: masterHashes,
-		hiddenBlockIds: []
+		content: masterContent,
+		hashes: computeHashes(masterContent),
+		hidden: []
 	};
 
-	const tailoredBlocks = mkBlocks('Senior Software Engineer');
+	const tailoredContent = mkContent('Senior Software Engineer');
+	const baselineContent = mkContent('Senior Software Engineer');
 	const tailoredCv: CV = {
 		id: 'tailored-2',
 		name: 'Google — Engineer',
 		createdAt: Date.now() - 86400000 * 3,
 		updatedAt: Date.now() - 86400000,
-		blocks: tailoredBlocks,
-		blockHashes: computeBlockHashes(tailoredBlocks),
-		hiddenBlockIds: [],
+		content: tailoredContent,
+		hashes: computeHashes(tailoredContent),
+		hidden: [],
 		sourceId: 'master-2',
-		syncBaseline: tailoredBlocks,
-		syncBaselineHashes: computeBlockHashes(tailoredBlocks)
+		baseline: baselineContent,
+		baselineHashes: computeHashes(baselineContent)
 	};
 
 	let open = $state(false);

@@ -2,30 +2,10 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Check, X, RotateCcw, Plus, Minus, ArrowLeftRight } from '@lucide/svelte';
-	import type {
-		Achievement,
-		ContactEntry,
-		CV,
-		EducationEntry,
-		Highlight,
-		JobEntry,
-		ProjectEntry,
-		SkillCategory,
-		Tag
-	} from '$lib/types/cv';
+	import type { CV } from '$lib/types/cv';
 	import type { DiffItem } from '$lib/features/tailoring/types';
-	import { describeDiff, entryKind, formatValue } from '$lib/features/tailoring/present';
-	import { resolveDiffEntry } from '$lib/features/tailoring/locate';
-	import { FIELD_LABELS } from '$lib/features/tailoring/types';
+	import { describeDiff, formatValue } from '$lib/features/tailoring/present';
 	import DiffFieldGrid from './diff/diff-field-grid.svelte';
-	import JobPreview from './diff/job-preview.svelte';
-	import ProjectPreview from './diff/project-preview.svelte';
-	import SkillCategoryPreview from './diff/skill-category-preview.svelte';
-	import EducationPreview from './diff/education-preview.svelte';
-	import ContactPreview from './diff/contact-preview.svelte';
-	import HighlightPreview from './diff/highlight-preview.svelte';
-	import AchievementPreview from './diff/achievement-preview.svelte';
-	import TagPreview from './diff/tag-preview.svelte';
 
 	interface Props {
 		item: DiffItem;
@@ -40,41 +20,19 @@
 	let { item, masterCv, tailoredCv, decision, onAccept, onDiscard, onRevert }: Props = $props();
 
 	const meta = $derived(describeDiff(item, masterCv, tailoredCv));
+	const breadcrumb = $derived(meta.breadcrumb.join(' › '));
 
-	const kind = $derived(
-		item.kind === 'text'
-			? undefined
-			: item.kind === 'nested'
-				? entryKind(item.blockKey, item.nestedListKey)
-				: entryKind(item.blockKey)
-	);
-
-	const resolvedEntry = $derived(resolveDiffEntry(item, masterCv, tailoredCv));
-
-	// Fields for text and modified items
-	const fields = $derived.by(() => {
-		if (item.kind === 'text') {
-			return [
-				{
-					label: meta.blockLabel,
-					before: item.before || '(empty)',
-					after: item.after || '(empty)'
-				}
-			];
-		}
-		if (item.change === 'modified') {
-			return Object.keys(item.after).map((key) => ({
-				label: FIELD_LABELS[key] ?? key,
-				before: formatValue(item.before[key]),
-				after: formatValue(item.after[key])
-			}));
-		}
-		return null;
-	});
-
-	// Show a colored preview box for added/removed entries (not for modified or text)
-	const showPreview = $derived(
-		meta.change !== 'modified' && item.kind !== 'text' && resolvedEntry !== undefined
+	// A modified item ends at a scalar, so show its before/after; added/removed speak for themselves.
+	const fields = $derived(
+		item.change === 'modified'
+			? [
+					{
+						label: meta.breadcrumb[meta.breadcrumb.length - 1] ?? meta.description,
+						before: formatValue(item.before),
+						after: formatValue(item.after)
+					}
+				]
+			: null
 	);
 </script>
 
@@ -113,38 +71,8 @@
 				</div>
 			{/if}
 
-			{#if item.kind !== 'text'}
-				<p class="mt-0.5 text-sm font-medium">{meta.title}</p>
-				<p class="text-muted-foreground text-xs">{meta.description}</p>
-			{:else}
-				<p class="mt-0.5 text-sm font-medium">{meta.description}</p>
-			{/if}
-
-			{#if showPreview && resolvedEntry}
-				<div
-					class="mt-2 rounded-lg border p-3 text-sm {meta.change === 'added'
-						? 'border-accent bg-accent/10'
-						: 'border-destructive bg-destructive/10'}"
-				>
-					{#if kind === 'job'}
-						<JobPreview entry={resolvedEntry as JobEntry} />
-					{:else if kind === 'project'}
-						<ProjectPreview entry={resolvedEntry as ProjectEntry} />
-					{:else if kind === 'skillCategory'}
-						<SkillCategoryPreview entry={resolvedEntry as SkillCategory} />
-					{:else if kind === 'education'}
-						<EducationPreview entry={resolvedEntry as EducationEntry} />
-					{:else if kind === 'contact'}
-						<ContactPreview entry={resolvedEntry as ContactEntry} />
-					{:else if kind === 'highlight'}
-						<HighlightPreview entry={resolvedEntry as Highlight} />
-					{:else if kind === 'achievement'}
-						<AchievementPreview entry={resolvedEntry as Achievement} />
-					{:else if kind === 'tag'}
-						<TagPreview entry={resolvedEntry as Tag} />
-					{/if}
-				</div>
-			{/if}
+			<p class="mt-0.5 text-sm font-medium">{breadcrumb}</p>
+			<p class="text-muted-foreground text-xs">{meta.description}</p>
 
 			{#if fields}
 				<DiffFieldGrid {fields} />

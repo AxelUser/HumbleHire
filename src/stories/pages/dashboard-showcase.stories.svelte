@@ -7,30 +7,21 @@
 
 	const now = Date.now();
 
-	import type { CV, ObjectId } from '$lib/types/cv';
-	import { computeBlockHashes } from '$lib/features/tailoring/hash';
+	import type { CV, CVContent } from '$lib/types/cv';
+	import { computeHashes } from '$lib/features/tailoring/hash';
+	import { emptyContent } from '$lib/services/cv/create';
 
-	function oid(s: string): ObjectId {
-		return s as unknown as ObjectId;
+	function mkContent(name: string, position: string, location: string): CVContent {
+		const content = emptyContent();
+		content.basics.fullName = name;
+		content.basics.position = position;
+		content.basics.location = location;
+		return content;
 	}
 
-	function mkBlocks(name: string, position: string, location: string) {
-		return {
-			fullName: { objectId: oid(`${name}-fn`), value: name },
-			position: { objectId: oid(`${name}-pos`), value: position },
-			location: { objectId: oid(`${name}-loc`), value: location },
-			contacts: { objectId: oid(`${name}-cb`), value: [] },
-			highlights: { objectId: oid(`${name}-hb`), value: [] },
-			skills: { objectId: oid(`${name}-sb`), value: [] },
-			jobHistory: { objectId: oid(`${name}-jb`), value: [] },
-			projects: { objectId: oid(`${name}-pb`), value: [] },
-			education: { objectId: oid(`${name}-eb`), value: [] }
-		};
-	}
-
-	const cv1Blocks = mkBlocks('Aleksey Maltsev', 'Senior Software Engineer', 'San Francisco, CA');
-	const cv2Blocks = mkBlocks('Aleksey Maltsev', 'Frontend Lead', 'Remote');
-	const cv3Blocks = mkBlocks('Aleksey Maltsev', 'Open Source Contributor', 'Edinburgh, UK');
+	const cv1Content = mkContent('Aleksey Maltsev', 'Senior Software Engineer', 'San Francisco, CA');
+	const cv2Content = mkContent('Aleksey Maltsev', 'Frontend Lead', 'Remote');
+	const cv3Content = mkContent('Aleksey Maltsev', 'Open Source Contributor', 'Edinburgh, UK');
 
 	const mockCVs: CV[] = [
 		{
@@ -38,27 +29,27 @@
 			name: 'Senior Developer — Stripe',
 			createdAt: now - 86400000 * 5,
 			updatedAt: now - 3600000,
-			blocks: cv1Blocks,
-			blockHashes: computeBlockHashes(cv1Blocks),
-			hiddenBlockIds: []
+			content: cv1Content,
+			hashes: computeHashes(cv1Content),
+			hidden: []
 		},
 		{
 			id: 'cv-2',
 			name: 'Frontend Lead — Vercel',
 			createdAt: now - 86400000 * 2,
 			updatedAt: now - 7200000,
-			blocks: cv2Blocks,
-			blockHashes: computeBlockHashes(cv2Blocks),
-			hiddenBlockIds: []
+			content: cv2Content,
+			hashes: computeHashes(cv2Content),
+			hidden: []
 		},
 		{
 			id: 'cv-3',
 			name: 'Open Source Contributor',
 			createdAt: now - 86400000,
 			updatedAt: now - 900000,
-			blocks: cv3Blocks,
-			blockHashes: computeBlockHashes(cv3Blocks),
-			hiddenBlockIds: []
+			content: cv3Content,
+			hashes: computeHashes(cv3Content),
+			hidden: []
 		}
 	];
 
