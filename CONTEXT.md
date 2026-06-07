@@ -12,9 +12,17 @@ This file is a glossary. It defines what each term means, not how any of it is b
 A single resume document. Holds a name, an optional company label, and a set of blocks. Every document in HumbleHire is a CV; "master" and "tailored" are roles, not separate types.
 _Avoid_: Resume, document, profile
 
-**Block**:
-One of the nine fixed sections of a CV (Full Name, Position, Location, Contacts, Highlights, Skills, Job History, Projects, Education). Block order is fixed and users cannot reorder.
-_Avoid_: Section, field (when referring to a whole block)
+**Section**:
+The presentation unit of a CV: one editor card, one renderer in a [[template]]'s section map. The fixed **Header** (name, position, location, contacts, photo) always leads a CV and is not reorderable, though its individual fields stay hideable. Below it sit twelve reorderable, hideable sections — Summary, Skills, Experience, Projects, Education, Volunteer, Awards, Certificates, Publications, Languages, Interests, References — each projected from the [[runtime cv]]'s content but not necessarily one-to-one with a content key (Summary is sourced from `basics.highlights`). A section is a presentation concept; it carries no data of its own.
+_Avoid_: Block (retired), field (when referring to a whole section).
+
+**Section order**:
+The user-chosen arrangement of the twelve reorderable [[section]]s, held in [[styling]] as a permutation of section ids. The Header is excluded (always first). A [[template]] renders sections in this order; v1 templates are single-column, so order is one flat list.
+_Avoid_: Layout (too broad), sort.
+
+**Block** _(retired)_:
+The former presentation unit — "one of the nine fixed sections." Superseded by [[section]], which is reorderable and decoupled from content. The word survives only in not-yet-renamed code (`*-block.svelte`); treat any new use as a mistake.
+_Avoid_: all product-facing use — say [[section]].
 
 **Entry**:
 A single repeatable item inside a block. One job inside Job History, one project inside Projects, one contact line.
@@ -114,9 +122,21 @@ _Avoid_: Home, library, list page
 The right-side pane in the editor that renders the live PDF of the current CV, page-for-page identical to what would be exported.
 _Avoid_: Render, output, view
 
-**Theme**:
-A self-contained rendering module that takes filtered CV blocks and produces a PDF layout. The v1 theme is "Classic." Adding a theme means adding a module, not changing the editor or the data.
-_Avoid_: Template, style, layout
+**Template**:
+A self-contained rendering module that lays out a CV's content into a PDF. One module per file, declared against a common contract (`CvTemplate`). A template owns only structure and graphics — section layout, headings, dividers, ornaments — and never hard-codes colours, fonts, margins, or type sizes; those are supplied to it as resolved [[styling]] tokens, so the same template renders under any palette. It chooses _where_ each token lands; it never computes a token's value. A template is a fixed header plus a set of per-[[section]] renderers, not a monolithic build: a shared driver walks the user's [[section order]], skips [[hidden]] sections, and invokes each renderer. v1 templates are single-column. The v1 template is "Classic." Adding a template means adding a module, not changing the editor or the data.
+_Avoid_: Theme, style, layout (as the noun for the module)
+
+**Styling**:
+The presentation inputs handed to a [[template]] at render time, kept separate from CV content: the [[palette]], typography (font family, base size, type scale), and page geometry (margins). A template consumes styling and owns layout and graphics; it never hard-codes colours, fonts, or margins. Styling is per-CV presentation state, so it is a sibling of content, never inside it — content stays presentation-free (ADR-010). Because it is not content, [[sync]] never raises it: a tailored copy inherits the master's styling once at creation and is free to diverge afterwards.
+_Avoid_: Theme settings, style config.
+
+**Palette**:
+The three user-chosen colours that drive a CV's [[styling]]: **Accent** (name, section headings, rules, links, sidebar fill), **Text** / ink (primary body), and **Surface** (sidebar or panel fill; single-column templates leave it white). Muted/secondary text, hairlines, and text-on-surface are **derived**, never set by hand, so the neutral scale and contrast stay correct. Users normally apply a named [[preset]]; raw colour pickers are an advanced affordance.
+_Avoid_: Colour scheme, theme colours.
+
+**Preset**:
+A named, coordinated [[palette]] (and possibly typography) applied in one click — the default entry point to [[styling]] so a non-designer never has to choose raw colours. A preset styles; a [[template]] lays out. The two are independent: any preset works with any template.
+_Avoid_: Template (a preset styles; a template lays out).
 
 ### Offline & durability
 
@@ -172,7 +192,7 @@ _Avoid_: Mapping (reserve for direct field-to-field correspondence), hack, worka
 
 ## Flagged ambiguities
 
-**"Block" is being redefined by the model refactor.** The definition above ("one of the nine fixed sections") conflates three jobs that the refactor splits apart: a content grouping, a rendered section, and the unit of hide / hash / sync. The new [[runtime cv]] groups content into typed sections (basics, work, education, skills, projects) with no flat list of nine blocks. Once the step-2 presentation design lands, "Block" is expected to survive only as a _presentation_ term (a rendered section in the editor and PDF), decoupled from the content shape. Until then, treat "Block" as legacy when it appears in code.
+**"Block" is retired (resolved by the step-2 presentation design).** It used to conflate three jobs the refactor split apart: a content grouping, a rendered section, and the unit of hide / hash / sync. Those are now distinct — content lives in typed groups on the [[runtime cv]], the rendered/edited unit is the [[section]], and hide / hash / sync key off [[path]]s. "Block" survives only in not-yet-renamed code; new code says [[section]].
 
 **"Version" is ambiguous. Qualify it or avoid it.**
 

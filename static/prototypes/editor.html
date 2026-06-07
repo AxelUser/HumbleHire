@@ -1,0 +1,1567 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>HumbleHire — Editor design prototype</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"
+			rel="stylesheet"
+		/>
+		<style>
+			:root {
+				--bg: oklch(0.97 0.006 255);
+				--fg: oklch(0.12 0.025 262);
+				--card: oklch(1 0 0);
+				--muted: oklch(0.93 0.01 255);
+				--muted-fg: oklch(0.48 0.04 258);
+				--secondary: oklch(0.88 0.018 255);
+				--line: oklch(0.12 0.025 262);
+				--hair: oklch(0.12 0.025 262 / 0.14);
+				--accent: oklch(0.52 0.16 252);
+				--accent-fg: oklch(0.97 0.006 255);
+				--destructive: oklch(0.577 0.245 27.325);
+				--radius: 2px;
+				--shadow: 4px 4px 0 0 var(--line);
+				--shadow-sm: 2px 2px 0 0 var(--line);
+				/* preview-only palette tokens, driven by the Look tab */
+				--pv-accent: oklch(0.52 0.16 252);
+				--pv-text: oklch(0.18 0.02 262);
+				--pv-surface: oklch(1 0 0);
+				--pv-muted: oklch(0.48 0.03 258);
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+			html,
+			body {
+				margin: 0;
+				height: 100%;
+			}
+			body {
+				background: var(--bg);
+				color: var(--fg);
+				font-family: 'Space Grotesk', system-ui, sans-serif;
+				font-size: 14px;
+				line-height: 1.45;
+				-webkit-font-smoothing: antialiased;
+			}
+			.mono {
+				font-family: 'Space Mono', ui-monospace, monospace;
+			}
+			.eyebrow {
+				font-family: 'Space Mono', ui-monospace, monospace;
+				font-size: 10.5px;
+				letter-spacing: 0.14em;
+				text-transform: uppercase;
+				color: var(--muted-fg);
+			}
+			button {
+				font-family: inherit;
+				cursor: pointer;
+			}
+
+			/* ---------- app frame ---------- */
+			.app {
+				display: flex;
+				flex-direction: column;
+				height: 100vh;
+			}
+
+			.protobar {
+				display: flex;
+				align-items: center;
+				gap: 14px;
+				padding: 6px 16px;
+				background: var(--line);
+				color: var(--bg);
+				font-family: 'Space Mono', monospace;
+				font-size: 11px;
+				letter-spacing: 0.08em;
+			}
+			.protobar .seg {
+				margin-left: auto;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+			.protobar .switch {
+				display: inline-flex;
+				border: 1.5px solid var(--bg);
+			}
+			.protobar .switch button {
+				background: transparent;
+				color: var(--bg);
+				border: 0;
+				padding: 3px 10px;
+				font-family: inherit;
+				font-size: 11px;
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+			}
+			.protobar .switch button[aria-pressed='true'] {
+				background: var(--bg);
+				color: var(--line);
+				font-weight: 700;
+			}
+
+			.toolbar {
+				display: flex;
+				align-items: center;
+				gap: 14px;
+				padding: 12px 20px;
+				border-bottom: 2px solid var(--line);
+				background: var(--bg);
+			}
+			.brand {
+				display: flex;
+				align-items: center;
+				gap: 9px;
+				font-weight: 700;
+				letter-spacing: -0.01em;
+			}
+			.brand .mark {
+				width: 26px;
+				height: 26px;
+				border: 2px solid var(--line);
+				display: grid;
+				place-items: center;
+				background: var(--card);
+				box-shadow: var(--shadow-sm);
+				font-size: 13px;
+			}
+			.brand b {
+				color: var(--accent);
+			}
+			.cvname {
+				display: flex;
+				flex-direction: column;
+				gap: 1px;
+				margin-left: 6px;
+				padding-left: 16px;
+				border-left: 2px solid var(--hair);
+			}
+			.cvname input {
+				font-family: inherit;
+				font-weight: 700;
+				font-size: 15px;
+				border: 0;
+				background: transparent;
+				color: var(--fg);
+				padding: 2px 4px;
+				margin-left: -4px;
+				border-radius: var(--radius);
+			}
+			.cvname input:hover {
+				background: var(--muted);
+			}
+			.cvname input:focus {
+				outline: 2px solid var(--accent);
+			}
+			.cvname .save {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				color: var(--muted-fg);
+				font-size: 11px;
+			}
+			.dot {
+				width: 7px;
+				height: 7px;
+				border-radius: 50%;
+				background: oklch(0.65 0.17 150);
+			}
+			.tb-spacer {
+				flex: 1;
+			}
+			.btn {
+				display: inline-flex;
+				align-items: center;
+				gap: 7px;
+				border: 2px solid var(--line);
+				background: var(--card);
+				color: var(--fg);
+				padding: 7px 13px;
+				font-weight: 600;
+				font-size: 13px;
+				border-radius: var(--radius);
+				box-shadow: var(--shadow-sm);
+				transition:
+					transform 0.12s ease,
+					box-shadow 0.12s ease;
+			}
+			.btn:hover {
+				transform: translate(-1px, -1px);
+				box-shadow: var(--shadow);
+			}
+			.btn:active {
+				transform: translate(0, 0);
+				box-shadow: var(--shadow-sm);
+			}
+			.btn.primary {
+				background: var(--accent);
+				color: var(--accent-fg);
+			}
+			.btn .ic {
+				width: 15px;
+				height: 15px;
+				stroke: currentColor;
+				fill: none;
+				stroke-width: 2;
+			}
+			.badge {
+				background: var(--accent);
+				color: var(--accent-fg);
+				font-family: 'Space Mono', monospace;
+				font-size: 10px;
+				padding: 1px 6px;
+				border: 1.5px solid var(--line);
+				margin-left: 4px;
+			}
+
+			/* ---------- body split ---------- */
+			.split {
+				display: flex;
+				flex: 1;
+				min-height: 0;
+			}
+			.editor {
+				width: 600px;
+				flex-shrink: 0;
+				display: flex;
+				flex-direction: column;
+				min-height: 0;
+				border-right: 2px solid var(--line);
+			}
+
+			/* tabs */
+			.tabs {
+				display: flex;
+				gap: 0;
+				padding: 14px 20px 0;
+				background: var(--bg);
+			}
+			.tab {
+				border: 2px solid var(--line);
+				border-bottom: 0;
+				background: var(--muted);
+				color: var(--muted-fg);
+				font-weight: 700;
+				font-size: 13px;
+				letter-spacing: 0.02em;
+				padding: 9px 18px;
+				border-radius: var(--radius) var(--radius) 0 0;
+				margin-right: 6px;
+				display: inline-flex;
+				gap: 8px;
+				align-items: center;
+				position: relative;
+				top: 2px;
+			}
+			.tab[aria-selected='true'] {
+				background: var(--card);
+				color: var(--fg);
+				top: 0;
+				box-shadow: 0 -3px 0 0 var(--accent) inset;
+			}
+			.tab .ic {
+				width: 15px;
+				height: 15px;
+				stroke: currentColor;
+				fill: none;
+				stroke-width: 2;
+			}
+			.panel {
+				flex: 1;
+				overflow-y: auto;
+				border-top: 2px solid var(--line);
+				padding: 20px;
+				display: flex;
+				flex-direction: column;
+				gap: 16px;
+			}
+			.panel[hidden] {
+				display: none;
+			}
+			.panel::-webkit-scrollbar {
+				width: 10px;
+			}
+			.panel::-webkit-scrollbar-thumb {
+				background: var(--secondary);
+				border: 2px solid var(--bg);
+			}
+
+			/* ---------- section card ---------- */
+			.section {
+				background: var(--card);
+				border: 2px solid var(--line);
+				border-radius: var(--radius);
+				box-shadow: var(--shadow);
+			}
+			.sec-head {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				padding: 12px 14px;
+				border-bottom: 2px solid var(--hair);
+			}
+			.grip {
+				color: var(--muted-fg);
+				cursor: grab;
+				display: inline-flex;
+				width: 16px;
+				justify-content: center;
+			}
+			.grip svg {
+				width: 14px;
+				height: 14px;
+				fill: currentColor;
+			}
+			.sec-title {
+				font-weight: 700;
+				font-size: 12px;
+				letter-spacing: 0.12em;
+				text-transform: uppercase;
+			}
+			.sec-count {
+				font-family: 'Space Mono', monospace;
+				font-size: 10px;
+				color: var(--muted-fg);
+				border: 1.5px solid var(--hair);
+				padding: 0 5px;
+				border-radius: 999px;
+			}
+			.sec-actions {
+				margin-left: auto;
+				display: flex;
+				align-items: center;
+				gap: 2px;
+			}
+			.iconbtn {
+				border: 0;
+				background: transparent;
+				color: var(--muted-fg);
+				width: 28px;
+				height: 28px;
+				display: grid;
+				place-items: center;
+				border-radius: var(--radius);
+			}
+			.iconbtn:hover {
+				background: var(--muted);
+				color: var(--fg);
+			}
+			.iconbtn.danger:hover {
+				color: var(--destructive);
+			}
+			.iconbtn svg {
+				width: 16px;
+				height: 16px;
+				stroke: currentColor;
+				fill: none;
+				stroke-width: 2;
+			}
+			.sec-body {
+				padding: 6px 16px 14px;
+			}
+			.fixed-pill {
+				font-family: 'Space Mono', monospace;
+				font-size: 9.5px;
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+				color: var(--muted-fg);
+				border: 1.5px dashed var(--hair);
+				padding: 1px 6px;
+			}
+
+			/* fields: subtitle + shallow, no nested cards */
+			.field {
+				padding: 10px 0;
+			}
+			.field + .field {
+				border-top: 1px solid var(--hair);
+			}
+			.sublabel {
+				font-family: 'Space Mono', monospace;
+				font-size: 10px;
+				letter-spacing: 0.1em;
+				text-transform: uppercase;
+				color: var(--muted-fg);
+				margin-bottom: 6px;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+			.inp {
+				width: 100%;
+				border: 0;
+				border-bottom: 1.5px solid var(--hair);
+				background: transparent;
+				font-family: inherit;
+				font-size: 14px;
+				color: var(--fg);
+				padding: 5px 2px;
+			}
+			.inp::placeholder {
+				color: oklch(0.6 0.02 258);
+			}
+			.inp:focus {
+				outline: 0;
+				border-bottom-color: var(--accent);
+			}
+			.inp.big {
+				font-size: 22px;
+				font-weight: 700;
+			}
+			.inp.mid {
+				font-size: 16px;
+				color: var(--muted-fg);
+			}
+			.row {
+				display: flex;
+				gap: 12px;
+			}
+			.row > * {
+				flex: 1;
+			}
+
+			/* repeating entries — flattened, separated by hairline OR whitespace */
+			.entries {
+				display: flex;
+				flex-direction: column;
+			}
+			.entry {
+				padding: 14px 0 14px 0;
+				position: relative;
+			}
+			.entry.current {
+				padding-left: 12px;
+				box-shadow: inset 3px 0 0 0 var(--accent);
+			}
+			.entry-head {
+				display: flex;
+				align-items: baseline;
+				gap: 8px;
+			}
+			.entry-title {
+				font-weight: 700;
+				font-size: 15px;
+			}
+			.entry-sep {
+				color: var(--muted-fg);
+			}
+			.entry-role {
+				color: var(--muted-fg);
+				font-size: 14px;
+			}
+			.entry-tools {
+				margin-left: auto;
+				display: flex;
+				gap: 2px;
+				opacity: 0;
+				transition: opacity 0.12s;
+			}
+			.entry:hover .entry-tools {
+				opacity: 1;
+			}
+			.entry-meta {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				margin-top: 4px;
+				color: var(--muted-fg);
+				font-size: 12.5px;
+				font-family: 'Space Mono', monospace;
+			}
+			.pill-toggle {
+				border: 1.5px solid var(--line);
+				display: inline-flex;
+				border-radius: var(--radius);
+				overflow: hidden;
+				margin-left: auto;
+			}
+			.pill-toggle button {
+				border: 0;
+				background: var(--card);
+				color: var(--muted-fg);
+				font-family: 'Space Mono', monospace;
+				font-size: 10px;
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+				padding: 3px 9px;
+			}
+			.pill-toggle button[aria-pressed='true'] {
+				background: var(--accent);
+				color: var(--accent-fg);
+				font-weight: 700;
+			}
+			.bullets {
+				margin: 8px 0 0;
+				padding: 0;
+				list-style: none;
+				display: flex;
+				flex-direction: column;
+				gap: 4px;
+			}
+			.bullets li {
+				display: flex;
+				gap: 8px;
+				align-items: flex-start;
+			}
+			.bullets li::before {
+				content: '▪';
+				color: var(--accent);
+				font-size: 11px;
+				line-height: 1.5;
+			}
+			.bullets li span {
+				flex: 1;
+			}
+			.chips {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 6px;
+				margin-top: 9px;
+			}
+			.chip {
+				border: 1.5px solid var(--hair);
+				background: var(--muted);
+				font-size: 12px;
+				padding: 2px 9px;
+				border-radius: 999px;
+				display: inline-flex;
+				gap: 6px;
+				align-items: center;
+			}
+			.chip .x {
+				color: var(--muted-fg);
+			}
+			.chip.add {
+				background: transparent;
+				border-style: dashed;
+				color: var(--muted-fg);
+			}
+			.addrow {
+				margin-top: 12px;
+			}
+			.addbtn {
+				display: inline-flex;
+				align-items: center;
+				gap: 7px;
+				border: 1.5px solid var(--line);
+				background: var(--card);
+				color: var(--fg);
+				padding: 6px 12px;
+				font-weight: 600;
+				font-size: 12.5px;
+				border-radius: var(--radius);
+			}
+			.addbtn:hover {
+				background: var(--muted);
+			}
+
+			/* separation variants */
+			body[data-sep='hairline'] .entry + .entry {
+				border-top: 1.5px solid var(--hair);
+			}
+			body[data-sep='whitespace'] .entry {
+				padding-top: 20px;
+				padding-bottom: 4px;
+			}
+
+			/* "add more sections" tray */
+			.tray {
+				border: 2px dashed var(--hair);
+				border-radius: var(--radius);
+				padding: 14px 16px;
+				background: transparent;
+			}
+			.tray .eyebrow {
+				margin-bottom: 10px;
+			}
+			.tray .chips .chip {
+				cursor: pointer;
+				background: var(--card);
+			}
+			.tray .chips .chip:hover {
+				border-color: var(--accent);
+				color: var(--accent);
+			}
+
+			/* ---------- Look tab ---------- */
+			.lookgroup {
+				background: var(--card);
+				border: 2px solid var(--line);
+				border-radius: var(--radius);
+				box-shadow: var(--shadow);
+				padding: 14px 16px;
+			}
+			.lookgroup > .eyebrow {
+				margin-bottom: 12px;
+			}
+			.tmpl-grid {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 10px;
+			}
+			.tmpl {
+				border: 2px solid var(--line);
+				border-radius: var(--radius);
+				padding: 8px;
+				background: var(--bg);
+				text-align: left;
+				display: flex;
+				flex-direction: column;
+				gap: 7px;
+			}
+			.tmpl[aria-pressed='true'] {
+				box-shadow: var(--shadow-sm);
+				outline: 2px solid var(--accent);
+			}
+			.tmpl .mini {
+				height: 64px;
+				background: var(--card);
+				border: 1.5px solid var(--hair);
+				padding: 6px;
+				display: flex;
+				flex-direction: column;
+				gap: 3px;
+			}
+			.tmpl .mini i {
+				display: block;
+				height: 3px;
+				background: var(--hair);
+				border-radius: 2px;
+			}
+			.tmpl .mini .h {
+				height: 6px;
+				width: 60%;
+				background: var(--pv-accent);
+			}
+			.tmpl .name {
+				font-weight: 700;
+				font-size: 12.5px;
+			}
+			.tmpl.soon {
+				opacity: 0.55;
+			}
+			.tmpl.soon .tag {
+				font-family: 'Space Mono', monospace;
+				font-size: 9px;
+				color: var(--muted-fg);
+			}
+
+			.presets {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 8px;
+			}
+			.preset {
+				border: 2px solid var(--line);
+				border-radius: var(--radius);
+				padding: 7px 9px;
+				background: var(--card);
+				display: flex;
+				align-items: center;
+				gap: 9px;
+				font-weight: 600;
+				font-size: 12px;
+			}
+			.preset[aria-pressed='true'] {
+				outline: 2px solid var(--accent);
+				box-shadow: var(--shadow-sm);
+			}
+			.swatches {
+				display: inline-flex;
+			}
+			.swatches i {
+				width: 13px;
+				height: 18px;
+				border: 1.5px solid var(--line);
+			}
+			.swatches i + i {
+				margin-left: -1.5px;
+			}
+			.disclosure {
+				margin-top: 12px;
+				border-top: 1.5px solid var(--hair);
+				padding-top: 12px;
+			}
+			.disclosure summary {
+				cursor: pointer;
+				font-weight: 600;
+				font-size: 12.5px;
+				color: var(--muted-fg);
+				list-style: none;
+				display: flex;
+				align-items: center;
+				gap: 7px;
+			}
+			.disclosure summary::-webkit-details-marker {
+				display: none;
+			}
+			.color-rows {
+				margin-top: 12px;
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+			}
+			.color-row {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+			}
+			.color-row label {
+				font-size: 12.5px;
+				font-weight: 600;
+				width: 70px;
+			}
+			.color-row .hex {
+				font-family: 'Space Mono', monospace;
+				font-size: 11px;
+				color: var(--muted-fg);
+			}
+			.color-row input[type='color'] {
+				width: 34px;
+				height: 26px;
+				border: 2px solid var(--line);
+				padding: 0;
+				background: none;
+				border-radius: var(--radius);
+			}
+			.color-row .derived {
+				margin-left: auto;
+				font-family: 'Space Mono', monospace;
+				font-size: 10px;
+				color: var(--muted-fg);
+			}
+
+			.segmented {
+				display: inline-flex;
+				border: 2px solid var(--line);
+				border-radius: var(--radius);
+				overflow: hidden;
+				width: 100%;
+			}
+			.segmented button {
+				flex: 1;
+				border: 0;
+				background: var(--card);
+				color: var(--muted-fg);
+				font-weight: 600;
+				font-size: 12.5px;
+				padding: 8px 6px;
+			}
+			.segmented button + button {
+				border-left: 2px solid var(--line);
+			}
+			.segmented button[aria-pressed='true'] {
+				background: var(--accent);
+				color: var(--accent-fg);
+			}
+			.fontseg button {
+				font-size: 13px;
+			}
+			.help {
+				font-size: 11.5px;
+				color: var(--muted-fg);
+				margin-top: 9px;
+				line-height: 1.4;
+			}
+
+			/* ---------- preview ---------- */
+			.preview {
+				flex: 1;
+				min-width: 0;
+				background: oklch(0.9 0.012 255);
+				display: flex;
+				flex-direction: column;
+			}
+			.pv-bar {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				padding: 10px 18px;
+				border-bottom: 2px solid var(--line);
+				background: var(--bg);
+			}
+			.pv-bar .eyebrow {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+			.pv-zoom {
+				margin-left: auto;
+				display: inline-flex;
+				border: 1.5px solid var(--line);
+				border-radius: var(--radius);
+			}
+			.pv-zoom button {
+				border: 0;
+				background: var(--card);
+				width: 30px;
+				height: 26px;
+			}
+			.pv-zoom span {
+				display: inline-grid;
+				place-items: center;
+				padding: 0 10px;
+				font-family: 'Space Mono', monospace;
+				font-size: 11px;
+				border-left: 1.5px solid var(--line);
+				border-right: 1.5px solid var(--line);
+			}
+			.pv-scroll {
+				flex: 1;
+				overflow: auto;
+				display: grid;
+				place-items: start center;
+				padding: 28px;
+			}
+			.page {
+				width: 480px;
+				min-height: 678px;
+				background: var(--pv-surface);
+				border: 2px solid var(--line);
+				box-shadow: var(--shadow);
+				padding: 40px 42px;
+				color: var(--pv-text);
+				font-size: 11px;
+				line-height: 1.5;
+			}
+			.page h1 {
+				font-size: 25px;
+				margin: 0;
+				letter-spacing: -0.01em;
+			}
+			.page .role {
+				color: var(--pv-muted);
+				font-size: 13px;
+				margin: 2px 0 7px;
+			}
+			.page .contacts {
+				color: var(--pv-muted);
+				font-size: 10px;
+				border-bottom: 1.5px solid var(--pv-accent);
+				padding-bottom: 12px;
+				margin-bottom: 14px;
+			}
+			.page h2 {
+				font-size: 11px;
+				text-transform: uppercase;
+				letter-spacing: 0.1em;
+				color: var(--pv-accent);
+				margin: 16px 0 3px;
+				padding-bottom: 3px;
+				border-bottom: 1px solid var(--pv-accent);
+			}
+			.page .je {
+				display: flex;
+				justify-content: space-between;
+				font-weight: 700;
+				font-size: 11.5px;
+				margin-top: 8px;
+			}
+			.page .je .d {
+				color: var(--pv-muted);
+				font-weight: 400;
+				font-family: 'Space Mono', monospace;
+				font-size: 9.5px;
+			}
+			.page ul {
+				margin: 4px 0 0;
+				padding-left: 15px;
+			}
+			.page .tags {
+				color: var(--pv-muted);
+				font-style: italic;
+				font-size: 10px;
+				margin-top: 3px;
+			}
+			.page .serif {
+			}
+			body[data-font='serif'] .page {
+				font-family: 'Source Serif 4', Georgia, serif;
+			}
+			body[data-font='serif'] .page h1,
+			body[data-font='serif'] .page h2 {
+				font-family: 'Source Serif 4', Georgia, serif;
+			}
+		</style>
+	</head>
+	<body data-sep="hairline" data-tab="content" data-font="sans">
+		<div class="app">
+			<!-- prototype chrome -->
+			<div class="protobar">
+				<span>◆ PROTOTYPE · editor design exploration · not wired to data</span>
+				<div class="seg">
+					<span>Entry separation</span>
+					<div class="switch" id="sepSwitch">
+						<button data-sep="hairline" aria-pressed="true">Hairline</button>
+						<button data-sep="whitespace" aria-pressed="false">Whitespace</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- toolbar -->
+			<div class="toolbar">
+				<div class="brand">
+					<span class="mark mono">H</span>
+					<span>Humble<b>Hire</b></span>
+				</div>
+				<div class="cvname">
+					<input value="Dummy — Dwight Schrute" aria-label="CV name" />
+					<span class="save"><span class="dot"></span> saved · just now</span>
+				</div>
+				<div class="tb-spacer"></div>
+				<button class="btn">
+					<svg class="ic" viewBox="0 0 24 24">
+						<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+					</svg>
+					Export PDF
+				</button>
+				<button class="btn">
+					<svg class="ic" viewBox="0 0 24 24">
+						<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" />
+						<circle cx="12" cy="12" r="3" />
+					</svg>
+					Preview
+				</button>
+				<button class="btn primary">
+					<svg class="ic" viewBox="0 0 24 24">
+						<path d="M21 2v6h-6M3 22v-6h6M21 8a9 9 0 0 0-15-3M3 16a9 9 0 0 0 15 3" />
+					</svg>
+					Sync <span class="badge">2</span>
+				</button>
+			</div>
+
+			<!-- split -->
+			<div class="split">
+				<!-- left editor -->
+				<div class="editor">
+					<div class="tabs" role="tablist">
+						<button class="tab" role="tab" aria-selected="true" data-tab="content">
+							<svg class="ic" viewBox="0 0 24 24">
+								<path d="M4 6h16M4 12h16M4 18h10" />
+							</svg>
+							Content
+						</button>
+						<button class="tab" role="tab" aria-selected="false" data-tab="look">
+							<svg class="ic" viewBox="0 0 24 24">
+								<circle cx="13.5" cy="6.5" r="2.5" />
+								<circle cx="17.5" cy="10.5" r="2.5" />
+								<circle cx="8.5" cy="7.5" r="2.5" />
+								<circle cx="6.5" cy="12.5" r="2.5" />
+								<path
+									d="M12 2a10 10 0 1 0 0 20 2 2 0 0 0 0-4 2 2 0 0 1 0-4h2a6 6 0 0 0 6-6 10 10 0 0 0-8-6Z"
+								/>
+							</svg>
+							Look
+						</button>
+					</div>
+
+					<!-- CONTENT PANEL -->
+					<div class="panel" data-panel="content">
+						<!-- Header (fixed) -->
+						<div class="section">
+							<div class="sec-head">
+								<span class="grip" title="Header is always first"
+									><svg viewBox="0 0 24 24">
+										<circle cx="9" cy="6" r="1.6" />
+										<circle cx="9" cy="12" r="1.6" />
+										<circle cx="9" cy="18" r="1.6" />
+										<circle cx="15" cy="6" r="1.6" />
+										<circle cx="15" cy="12" r="1.6" />
+										<circle cx="15" cy="18" r="1.6" /></svg
+								></span>
+								<span class="sec-title">Header</span>
+								<span class="fixed-pill">always first</span>
+								<div class="sec-actions">
+									<button class="iconbtn" title="Collapse">
+										<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
+									</button>
+								</div>
+							</div>
+							<div class="sec-body">
+								<div class="field">
+									<input class="inp big" value="Dwight K. Schrute" placeholder="Your full name" />
+								</div>
+								<div class="field">
+									<input
+										class="inp mid"
+										value="Assistant Regional Manager"
+										placeholder="Position / job title"
+									/>
+								</div>
+								<div class="row">
+									<div class="field">
+										<div class="sublabel">
+											Location
+											<button class="iconbtn" title="Hide on CV" style="width: 20px; height: 20px">
+												<svg viewBox="0 0 24 24">
+													<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" />
+													<circle cx="12" cy="12" r="3" />
+												</svg>
+											</button>
+										</div>
+										<input class="inp" value="Scranton, PA" placeholder="City, Country" />
+									</div>
+									<div class="field">
+										<div class="sublabel">
+											Photo
+											<span class="fixed-pill" style="border-style: solid">hidden</span>
+										</div>
+										<input class="inp" value="" placeholder="Image URL (optional)" />
+									</div>
+								</div>
+								<div class="field">
+									<div class="sublabel">Contacts</div>
+									<div class="row">
+										<input class="inp" value="dwight@schrutefarms.com" placeholder="Email" />
+										<input class="inp" value="+1 570 555 0147" placeholder="Phone" />
+									</div>
+									<div class="chips" style="margin-top: 12px">
+										<span class="chip">LinkedIn · /in/dwight <span class="x">×</span></span>
+										<span class="chip">Website · schrutefarms.com <span class="x">×</span></span>
+										<span class="chip add">+ Add profile</span>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Summary -->
+						<div class="section">
+							<div class="sec-head">
+								<span class="grip"
+									><svg viewBox="0 0 24 24">
+										<circle cx="9" cy="6" r="1.6" />
+										<circle cx="9" cy="12" r="1.6" />
+										<circle cx="9" cy="18" r="1.6" />
+										<circle cx="15" cy="6" r="1.6" />
+										<circle cx="15" cy="12" r="1.6" />
+										<circle cx="15" cy="18" r="1.6" /></svg
+								></span>
+								<span class="sec-title">Summary</span>
+								<div class="sec-actions">
+									<button class="iconbtn" title="Hide section">
+										<svg viewBox="0 0 24 24">
+											<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" />
+											<circle cx="12" cy="12" r="3" />
+										</svg>
+									</button>
+									<button class="iconbtn" title="Collapse">
+										<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
+									</button>
+								</div>
+							</div>
+							<div class="sec-body">
+								<ul class="bullets">
+									<li>
+										<span>Top-selling salesman at Dunder Mifflin, six years running.</span>
+									</li>
+									<li>
+										<span>Owner-operator of a 60-acre beet farm and agritourism destination.</span>
+									</li>
+									<li><span>Certified in emergency response, defense, and surveillance.</span></li>
+								</ul>
+								<div class="addrow">
+									<button class="addbtn">+ Add highlight</button>
+								</div>
+							</div>
+						</div>
+
+						<!-- Experience -->
+						<div class="section">
+							<div class="sec-head">
+								<span class="grip"
+									><svg viewBox="0 0 24 24">
+										<circle cx="9" cy="6" r="1.6" />
+										<circle cx="9" cy="12" r="1.6" />
+										<circle cx="9" cy="18" r="1.6" />
+										<circle cx="15" cy="6" r="1.6" />
+										<circle cx="15" cy="12" r="1.6" />
+										<circle cx="15" cy="18" r="1.6" /></svg
+								></span>
+								<span class="sec-title">Experience</span>
+								<span class="sec-count">2</span>
+								<div class="sec-actions">
+									<button class="iconbtn" title="Hide section">
+										<svg viewBox="0 0 24 24">
+											<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" />
+											<circle cx="12" cy="12" r="3" />
+										</svg>
+									</button>
+									<button class="iconbtn" title="Collapse">
+										<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
+									</button>
+								</div>
+							</div>
+							<div class="sec-body">
+								<div class="entries">
+									<!-- current entry: accent rail -->
+									<div class="entry current">
+										<div class="entry-head">
+											<span class="entry-title">Dunder Mifflin</span>
+											<span class="entry-sep">—</span>
+											<span class="entry-role">Assistant Regional Manager</span>
+											<div class="entry-tools">
+												<button class="iconbtn" title="Hide entry">
+													<svg viewBox="0 0 24 24">
+														<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" />
+														<circle cx="12" cy="12" r="3" />
+													</svg>
+												</button>
+												<button class="iconbtn danger" title="Delete entry">
+													<svg viewBox="0 0 24 24">
+														<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14" />
+													</svg>
+												</button>
+											</div>
+										</div>
+										<div class="entry-meta">
+											<span>Apr 2005 — Present</span>
+											<span>· Scranton, PA</span>
+											<div class="pill-toggle">
+												<button aria-pressed="false">Past</button>
+												<button aria-pressed="true">Current</button>
+											</div>
+										</div>
+										<ul class="bullets">
+											<li><span>Closed the most paper sales in the Northeast region.</span></li>
+											<li><span>Trained junior salesmen and ran the safety committee.</span></li>
+										</ul>
+										<div class="chips">
+											<span class="chip">Sales <span class="x">×</span></span>
+											<span class="chip">Cold-calling <span class="x">×</span></span>
+											<span class="chip">Logistics <span class="x">×</span></span>
+											<span class="chip add">+ keyword</span>
+										</div>
+									</div>
+									<!-- past entry -->
+									<div class="entry">
+										<div class="entry-head">
+											<span class="entry-title">Vance Refrigeration</span>
+											<span class="entry-sep">—</span>
+											<span class="entry-role">Sales (part-time)</span>
+											<div class="entry-tools">
+												<button class="iconbtn" title="Hide entry">
+													<svg viewBox="0 0 24 24">
+														<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" />
+														<circle cx="12" cy="12" r="3" />
+													</svg>
+												</button>
+												<button class="iconbtn danger" title="Delete entry">
+													<svg viewBox="0 0 24 24">
+														<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14" />
+													</svg>
+												</button>
+											</div>
+										</div>
+										<div class="entry-meta">
+											<span>2007 — 2009</span>
+											<div class="pill-toggle">
+												<button aria-pressed="true">Past</button>
+												<button aria-pressed="false">Current</button>
+											</div>
+										</div>
+										<ul class="bullets">
+											<li><span>Sold refrigeration units to local businesses.</span></li>
+										</ul>
+									</div>
+								</div>
+								<div class="addrow"><button class="addbtn">+ Add experience</button></div>
+							</div>
+						</div>
+
+						<!-- Skills -->
+						<div class="section">
+							<div class="sec-head">
+								<span class="grip"
+									><svg viewBox="0 0 24 24">
+										<circle cx="9" cy="6" r="1.6" />
+										<circle cx="9" cy="12" r="1.6" />
+										<circle cx="9" cy="18" r="1.6" />
+										<circle cx="15" cy="6" r="1.6" />
+										<circle cx="15" cy="12" r="1.6" />
+										<circle cx="15" cy="18" r="1.6" /></svg
+								></span>
+								<span class="sec-title">Skills</span>
+								<span class="sec-count">2</span>
+								<div class="sec-actions">
+									<button class="iconbtn" title="Hide section">
+										<svg viewBox="0 0 24 24">
+											<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" />
+											<circle cx="12" cy="12" r="3" />
+										</svg>
+									</button>
+									<button class="iconbtn" title="Collapse">
+										<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
+									</button>
+								</div>
+							</div>
+							<div class="sec-body">
+								<div class="entries">
+									<div class="entry">
+										<div class="entry-head">
+											<span class="entry-title" style="font-size: 14px">Sales & Office</span>
+											<div class="entry-tools">
+												<button class="iconbtn danger" title="Delete category">
+													<svg viewBox="0 0 24 24">
+														<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14" />
+													</svg>
+												</button>
+											</div>
+										</div>
+										<div class="chips">
+											<span class="chip">Salesmanship <span class="x">×</span></span>
+											<span class="chip">Microsoft Excel <span class="x">×</span></span>
+											<span class="chip">Negotiation <span class="x">×</span></span>
+											<span class="chip add">+ skill</span>
+										</div>
+									</div>
+									<div class="entry">
+										<div class="entry-head">
+											<span class="entry-title" style="font-size: 14px">Survival & Defense</span>
+											<div class="entry-tools">
+												<button class="iconbtn danger" title="Delete category">
+													<svg viewBox="0 0 24 24">
+														<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14" />
+													</svg>
+												</button>
+											</div>
+										</div>
+										<div class="chips">
+											<span class="chip">Krav Maga <span class="x">×</span></span>
+											<span class="chip">Beet farming <span class="x">×</span></span>
+											<span class="chip add">+ skill</span>
+										</div>
+									</div>
+								</div>
+								<div class="addrow"><button class="addbtn">+ Add category</button></div>
+							</div>
+						</div>
+
+						<!-- Add more sections tray -->
+						<div class="tray">
+							<div class="eyebrow">↳ Add a section</div>
+							<div class="chips">
+								<span class="chip">+ Education</span>
+								<span class="chip">+ Projects</span>
+								<span class="chip">+ Volunteer</span>
+								<span class="chip">+ Awards</span>
+								<span class="chip">+ Certificates</span>
+								<span class="chip">+ Publications</span>
+								<span class="chip">+ Languages</span>
+								<span class="chip">+ Interests</span>
+								<span class="chip">+ References</span>
+							</div>
+						</div>
+					</div>
+
+					<!-- LOOK PANEL -->
+					<div class="panel" data-panel="look" hidden>
+						<!-- Template -->
+						<div class="lookgroup">
+							<div class="eyebrow">↳ Template</div>
+							<div class="tmpl-grid">
+								<button class="tmpl" aria-pressed="true">
+									<span class="mini"
+										><i class="h"></i><i></i><i></i><i style="width: 70%"></i
+									></span>
+									<span class="name">Classic</span>
+								</button>
+								<button class="tmpl soon">
+									<span class="mini"
+										><i class="h"></i><i></i><i style="width: 80%"></i><i></i
+									></span>
+									<span class="name">Editorial <span class="tag">soon</span></span>
+								</button>
+								<button class="tmpl soon">
+									<span class="mini"><i class="h"></i><i></i><i></i></span>
+									<span class="name">Compact <span class="tag">soon</span></span>
+								</button>
+							</div>
+							<p class="help">
+								v1 templates are single-column. A template owns layout & graphics only.
+							</p>
+						</div>
+
+						<!-- Palette -->
+						<div class="lookgroup">
+							<div class="eyebrow">↳ Palette</div>
+							<div class="presets" id="presets">
+								<button
+									class="preset"
+									aria-pressed="true"
+									data-accent="oklch(0.52 0.16 252)"
+									data-text="oklch(0.18 0.02 262)"
+								>
+									<span class="swatches"
+										><i style="background: oklch(0.52 0.16 252)"></i
+										><i style="background: oklch(0.18 0.02 262)"></i><i style="background: #fff"></i
+									></span>
+									Slate Blue
+								</button>
+								<button
+									class="preset"
+									data-accent="oklch(0.52 0.13 200)"
+									data-text="oklch(0.2 0.02 230)"
+								>
+									<span class="swatches"
+										><i style="background: oklch(0.52 0.13 200)"></i
+										><i style="background: oklch(0.2 0.02 230)"></i><i style="background: #fff"></i
+									></span>
+									Teal
+								</button>
+								<button
+									class="preset"
+									data-accent="oklch(0.5 0.17 25)"
+									data-text="oklch(0.2 0.02 30)"
+								>
+									<span class="swatches"
+										><i style="background: oklch(0.5 0.17 25)"></i
+										><i style="background: oklch(0.2 0.02 30)"></i><i style="background: #fff"></i
+									></span>
+									Brick
+								</button>
+								<button
+									class="preset"
+									data-accent="oklch(0.45 0.13 145)"
+									data-text="oklch(0.2 0.02 150)"
+								>
+									<span class="swatches"
+										><i style="background: oklch(0.45 0.13 145)"></i
+										><i style="background: oklch(0.2 0.02 150)"></i><i style="background: #fff"></i
+									></span>
+									Forest
+								</button>
+								<button
+									class="preset"
+									data-accent="oklch(0.48 0.16 300)"
+									data-text="oklch(0.2 0.02 300)"
+								>
+									<span class="swatches"
+										><i style="background: oklch(0.48 0.16 300)"></i
+										><i style="background: oklch(0.2 0.02 300)"></i><i style="background: #fff"></i
+									></span>
+									Plum
+								</button>
+								<button
+									class="preset"
+									data-accent="oklch(0.32 0.02 260)"
+									data-text="oklch(0.2 0.01 260)"
+								>
+									<span class="swatches"
+										><i style="background: oklch(0.32 0.02 260)"></i
+										><i style="background: oklch(0.2 0.01 260)"></i><i style="background: #fff"></i
+									></span>
+									Mono Ink
+								</button>
+							</div>
+							<details class="disclosure">
+								<summary>
+									<svg
+										class="ic"
+										viewBox="0 0 24 24"
+										style="
+											width: 14px;
+											height: 14px;
+											stroke: currentColor;
+											fill: none;
+											stroke-width: 2;
+										"
+									>
+										<circle cx="13.5" cy="6.5" r="2.5" />
+										<circle cx="6.5" cy="12.5" r="2.5" />
+										<path
+											d="M12 2a10 10 0 1 0 0 20 2 2 0 0 0 0-4 2 2 0 0 1 0-4h2a6 6 0 0 0 6-6 10 10 0 0 0-8-6Z"
+										/>
+									</svg>
+									Advanced — customise colours
+								</summary>
+								<div class="color-rows">
+									<div class="color-row">
+										<input type="color" value="#2c63d4" id="cAccent" />
+										<label>Accent</label>
+										<span class="hex">#2C63D4</span>
+									</div>
+									<div class="color-row">
+										<input type="color" value="#23272f" id="cText" />
+										<label>Text</label>
+										<span class="hex">#23272F</span>
+									</div>
+									<div class="color-row">
+										<input type="color" value="#ffffff" id="cSurface" />
+										<label>Surface</label>
+										<span class="hex">#FFFFFF</span>
+										<span class="derived">single-column · unused</span>
+									</div>
+									<p class="help">
+										Muted text, hairlines & on-accent contrast are derived automatically — you never
+										set them by hand.
+									</p>
+								</div>
+							</details>
+						</div>
+
+						<!-- Font -->
+						<div class="lookgroup">
+							<div class="eyebrow">↳ Font</div>
+							<div class="segmented fontseg" id="fontSeg">
+								<button aria-pressed="true" data-font="sans">Grotesk</button>
+								<button data-font="serif" style="font-family: 'Source Serif 4', serif">
+									Serif
+								</button>
+								<button aria-pressed="false" data-font="sans">Sans</button>
+							</div>
+							<p class="help">
+								Curated, embeddable & ATS-safe. The type scale belongs to the template.
+							</p>
+						</div>
+
+						<!-- Base size -->
+						<div class="lookgroup">
+							<div class="eyebrow">↳ Base size</div>
+							<div class="segmented">
+								<button>Compact</button>
+								<button aria-pressed="true">Normal</button>
+								<button>Large</button>
+							</div>
+							<p class="help">The single most effective one-page-fit lever.</p>
+						</div>
+
+						<!-- Density -->
+						<div class="lookgroup">
+							<div class="eyebrow">↳ Density</div>
+							<div class="segmented">
+								<button>Compact</button>
+								<button aria-pressed="true">Normal</button>
+								<button>Relaxed</button>
+							</div>
+							<p class="help">Drives page margins and vertical spacing together.</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- preview -->
+				<div class="preview">
+					<div class="pv-bar">
+						<span class="eyebrow"
+							><span class="dot" style="background: var(--accent)"></span> Live preview ·
+							Classic</span
+						>
+						<div class="pv-zoom"><button>−</button><span>100%</span><button>+</button></div>
+					</div>
+					<div class="pv-scroll">
+						<div class="page">
+							<h1>Dwight K. Schrute</h1>
+							<div class="role">Assistant Regional Manager</div>
+							<div class="contacts">
+								Scranton, PA · dwight@schrutefarms.com · +1 570 555 0147 · /in/dwight
+							</div>
+
+							<h2>Summary</h2>
+							<ul>
+								<li>Top-selling salesman at Dunder Mifflin, six years running.</li>
+								<li>Owner-operator of a 60-acre beet farm and agritourism destination.</li>
+							</ul>
+
+							<h2>Experience</h2>
+							<div class="je">
+								<span>Dunder Mifflin · Assistant Regional Manager</span
+								><span class="d">Apr 2005 — Present</span>
+							</div>
+							<ul>
+								<li>Closed the most paper sales in the Northeast region.</li>
+								<li>Trained junior salesmen and ran the safety committee.</li>
+							</ul>
+							<div class="tags">Sales · Cold-calling · Logistics</div>
+							<div class="je">
+								<span>Vance Refrigeration · Sales</span><span class="d">2007 — 2009</span>
+							</div>
+							<ul>
+								<li>Sold refrigeration units to local businesses.</li>
+							</ul>
+
+							<h2>Skills</h2>
+							<div style="margin-top: 4px">
+								<b>Sales &amp; Office:</b> Salesmanship, Microsoft Excel, Negotiation
+							</div>
+							<div><b>Survival &amp; Defense:</b> Krav Maga, Beet farming</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			const body = document.body;
+
+			// entry separation toggle
+			document.getElementById('sepSwitch').addEventListener('click', (e) => {
+				const btn = e.target.closest('button');
+				if (!btn) return;
+				body.dataset.sep = btn.dataset.sep;
+				document
+					.querySelectorAll('#sepSwitch button')
+					.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+			});
+
+			// content / look tabs
+			document.querySelectorAll('.tab').forEach((tab) => {
+				tab.addEventListener('click', () => {
+					const which = tab.dataset.tab;
+					document
+						.querySelectorAll('.tab')
+						.forEach((t) => t.setAttribute('aria-selected', String(t === tab)));
+					document
+						.querySelectorAll('.panel')
+						.forEach((p) => (p.hidden = p.dataset.panel !== which));
+				});
+			});
+
+			// palette presets drive the preview tokens
+			function applyPalette(accent, text) {
+				document.documentElement.style.setProperty('--pv-accent', accent);
+				if (text) document.documentElement.style.setProperty('--pv-text', text);
+			}
+			document.getElementById('presets').addEventListener('click', (e) => {
+				const btn = e.target.closest('.preset');
+				if (!btn) return;
+				document
+					.querySelectorAll('#presets .preset')
+					.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+				applyPalette(btn.dataset.accent, btn.dataset.text);
+			});
+			// advanced pickers
+			document.getElementById('cAccent').addEventListener('input', (e) => {
+				applyPalette(e.target.value);
+				e.target.nextElementSibling.nextElementSibling.textContent = e.target.value.toUpperCase();
+			});
+
+			// font segmented drives preview font
+			document.getElementById('fontSeg').addEventListener('click', (e) => {
+				const btn = e.target.closest('button');
+				if (!btn) return;
+				document
+					.querySelectorAll('#fontSeg button')
+					.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+				body.dataset.font = btn.dataset.font;
+			});
+
+			// generic segmented controls (base size / density) — visual only
+			document.querySelectorAll('.lookgroup .segmented:not(.fontseg)').forEach((seg) => {
+				seg.addEventListener('click', (e) => {
+					const btn = e.target.closest('button');
+					if (!btn) return;
+					seg
+						.querySelectorAll('button')
+						.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+				});
+			});
+		</script>
+	</body>
+</html>
